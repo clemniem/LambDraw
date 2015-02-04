@@ -2,7 +2,7 @@
 
 --module LoadImage where
 
-
+import Dither
 import Control.Applicative
 import Control.Monad
 import Codec.Picture 
@@ -21,7 +21,6 @@ main :: IO ()
 main = do
     putStrLn "Hallo zu LambDraw!"
     args <- getArgs
-    putStrLn (head args)
     checkArgs args
 
 checkArgs :: [String] -> IO()
@@ -38,9 +37,9 @@ processImage :: FilePath -> FilePath -> IO()
 processImage pathIn pathOut = do
     dynImg <- loadPng pathIn
     dyn2string dynImg
-    safesave pathOut (dyn2rgb8 dynImg)
+    safesave pathOut $ (dyn2rgb8 dynImg)
         where 
-        safesave pOut (Just img) = saveImage pathOut $ ImageRGB8 $ img
+        safesave pOut (Just img) = saveImage pathOut $ ImageRGB8 $ imgConverter 1 img
         safesave _    Nothing    = putStrLn "Fehler bei Bildumwandlung!Falsches Bildformat!"
 
 loadPng :: FilePath -> IO DynamicImage
@@ -52,7 +51,16 @@ saveImage :: FilePath -> DynamicImage -> IO ()
 saveImage name img  = do 
     savePngImage (name ++ ".png") img
     putStrLn "Gespeichert." 
-   
+
+imgConverter :: Int -> Image PixelRGB8 -> Image PixelRGB8
+imgConverter state img@( Image {  imageWidth  = w
+                                , imageHeight = h
+                                , imageData   = arr })
+    | state == 1 = ditherFloydRGB8 cmykPix img  
+    | state == 2 = pixelMapXY dither img
+
+
+imgPls w h = [(x,y)| x <- [0..w-1], y <- [0..h-1]]
 
 dyn2rgb8 :: DynamicImage -> Maybe (Image PixelRGB8)
 dyn2rgb8 (ImageRGB8   img) = Just $ img
@@ -66,9 +74,14 @@ dyn2rgb8 (ImageRGBA16 img) = dyn2rgb8 $ ImageRGB16 $ pixelMap dropTransparency i
 dyn2rgb8 (ImageYCbCr8 img) = Just $ convertImage img
 dyn2rgb8 (ImageCMYK8  img) = Just $ convertImage img
 dyn2rgb8 (ImageCMYK16 img) = dyn2rgb8 $ ImageRGB16 $ convertImage img
-dyn2rgb8 _                 = Nothing
---dyn2rgb8 (ImageRGBF   img) = undefined
+dyn2rgb8 (ImageRGBF   img) = Just $ pixelMap toRGB8 img
 --dyn2rgb8 (ImageYF     img) = undefined
+dyn2rgb8 _                 = Nothing
+
+-- Source: http://hackage.haskell.org/package/JuicyPixels-3.1.5/docs/src/Codec-Picture-ColorQuant.html
+toRGB8 :: PixelRGBF -> PixelRGB8
+toRGB8 (PixelRGBF r g b) =
+  PixelRGB8 (round r) (round g) (round b)
 
 -- Source: http://hackage.haskell.org/package/JuicyPixels-3.2.2/docs/src/Codec-Picture-Saving.html
 from16to8 :: ( PixelBaseComponent source ~ Word16
