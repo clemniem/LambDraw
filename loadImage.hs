@@ -1,7 +1,5 @@
 {-# LANGUAGE TypeFamilies #-}
 
---module LoadImage where
-
 import Dither
 import Control.Applicative
 import Control.Monad
@@ -15,56 +13,21 @@ import Data.Bits( unsafeShiftR )
 import Data.Word( Word8, Word16 )
 import qualified Data.ByteString.Lazy as L
 import qualified Data.Vector.Storable as V
-
-
-main :: IO ()
-main = do
-    putStrLn "Hallo zu LambDraw!"
-    args <- getArgs
-    checkArgs args
-
-checkArgs :: [String] -> IO()
-checkArgs [pathIn,pathOut] = processImage pathIn pathOut
-checkArgs [pathIn] = processImage pathIn "processed" 
-checkArgs _ = hilfstext
-    where 
-    hilfstext :: IO ()
-    hilfstext = do
-      putStrLn "Eingabeformat ist:"
-      putStrLn "<pathIn> <pathOut>"
-
-processImage :: FilePath -> FilePath -> IO()
-processImage pathIn pathOut = do
-    dynImg <- loadPng pathIn
-    dyn2string dynImg
-    safesave pathOut $ (dyn2rgb8 dynImg)
-        where 
-        safesave pOut (Just img) = saveImage pathOut $ ImageRGB8 $ imgConverter 1 img
-        safesave _    Nothing    = putStrLn "Fehler bei Bildumwandlung!Falsches Bildformat!"
-
-loadPng :: FilePath -> IO DynamicImage
-loadPng path = do
-    temp <- readPng path >>= either error return
-    return temp
-
-saveImage :: FilePath -> DynamicImage -> IO ()
-saveImage name img  = do 
-    savePngImage (name ++ ".png") img
-    putStrLn "Gespeichert." 
-
-imgConverter :: Int -> Image PixelRGB8 -> Image PixelRGB8
-imgConverter state img@( Image {  imageWidth  = w
-                                , imageHeight = h
-                                , imageData   = arr })
-    | state == 1 = ditherFloydRGB8 cmykPix img  
-    | state == 2 = pixelMapXY dither img
-
-
-imgPls w h = [(x,y)| x <- [0..w-1], y <- [0..h-1]]
-
+import Data.Int
+import Data.String
+-- DynamicImage to Image PixelRGB8 converter
 dyn2rgb8 :: DynamicImage -> Maybe (Image PixelRGB8)
 dyn2rgb8 (ImageRGB8   img) = Just $ img
-dyn2rgb8 (ImageRGB16  img) = Just $ from16to8 img
+dyn2rgb8 (ImageRGB16  img) = Just $ from16to8' img
+  where
+  -- Source: http://hackage.haskell.org/package/JuicyPixels-3.2.2/docs/src/Codec-Picture-Saving.html
+  from16to8' :: ( PixelBaseComponent source ~ Word16
+                , PixelBaseComponent dest   ~ Word8 )
+            => Image source -> Image dest
+  from16to8' Image { imageWidth = w, imageHeight = h
+                  , imageData = arr } = Image w h transformed
+     where transformed = V.map toWord8 arr
+           toWord8 v = fromIntegral (v `unsafeShiftR` 8)
 dyn2rgb8 (ImageY8     img) = Just $ promoteImage img
 dyn2rgb8 (ImageY16    img) = dyn2rgb8 $ ImageRGB16 $ promoteImage img
 dyn2rgb8 (ImageYA8    img) = Just $ promoteImage $ pixelMap dropTransparency img
@@ -74,24 +37,18 @@ dyn2rgb8 (ImageRGBA16 img) = dyn2rgb8 $ ImageRGB16 $ pixelMap dropTransparency i
 dyn2rgb8 (ImageYCbCr8 img) = Just $ convertImage img
 dyn2rgb8 (ImageCMYK8  img) = Just $ convertImage img
 dyn2rgb8 (ImageCMYK16 img) = dyn2rgb8 $ ImageRGB16 $ convertImage img
-dyn2rgb8 (ImageRGBF   img) = Just $ pixelMap toRGB8 img
+dyn2rgb8 (ImageRGBF   img) = Just $ pixelMap pFtoRGB8 img
+  where
+  -- Source: http://hackage.haskell.org/package/JuicyPixels-3.1.5/docs/src/Codec-Picture-ColorQuant.html
+  pFtoRGB8 :: PixelRGBF -> PixelRGB8
+  pFtoRGB8 (PixelRGBF r g b) =
+    PixelRGB8 (round r) (round g) (round b)
 --dyn2rgb8 (ImageYF     img) = undefined
 dyn2rgb8 _                 = Nothing
 
--- Source: http://hackage.haskell.org/package/JuicyPixels-3.1.5/docs/src/Codec-Picture-ColorQuant.html
-toRGB8 :: PixelRGBF -> PixelRGB8
-toRGB8 (PixelRGBF r g b) =
-  PixelRGB8 (round r) (round g) (round b)
 
--- Source: http://hackage.haskell.org/package/JuicyPixels-3.2.2/docs/src/Codec-Picture-Saving.html
-from16to8 :: ( PixelBaseComponent source ~ Word16
-             , PixelBaseComponent dest ~ Word8 )
-          => Image source -> Image dest
-from16to8 Image { imageWidth = w, imageHeight = h
-                , imageData = arr } = Image w h transformed
-   where transformed = V.map toWord8 arr
-         toWord8 v = fromIntegral (v `unsafeShiftR` 8)
 
+-- for Debugging
 dyn2string :: DynamicImage -> IO()
 dyn2string (ImageY8 d)       = putStrLn "ImageY8"
 dyn2string (ImageY16 d)      = putStrLn "ImageY16"
@@ -106,6 +63,75 @@ dyn2string (ImageRGBA16 d)   = putStrLn "ImageRGBA16"
 dyn2string (ImageYCbCr8 d)   = putStrLn "ImageYCbCr8"
 dyn2string (ImageCMYK8 d)    = putStrLn "ImageCMYK8"
 dyn2string (ImageCMYK16 d)   = putStrLn "ImageCMYK16"
+
+
+main :: IO ()
+main = do
+    putStrLn "Hallo zu LambDraw!"
+    args <- getArgs
+    checkArgs args
+
+main1 :: [String] -> IO()
+main1 args = do
+    putStrLn $ show args
+    checkArgs args
+
+loadPng :: FilePath -> IO DynamicImage
+loadPng path = do
+    temp <- readPng path >>= either error return
+    return temp
+
+
+checkArgs :: [String] -> IO()
+checkArgs [pathIn,pathOut] = do 
+    putStrLn "Choose Option:"
+    putStrLn "1 rgbPallette  Floyd-Steinberg Dither"
+    putStrLn "2 cmykPallette Floyd-Steinberg Dither"
+    putStrLn "3 noDither conversion"  
+    opt <- getLine
+    checkopt $ (read opt :: Int)
+    processImage (read opt :: Int) pathIn pathOut
+    where 
+    checkopt :: Int -> IO()
+    checkopt 1  = putStrLn "Starting rgb  conversion."    -- >>= 1
+    checkopt 2  = putStrLn "Starting cmyk conversion"     -- >>= 2
+    checkopt 3  = putStrLn "Starting noDither conversion" -- >>= 3
+    checkopt _ = do 
+      putStrLn "Wrong Input"
+      checkArgs [pathIn,pathOut] 
+checkArgs _                = hilfstext
+    where 
+    hilfstext :: IO ()
+    hilfstext = do
+      putStrLn "Input needed:"
+      putStrLn "<pathIn.png> <pathOut>"
+      args'  <- getLine
+      main1 $ words args'
+
+
+processImage :: Int -> FilePath -> FilePath -> IO()
+processImage opt pathIn pathOut = do
+    dynImg <- loadPng pathIn
+    dyn2string dynImg -- Debugging Helper
+    safesave pathOut $ (dyn2rgb8 dynImg)
+        where 
+        safesave pOut (Just img) = saveImage pathOut $ ImageRGB8 $ imgConverter opt img
+        safesave _    Nothing    = putStrLn "Error with Image to RGB8 conversion!"
+
+saveImage :: FilePath -> DynamicImage -> IO ()
+saveImage name img  = do 
+    savePngImage (name ++ ".png") img
+    putStrLn "Saved." 
+
+imgConverter :: Int -> Image PixelRGB8 -> Image PixelRGB8
+imgConverter state img@( Image {  imageWidth  = w
+                                , imageHeight = h
+                                , imageData   = arr })
+    | state == 1 = ditherFloydRGB8 rgbPixls img  
+    | state == 2 = ditherFloydRGB8 cmykPixls img  
+    | state == 3 = pixelMap (noDither cmykPixls) img  
+    | otherwise  = pixelMap (noDither rgbPixls)  img  
+
 
 
 

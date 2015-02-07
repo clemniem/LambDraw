@@ -249,7 +249,7 @@ varDrawMax = (drawHeight,drawWidth)
 
 varMinDist = 1500 :: Distance
 -- Help Variables for testing
-pic = generateImage pixelunggrey 100 100 
+pic = generateImage pixelunggrey 10 10 
 varConF = 2
 
 picArray Image {imageData = arr} = arr 
@@ -481,11 +481,37 @@ arrPix p = pToPix $ imgToPoints p (varConF-1) varImgMax
     pToPix []     = []
     pToPix (p:ps) = (uncurry (pixelAt varImg8) p): pToPix ps
 
-
+toVecPos :: Int -> (Point, PixelRGB8) -> [(Int,Word8)]
+toVecPos w ((x,y),(PixelRGB8 r g b)) = [((baseInd + 0),r),((baseInd + 1),g),((baseInd + 2),b)]
+  where baseInd = (x + y * w) * componentCount (undefined :: PixelRGB8)
 
 ------------------------------------Colorquant-------------------------------
 
+-- addWordError :: Int -> Word8 -> Int -> Word8
+-- addWordError fac val err
+--             | res <= 0   = 0
+--             | res >= 255 = 255
+--             | otherwise  = fromIntegral res
+--             where res = fromIntegral val + ((fac*(fromIntegral err) `shiftR` 4))
 
+-- addPixError :: Int -> PixelRGB8 -> PixError -> PixelRGB8
+-- addPixError fact (PixelRGB8 r g b) (PixError x y z) = PixelRGB8 (pixError r x) (pixError g y) (pixError b z)
+--   where 
+--   pixError u v
+--     | res <= 0   = 0
+--     | res >= 255 = 255
+--     | otherwise  = fromIntegral res
+--     where res = fromIntegral u + ((fact*(fromIntegral v) `shiftR` 4))
+
+
+-- getPixCoords :: ImgMax -> ConvFactor -> [Point]
+-- getPixCoords (imx,imy) f = [(x,y) | x <- [0,f..imx-1], y <- [0,f..imy-1]]
+
+
+-- getvarImgMax :: Image PixelRGB8 -> ImgMax
+-- getvarImgMax img = (imageWidth img,imageHeight img)    
+
+-- imgPls w h = [(x,y)| x <- [0..w-1], y <- [0..h-1]]
 
 
 
