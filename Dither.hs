@@ -24,10 +24,11 @@ yellowPix  = PixelRGB8 255 255 0
 magentaPix = PixelRGB8 255 0   255
 cyanPix    = PixelRGB8 0   255 255
 
---
+-- PixelLists for rgb and cmyk
 rgbPixls   = [redPix,greenPix,bluePix,blackPix,whitePix]
 cmykPixls  = [cyanPix,magentaPix,yellowPix,blackPix,whitePix]
 
+-- operation to drop used colors to a list of colors
 noDither :: [PixelRGB8] -> PixelRGB8 -> PixelRGB8
 noDither ls p = colorMinDist p ls
 
@@ -60,10 +61,10 @@ ditherFloydRGB8 ls img@(Image { imageWidth  = w,
             | a >= w    = Nothing
             | b >= h    = Nothing
             | otherwise = Just $ (a + b * w) * compCount
-        -- base of pixel of this instant point (x,y)
+        -- base of pixel of the current point (x,y)
         baseA :: BasID
         baseA = (x + y * w) * compCount
-        -- calculate closest color from palette and pixError for instant pixel
+        -- calculate closest color from palette and pixError for current pixel
         findPix :: [PixelRGB8] -> (PixelRGB8, PixError)
         findPix pxls = (newPix,pixErr)
           where 
@@ -93,7 +94,12 @@ ditherFloydRGB8 ls img@(Image { imageWidth  = w,
                     | otherwise  = fromIntegral res
                     where res = fromIntegral p' + ((fac*(fromIntegral e') `shiftR` 4))
 
-
+calcErr' :: Word8 -> Int -> Int -> Word8
+calcErr' p' e' fac
+        | res <= 0   = 0
+        | res >= 255 = 255
+        | otherwise  = fromIntegral res
+        where res = fromIntegral p' + ((fac*(fromIntegral e') `shiftR` 4))
 
 
 -- calculates the difference between two pixels
@@ -119,6 +125,7 @@ colorMinDist p (x:xs) = colorMinDistAcc p xs ((colorDist8 p x),x)
         where
         dist' = colorDist8 p x 
 
+
 -- calculates perceived color-distance between two pixels
 -- Source for function: http://www.compuphase.com/cmetric.htm
 colorDist8 :: PixelRGB8 -> PixelRGB8 -> Distance
@@ -131,10 +138,13 @@ colorDist8 (PixelRGB8 r1 g1 b1) (PixelRGB8 r2 g2 b2) = sqrt $ (2 + r'/256)   * d
     dg = fromIntegral g1 - fromIntegral g2
     db = fromIntegral b1 - fromIntegral b2
 
-
-
--- check dither branch!! 
-
-
+-- simple euclidian Distance between two pixels
+colorDistEuclid ::  PixelRGB8 -> PixelRGB8 -> Distance
+colorDistEuclid (PixelRGB8 r1 g1 b1) (PixelRGB8 r2 g2 b2) = sqrt $ dr^2  + dg^2 + db^2)
+    where
+    r' = (fromIntegral r1)/2 + (fromIntegral r2)/2
+    dr = fromIntegral r1 - fromIntegral r2
+    dg = fromIntegral g1 - fromIntegral g2
+    db = fromIntegral b1 - fromIntegral b2
 
 
