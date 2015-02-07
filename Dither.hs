@@ -133,7 +133,7 @@ colorDist8 (PixelRGB8 r1 g1 b1) (PixelRGB8 r2 g2 b2) = sqrt $ (2 + r'/256)   * d
 
 
 
-
+-- check dither branch!! 
 
 
 
