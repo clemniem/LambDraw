@@ -1,6 +1,7 @@
 {-# LANGUAGE TypeFamilies #-}
 
 import Dither
+import Resize
 import Control.Applicative
 import Control.Monad
 import Codec.Picture 
@@ -88,6 +89,7 @@ checkArgs [pathIn,pathOut] = do
     putStrLn "1 rgbPallette  Floyd-Steinberg Dither"
     putStrLn "2 cmykPallette Floyd-Steinberg Dither"
     putStrLn "3 noDither conversion"  
+    putStrLn "4 resize"
     opt <- getLine
     checkopt $ (read opt :: Int)
     processImage (read opt :: Int) pathIn pathOut
@@ -96,6 +98,7 @@ checkArgs [pathIn,pathOut] = do
     checkopt 1  = putStrLn "Starting rgb  conversion."    -- >>= 1
     checkopt 2  = putStrLn "Starting cmyk conversion"     -- >>= 2
     checkopt 3  = putStrLn "Starting noDither conversion" -- >>= 3
+    checkopt 4  = putStrLn "Starting to resize to" 
     checkopt _ = do 
       putStrLn "Wrong Input"
       checkArgs [pathIn,pathOut] 
@@ -110,6 +113,17 @@ checkArgs _                = hilfstext
 
 
 processImage :: Int -> FilePath -> FilePath -> IO()
+-- processImage 4 pathIn pathOut   = do 
+--     dynImg <- loadPng pathIn
+--     dyn2string dynImg -- Debugging Helper
+--     putStrLn "Bildgroesse: ("++(print ih) ++ "," ++(print iw) ++ ")"
+--     putStr "Please enter maxBound (is compared to max): "
+--     inVal <- getLine
+--     let dh = read inVal :: Int
+--     safeResize pathOut $ (dyn2rgb8 dynImg)
+--         where 
+--         safeResize pOut (Just img) = saveImage pathOut $ ImageRGB8 $ imgResizer dh img
+--         safeResize _    Nothing    = putStrLn "Error with Image to RGB8 conversion!"
 processImage opt pathIn pathOut = do
     dynImg <- loadPng pathIn
     dyn2string dynImg -- Debugging Helper
@@ -129,10 +143,11 @@ imgConverter state img@( Image {  imageWidth  = w
                                 , imageData   = arr })
     | state == 1 = ditherFloydRGB8 rgbPixls img  
     | state == 2 = ditherFloydRGB8 cmykPixls img  
-    | state == 3 = pixelMap (noDither cmykPixls) img  
+    | state == 3 = pixelMap (noDither cmykPixls) img
+--    | state == 4 = resizeImage rgbPixls img   
     | otherwise  = pixelMap (noDither rgbPixls)  img  
 
-
+-- imgResizer :: Int 
 
 
 
