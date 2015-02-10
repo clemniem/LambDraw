@@ -37,7 +37,7 @@ flAccessor (_,f,_) = f
 distance:: Point -> Point -> Distance
 distance (x1,y1) (x2,y2) = sqrt $ fromIntegral $ (x1-x2)^2 + (y1-y2)^2
 
--- calculates the closest Point from a list to a given Pint. 
+-- calculates the closest Point from a list to a given Point. 
 -- Returns: (closest Point, distance, rest of the list)
 nextPoint :: Point -> [Point] -> (Maybe Point,Distance,[Point])
 nextPoint p [] = (Nothing,0,[])
