@@ -5,7 +5,7 @@ import qualified Data.Vector.Storable as VS
 import           Codec.Picture.Types
 import Control.Monad( foldM, liftM, ap )
 import Control.DeepSeq( NFData( .. ) )
-import Control.Monad.ST (runST)
+import Control.Monad.ST as ST
 import Control.Monad.Primitive ( PrimMonad, PrimState )
 import Foreign.ForeignPtr( castForeignPtr )
 import Foreign.Storable ( Storable )
@@ -168,25 +168,30 @@ ditherST pxls img@(Image { imageWidth  = w,
           destComponentCount = componentCount (undefined :: PixelRGB8)
 
           pixels = runST $ do
+            oldArr <- VS.thaw vec 
             newArr <- M.new (w * h * sourceCompCount)
             let lineMapper _ _ y | y >= h = return ()
                 lineMapper readIdxLine writeIdxLine y = colMapper readIdxLine writeIdxLine 0
                   where colMapper readIdx writeIdx x
                             | x >= w = lineMapper readIdx writeIdx $ y + 1
                             | otherwise = do
-                                unsafeWritePixel newArr writeIdx $ fst findPix
-                                unsafeWritePixel' 7 (baseId (x+1,y  )) $ snd findPix
+                                unsafeWritePixel newArr writeIdx $ newPix
+                                unsafeWritePixel' (7 :: Int) (baseId (x+1,y  )) pixErr
+                                unsafeWritePixel' (3 :: Int) (baseId (x-1,y+1)) pixErr
+                                unsafeWritePixel' (5 :: Int) (baseId (x  ,y+1)) pixErr
+                                unsafeWritePixel' (1 :: Int) (baseId (x+1,y+1)) pixErr
                                 colMapper (readIdx  + sourceCompCount)
                                           (writeIdx + destComponentCount)
                                           (x + 1)
                                     where
                                     -- calculate closest color from palette and pixError for current pixel                                    
-                                    findPix :: (PixelRGB8, PixError)
-                                    findPix = (newPix,pixErr)
-                                      where 
-                                      newPix = colorMinDist oldPix pxls
-                                      oldPix = unsafePixelAt vec readIdx
-                                      pixErr = subtPixel oldPix newPix
+                                    -- findPix :: PrimState m => (m PixelRGB8, m PixError)
+                                    -- newPix = fmap ((flip colorMinDist) pxls) oldPix 
+                                    newPix = colorMinDist oldPix pxls
+                                    oldPix = unsafePixelAt vec readIdx
+                                    pixErr = subtPixel oldPix newPix
+                                    -- oldPix = unsafeReadPixel oldArr readIdx
+                                    -- pixErr = fmap subtPixel oldPix newPix
                                     -- calculate indices where a pixel starts (= base) and check for bounds
                                     baseId :: Point -> Maybe Int
                                     baseId (a,b)
@@ -194,20 +199,24 @@ ditherST pxls img@(Image { imageWidth  = w,
                                         | a >= w    = Nothing
                                         | b >= h    = Nothing
                                         | otherwise = Just $ (a + b * w) * sourceCompCount
+                                    --unsafeWritePixel' :: PrimState m => Int -> Maybe Int -> m PixError -> m ()
                                     unsafeWritePixel' fac Nothing    pe  = return ()
-                                    unsafeWritePixel' fac (Just bas) pe  = unsafeWritePixel newArr bas $ findErrPix fac bas pe
-                                    findErrPix :: Int -> Int -> PixError -> PixelRGB8
-                                    findErrPix fac' bas' pe' = newPix
+                                    unsafeWritePixel' fac (Just bas) pe  = do 
+                                                                              ole  <- unsafeReadPixel oldArr bas
+                                                                              let cp = compwiseErr pe ole
+                                                                              unsafeWritePixel oldArr bas cp
+                                    --findErrPix :: Int -> Int -> PixError -> PixelRGB8
+                                    --findErrPix fac' bas' pe' = newPix
                                       where 
-                                      newPix = compwiseErr pe' oldPix
-                                      oldPix = unsafePixelAt vec bas'
+                                      newPixE = compwiseErr pe oldPixE
+                                      oldPixE = unsafePixelAt vec bas
                                       compwiseErr (PixError r' g' b') (PixelRGB8 r g b) = PixelRGB8 (calcErr r r') (calcErr g g') (calcErr b b')
                                       calcErr :: Pixel8 -> Int -> Pixel8
                                       calcErr p' e'
                                                 | res <= 0   = 0
                                                 | res >= 255 = 255
                                                 | otherwise  = fromIntegral res
-                                                where res = fromIntegral p' + ((fac'*(fromIntegral e') `shiftR` 4))
+                                                where res = fromIntegral p' + ((fac*(fromIntegral e') `shiftR` 4))
 
 
             lineMapper 0 0 0
@@ -215,7 +224,7 @@ ditherST pxls img@(Image { imageWidth  = w,
             -- unsafeFreeze avoids making a second copy and it will be
             -- safe because newArray can't be referenced as a mutable array
             -- outside of this where block
-            VS.unsafeFreeze newArr
+            VS.unsafeFreeze oldArr
 
                                     -- -- calculate indices where a pixel starts (= base) and check for bounds
                                     -- baseId :: Point -> Maybe Int

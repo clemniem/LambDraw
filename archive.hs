@@ -307,7 +307,7 @@ varDrawMax = (drawHeight,drawWidth)
 
 varMinDist = 1500 :: Distance
 -- Help Variables for testing
-pic = generateImage pixelung 125 125 
+pic = generateImage pixelunggrey 50 50 
 varConF = 2
 
 picArray Image {imageData = arr} = arr 
