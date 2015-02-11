@@ -1,3 +1,13 @@
+{-# LANGUAGE MultiParamTypeClasses #-}
+{-# LANGUAGE FlexibleInstances #-}
+{-# LANGUAGE ScopedTypeVariables #-}
+{-# LANGUAGE TypeSynonymInstances #-}
+{-# LANGUAGE FunctionalDependencies #-}
+{-# LANGUAGE TypeFamilies #-}
+{-# LANGUAGE FlexibleContexts #-}
+{-# LANGUAGE Rank2Types #-}
+{-# LANGUAGE CPP #-}
+
 module Dither where 
 
 import           Data.Vector          (Vector, (!))
@@ -169,17 +179,19 @@ ditherST pxls img@(Image { imageWidth  = w,
 
           pixels = runST $ do
             oldArr <- VS.thaw vec 
-            newArr <- M.new (w * h * sourceCompCount)
+            --newArr <- M.new (w * h * sourceCompCount)
             let lineMapper _ _ y | y >= h = return ()
                 lineMapper readIdxLine writeIdxLine y = colMapper readIdxLine writeIdxLine 0
                   where colMapper readIdx writeIdx x
                             | x >= w = lineMapper readIdx writeIdx $ y + 1
                             | otherwise = do
-                                unsafeWritePixel newArr writeIdx $ newPix
-                                unsafeWritePixel' (7 :: Int) (baseId (x+1,y  )) pixErr
-                                unsafeWritePixel' (3 :: Int) (baseId (x-1,y+1)) pixErr
-                                unsafeWritePixel' (5 :: Int) (baseId (x  ,y+1)) pixErr
-                                unsafeWritePixel' (1 :: Int) (baseId (x+1,y+1)) pixErr
+                                (oldPix :: PixelRGB8) <- unsafeReadPixel oldArr readIdx
+                                --(newPix :: PixelRGB8) <- fmap ((flip colorMinDist) pxls) $ return oldPix
+                                unsafeWritePixel oldArr writeIdx $ colorMinDist oldPix pxls                              
+                                --unsafeWritePixel' (7 :: Int) (baseId (x+1,y  )) pixErr
+                                --unsafeWritePixel' (3 :: Int) (baseId (x-1,y+1)) pixErr
+                                --unsafeWritePixel' (5 :: Int) (baseId (x  ,y+1)) pixErr
+                                --unsafeWritePixel' (1 :: Int) (baseId (x+1,y+1)) pixErr
                                 colMapper (readIdx  + sourceCompCount)
                                           (writeIdx + destComponentCount)
                                           (x + 1)
@@ -187,9 +199,9 @@ ditherST pxls img@(Image { imageWidth  = w,
                                     -- calculate closest color from palette and pixError for current pixel                                    
                                     -- findPix :: PrimState m => (m PixelRGB8, m PixError)
                                     -- newPix = fmap ((flip colorMinDist) pxls) oldPix 
-                                    newPix = colorMinDist oldPix pxls
-                                    oldPix = unsafePixelAt vec readIdx
-                                    pixErr = subtPixel oldPix newPix
+                                    -- newPix old = colorMinDist old pxls
+                                    --oldPix = unsafePixelAt vec readIdx
+                                    --pixErr = subtPixel oldPix newPix
                                     -- oldPix = unsafeReadPixel oldArr readIdx
                                     -- pixErr = fmap subtPixel oldPix newPix
                                     -- calculate indices where a pixel starts (= base) and check for bounds
@@ -200,23 +212,23 @@ ditherST pxls img@(Image { imageWidth  = w,
                                         | b >= h    = Nothing
                                         | otherwise = Just $ (a + b * w) * sourceCompCount
                                     --unsafeWritePixel' :: PrimState m => Int -> Maybe Int -> m PixError -> m ()
-                                    unsafeWritePixel' fac Nothing    pe  = return ()
-                                    unsafeWritePixel' fac (Just bas) pe  = do 
-                                                                              ole  <- unsafeReadPixel oldArr bas
-                                                                              let cp = compwiseErr pe ole
-                                                                              unsafeWritePixel oldArr bas cp
+                                    --unsafeWritePixel' fac Nothing    pe  = return ()
+                                    --unsafeWritePixel' fac (Just bas) pe  = do 
+                                    --                                          ole  <- unsafeReadPixel oldArr bas
+                                    --                                          let cp = compwiseErr pe ole
+                                    --                                          unsafeWritePixel oldArr bas cp
                                     --findErrPix :: Int -> Int -> PixError -> PixelRGB8
                                     --findErrPix fac' bas' pe' = newPix
-                                      where 
-                                      newPixE = compwiseErr pe oldPixE
-                                      oldPixE = unsafePixelAt vec bas
-                                      compwiseErr (PixError r' g' b') (PixelRGB8 r g b) = PixelRGB8 (calcErr r r') (calcErr g g') (calcErr b b')
-                                      calcErr :: Pixel8 -> Int -> Pixel8
-                                      calcErr p' e'
-                                                | res <= 0   = 0
-                                                | res >= 255 = 255
-                                                | otherwise  = fromIntegral res
-                                                where res = fromIntegral p' + ((fac*(fromIntegral e') `shiftR` 4))
+                                      -- where 
+                                      -- newPixE = compwiseErr pe oldPixE
+                                      -- oldPixE = unsafePixelAt vec bas
+                                      -- compwiseErr (PixError r' g' b') (PixelRGB8 r g b) = PixelRGB8 (calcErr r r') (calcErr g g') (calcErr b b')
+                                      -- calcErr :: Pixel8 -> Int -> Pixel8
+                                      -- calcErr p' e'
+                                      --           | res <= 0   = 0
+                                      --           | res >= 255 = 255
+                                      --           | otherwise  = fromIntegral res
+                                      --           where res = fromIntegral p' + ((fac*(fromIntegral e') `shiftR` 4))
 
 
             lineMapper 0 0 0
@@ -252,7 +264,44 @@ ditherST pxls img@(Image { imageWidth  = w,
                                     --             where res = fromIntegral p' + ((fac*(fromIntegral e') `shiftR` 4))
 
 
+------------------------------------------------------------------------
+-- Just a small Image(Vector) for testing.
+-- It has one white Pixel on the top left corner, rest is black
+imgVector :: VS.Vector (PixelBaseComponent PixelRGB8)
+imgVector = getPicVec pic
+  where getPicVec Image {imageData = vec} = vec 
+        pic = generateImage pixelung 5 5 
+        pixelung :: Int -> Int -> PixelRGB8
+        pixelung 0 0 = PixelRGB8 255 255 255
+        pixelung _ _ = PixelRGB8 0   0   0 
 
+
+
+stMonadFoo :: VS.Vector (PixelBaseComponent PixelRGB8) -> VS.Vector (PixelBaseComponent PixelRGB8)
+stMonadFoo imgVec = runST $ do
+  oldArr <- VS.thaw imgVec
+  -- -- pix :: PixelRGB8 -- Hasn't pix this type?  
+  (pix :: PixelRGB8) <- unsafeReadPixel oldArr 0 
+  unsafeWritePixel oldArr 3 pix
+  VS.unsafeFreeze oldArr
+--------------------------------------------------------------------------
+-- Source: http://hackage.haskell.org/package/JuicyPixels-3.1.3.2/docs/src/Codec-Picture-Types.html
+-- | Unsafe version of readPixel,  read a pixel at the given
+-- position without bound checking (if possible). The index
+-- is expressed in number (PixelBaseComponent a)
+-- unsafeReadPixel' :: PrimMonad m => M.STVector (PrimState m) (PixelBaseComponent a) -> Int -> m a
+-- unsafeReadPixel' vec idx =
+--         PixelRGB8 `liftM` M.unsafeRead vec idx
+--                   `ap` M.unsafeRead vec (idx + 1)
+--                   `ap` M.unsafeRead vec (idx + 2)
+
+-- | Unsafe version of writePixel, write a pixel at the
+-- given position without bound checking. This can be _really_ unsafe.
+-- The index is expressed in number (PixelBaseComponent a)
+-- unsafeWritePixel' :: PrimMonad m => M.STVector (PrimState m) (PixelBaseComponent a) -> Int -> a -> m ()
+-- unsafeWritePixel' v idx (PixelRGB8 r g b) =
+--     M.unsafeWrite v idx r >> M.unsafeWrite v (idx + 1) g
+--                           >> M.unsafeWrite v (idx + 2) b
 
 
 
