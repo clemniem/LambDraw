@@ -11,7 +11,7 @@ import System.Environment
 import Codec.Picture
 import Codec.Picture.Types
 import Data.Array
-import Bither
+import Dither
 
 -- HelperVariables
 distMax = distance (0,0) (drawWidth,drawHeight)
@@ -161,25 +161,25 @@ compPix  ls p q = comPixAcc (delete p ls) p q $ colorDist8 p q
 		| dist > (colorDist8 x q) = False
 		| otherwise = comPixAcc xs p q dist
 
-colorMinDist :: PixelRGB8 -> [PixelRGB8] -> PixelRGB8
-colorMinDist p []     = PixelRGB8 255 255 255
-colorMinDist p (x:xs) = colorMinDistAcc p xs ((colorDist8 p x),x) 
-    where
-    colorMinDistAcc :: PixelRGB8 -> [PixelRGB8] -> (Distance,PixelRGB8) -> PixelRGB8
-    colorMinDistAcc p []     (_,pixAcc)    = pixAcc
-    colorMinDistAcc p (x:xs) (dist,pixAcc)
-        | dist' < dist = colorMinDistAcc p xs (dist',x)
-        | otherwise    = colorMinDistAcc p xs (dist ,pixAcc)
-        where
-        dist' = colorDist8 p x 
+-- colorMinDist :: PixelRGB8 -> [PixelRGB8] -> PixelRGB8
+-- colorMinDist p []     = PixelRGB8 255 255 255
+-- colorMinDist p (x:xs) = colorMinDistAcc p xs ((colorDist8 p x),x) 
+--     where
+--     colorMinDistAcc :: PixelRGB8 -> [PixelRGB8] -> (Distance,PixelRGB8) -> PixelRGB8
+--     colorMinDistAcc p []     (_,pixAcc)    = pixAcc
+--     colorMinDistAcc p (x:xs) (dist,pixAcc)
+--         | dist' < dist = colorMinDistAcc p xs (dist',x)
+--         | otherwise    = colorMinDistAcc p xs (dist ,pixAcc)
+--         where
+--         dist' = colorDist8 p x 
 
-colorDist8 :: PixelRGB8 -> PixelRGB8 -> Distance
-colorDist8 (PixelRGB8 r1 g1 b1) (PixelRGB8 r2 g2 b2) = sqrt $ (2 + r'/256) * dr^2 + 4 * dg^2 + (2+(255-r'/256)*db^2)
-    where
-    r' = (fromIntegral r1)/2 + (fromIntegral r2)/2
-    dr = fromIntegral r1 - fromIntegral r2
-    dg = fromIntegral g1 - fromIntegral g2
-    db = fromIntegral b1 - fromIntegral b2
+-- colorDist8 :: PixelRGB8 -> PixelRGB8 -> Distance
+-- colorDist8 (PixelRGB8 r1 g1 b1) (PixelRGB8 r2 g2 b2) = sqrt $ (2 + r'/256) * dr^2 + 4 * dg^2 + (2+(255-r'/256)*db^2)
+--     where
+--     r' = (fromIntegral r1)/2 + (fromIntegral r2)/2
+--     dr = fromIntegral r1 - fromIntegral r2
+--     dg = fromIntegral g1 - fromIntegral g2
+--     db = fromIntegral b1 - fromIntegral b2
 -- colorDist8 (PixelRGB8 r1 g1 b1) (PixelRGB8 r2 g2 b2) = sqrt $ dr^2 + dg^2 + db^2
 --     where
 --     r' = (fromIntegral r1)/2 + (fromIntegral r2)/2
