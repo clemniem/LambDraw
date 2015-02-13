@@ -10,6 +10,7 @@
 
 module Dither where 
 
+import MakeIMG
 import           Data.Vector          (Vector, (!))
 import qualified Data.Vector.Storable as VS
 import           Codec.Picture.Types
@@ -26,27 +27,6 @@ import Data.Vector.Storable ( (!) )
 import qualified Data.Vector.Storable.Mutable as M
 import Data.Maybe
 
--- Type & Data declarations
-type Point      = (Int,Int)
-type Distance   = Float
-data PixError   = PixError Int Int Int 
-    deriving (Show,Eq,Ord)
-type BasID      = Int
-type ErrorFac   = Int
-
--- HelperVariables for Testing
-redPix     = PixelRGB8 255 0   0
-greenPix   = PixelRGB8 0   255 0
-bluePix    = PixelRGB8 0   0   255
-blackPix   = PixelRGB8 0   0   0
-whitePix   = PixelRGB8 255 255 255
-yellowPix  = PixelRGB8 255 255 0
-magentaPix = PixelRGB8 255 0   255
-cyanPix    = PixelRGB8 0   255 255
-
--- PixelLists for rgb and cmyk
-rgbPixls   = [redPix,greenPix,bluePix,blackPix,whitePix]
-cmykPixls  = [cyanPix,magentaPix,yellowPix,blackPix,whitePix]
 
 -- operation to drop used colors to a list of colors
 noDither :: [PixelRGB8] -> PixelRGB8 -> PixelRGB8
