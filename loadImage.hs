@@ -93,9 +93,9 @@ checkArgs [pathIn,pathOut] = do
     processImage (read opt :: Int) pathIn pathOut
     where 
     checkopt :: Int -> IO()
-    checkopt 1  = putStrLn "Starting rgb  conversion."    -- >>= 1
-    checkopt 2  = putStrLn "Starting cmyk conversion"     -- >>= 2
-    checkopt 3  = putStrLn "Starting noDither conversion" -- >>= 3
+    checkopt 1  = putStrLn "Starting rgb  conversion."    
+    checkopt 2  = putStrLn "Starting cmyk conversion"     
+    checkopt 3  = putStrLn "Starting noDither conversion" 
     checkopt _ = do 
       putStrLn "Wrong Input"
       checkArgs [pathIn,pathOut] 
@@ -129,7 +129,7 @@ imgConverter state img@( Image {  imageWidth  = w
                                 , imageData   = arr })
     | state == 1 = ditherFloydRGB8 rgbPixls img  
     | state == 2 = ditherFloydRGB8 cmykPixls img  
-    | state == 3 = pixelMap (noDither cmykPixls) img  
+    | state == 3 = pixelMap (noDither cmykPixls) img
     | otherwise  = pixelMap (noDither rgbPixls)  img  
 
 

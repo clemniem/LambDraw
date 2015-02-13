@@ -485,6 +485,16 @@ toVecPos :: Int -> (Point, PixelRGB8) -> [(Int,Word8)]
 toVecPos w ((x,y),(PixelRGB8 r g b)) = [((baseInd + 0),r),((baseInd + 1),g),((baseInd + 2),b)]
   where baseInd = (x + y * w) * componentCount (undefined :: PixelRGB8)
 
+
+calcErr' :: Word8 -> Int -> Int -> Word8
+calcErr' p' e' fac
+        | res <= 0   = 0
+        | res >= 255 = 255
+        | otherwise  = fromIntegral res
+        where res = fromIntegral p' + ((fac*(fromIntegral e') `shiftR` 4))
+
+
+
 ------------------------------------Colorquant-------------------------------
 
 -- addWordError :: Int -> Word8 -> Int -> Word8
@@ -512,6 +522,40 @@ toVecPos w ((x,y),(PixelRGB8 r g b)) = [((baseInd + 0),r),((baseInd + 1),g),((ba
 -- getvarImgMax img = (imageWidth img,imageHeight img)    
 
 -- imgPls w h = [(x,y)| x <- [0..w-1], y <- [0..h-1]]
+
+-- ------------------------------------------------------------------------
+-- -- Just a small Image(Vector) for testing.
+-- -- It has one white Pixel on the top left corner, rest is black
+-- imgVector :: VS.Vector (PixelBaseComponent PixelRGB8)
+-- imgVector = getPicVec pic
+--   where getPicVec Image {imageData = vec} = vec 
+--         pic = generateImage pixelung 5 5 
+--         pixelung :: Int -> Int -> PixelRGB8
+--         pixelung 0 0 = PixelRGB8 255 255 255
+--         pixelung _ _ = PixelRGB8 0   0   0 
+
+
+
+-- stMonadFoo :: VS.Vector (PixelBaseComponent PixelRGB8) -> VS.Vector (PixelBaseComponent PixelRGB8)
+-- stMonadFoo imgVec = runST $ do
+--   oldArr <- VS.thaw imgVec
+--   -- -- pix :: PixelRGB8 -- Hasn't pix this type?  
+--   (pix :: PixelRGB8) <- unsafeReadPixel oldArr 0 
+--   unsafeWritePixel oldArr 3 pix
+--   VS.unsafeFreeze oldArr
+-- --------------------------------------------------------------------------
+
+
+
+compwiseErr1 :: Int -> PixError -> PixelRGB8 -> PixelRGB8
+compwiseErr1 fac (PixError r' g' b') (PixelRGB8 r g b) = PixelRGB8 (calcErr r r') (calcErr g g') (calcErr b b')
+  where
+  calcErr :: Pixel8 -> Int -> Pixel8
+  calcErr p' e'
+            | res <= 0   = 0
+            | res >= 255 = 255
+            | otherwise  = fromIntegral res
+            where res = fromIntegral p' + ((fac*(fromIntegral e') `shiftR` 4))
 
 
 
