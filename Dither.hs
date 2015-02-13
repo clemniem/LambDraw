@@ -1,32 +1,17 @@
-{-# LANGUAGE MultiParamTypeClasses #-}
-{-# LANGUAGE FlexibleInstances #-}
-{-# LANGUAGE ScopedTypeVariables #-}
-{-# LANGUAGE TypeSynonymInstances #-}
-{-# LANGUAGE FunctionalDependencies #-}
-{-# LANGUAGE TypeFamilies #-}
-{-# LANGUAGE FlexibleContexts #-}
-{-# LANGUAGE Rank2Types #-}
-{-# LANGUAGE CPP #-}
-
 module Dither where 
 
-import MakeIMG
+import           MakeIMG
+
 import           Data.Vector          (Vector, (!))
 import qualified Data.Vector.Storable as VS
 import           Codec.Picture.Types
-import Control.Monad( foldM, liftM, ap )
-import Control.DeepSeq( NFData( .. ) )
-import Control.Monad.ST as ST
-import Control.Monad.Primitive ( PrimMonad, PrimState )
-import Foreign.ForeignPtr( castForeignPtr )
-import Foreign.Storable ( Storable )
-import Data.Bits( unsafeShiftL, unsafeShiftR, (.|.), (.&.),shiftR )
-import Data.Word( Word8, Word16, Word32, Word64 )
-import Data.List( foldl' )
-import Data.Vector.Storable ( (!) )
+import           Control.Monad( foldM, liftM, ap )
+import           Control.Monad.ST as ST
+import           Control.Monad.Primitive ( PrimMonad, PrimState )
+import           Data.Bits( unsafeShiftL, unsafeShiftR, (.|.), (.&.),shiftR )
+import           Data.Word( Word8, Word16, Word32, Word64 )
 import qualified Data.Vector.Storable.Mutable as M
-import Data.Maybe
-
+import           Data.Maybe
 
 -- operation to drop used colors to a list of colors
 noDither :: [PixelRGB8] -> PixelRGB8 -> PixelRGB8

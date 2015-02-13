@@ -2,19 +2,14 @@ module MakeIMG where
 
 import Codec.Picture
 import Codec.Picture.Types
-import Codec.Picture.Png
-import Codec.Picture.Saving
-import Codec.Picture.ColorQuant
-import System.IO
-import Data.Word
 
 -- Type & Data declarations
 type Point      = (Int,Int)
 type Distance   = Float
 data PixError   = PixError Int Int Int 
     deriving (Show,Eq,Ord)
-type BasID      = Int
-type ErrorFac   = Int
+--type BasID      = Int
+--type ErrorFac   = Int
 
 -- HelperVariables for Testing
 redPix     = PixelRGB8 255 0   0
@@ -55,7 +50,7 @@ dynpic = ImageRGB8 (pic)
 saveImage :: FilePath -> DynamicImage -> IO ()
 saveImage name img  = do
     savePngImage (name ++ ".png") img
-    putStrLn "Gespeichert." 
+    putStrLn "Image saved." 
 
 loadPng :: FilePath -> IO DynamicImage
 loadPng path = do

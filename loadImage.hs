@@ -1,23 +1,26 @@
 {-# LANGUAGE TypeFamilies #-}
 
+import MakeIMG
 import Dither
-import Control.Applicative
-import Control.Monad
-import Codec.Picture 
+
 import Codec.Picture.Types 
-import Data.Ratio (Ratio, (%))
-import Foreign.Marshal.Alloc (mallocBytes)
-import Foreign.Storable (pokeByteOff)
 import System.Environment
 import Data.Bits( unsafeShiftR )
 import Data.Word( Word8, Word16 )
-import qualified Data.ByteString.Lazy as L
 import qualified Data.Vector.Storable as V
-import Data.Int
-import Data.String
+
+
 -- DynamicImage to Image PixelRGB8 converter
 dyn2rgb8 :: DynamicImage -> Maybe (Image PixelRGB8)
 dyn2rgb8 (ImageRGB8   img) = Just $ img
+dyn2rgb8 (ImageY8     img) = Just $ promoteImage img
+dyn2rgb8 (ImageY16    img) = dyn2rgb8 $ ImageRGB16 $ promoteImage img
+dyn2rgb8 (ImageYA8    img) = Just $ promoteImage $ pixelMap dropTransparency img
+dyn2rgb8 (ImageYA16   img) = dyn2rgb8 $ ImageY16 $ pixelMap dropTransparency img
+dyn2rgb8 (ImageRGBA8  img) = Just $ pixelMap dropTransparency img
+dyn2rgb8 (ImageRGBA16 img) = dyn2rgb8 $ ImageRGB16 $ pixelMap dropTransparency img
+dyn2rgb8 (ImageYCbCr8 img) = Just $ convertImage img
+dyn2rgb8 (ImageCMYK8  img) = Just $ convertImage img
 dyn2rgb8 (ImageRGB16  img) = Just $ from16to8' img
   where
   -- Source: http://hackage.haskell.org/package/JuicyPixels-3.2.2/docs/src/Codec-Picture-Saving.html
@@ -28,14 +31,6 @@ dyn2rgb8 (ImageRGB16  img) = Just $ from16to8' img
                   , imageData = arr } = Image w h transformed
      where transformed = V.map toWord8 arr
            toWord8 v = fromIntegral (v `unsafeShiftR` 8)
-dyn2rgb8 (ImageY8     img) = Just $ promoteImage img
-dyn2rgb8 (ImageY16    img) = dyn2rgb8 $ ImageRGB16 $ promoteImage img
-dyn2rgb8 (ImageYA8    img) = Just $ promoteImage $ pixelMap dropTransparency img
-dyn2rgb8 (ImageYA16   img) = dyn2rgb8 $ ImageY16 $ pixelMap dropTransparency img
-dyn2rgb8 (ImageRGBA8  img) = Just $ pixelMap dropTransparency img
-dyn2rgb8 (ImageRGBA16 img) = dyn2rgb8 $ ImageRGB16 $ pixelMap dropTransparency img
-dyn2rgb8 (ImageYCbCr8 img) = Just $ convertImage img
-dyn2rgb8 (ImageCMYK8  img) = Just $ convertImage img
 dyn2rgb8 (ImageCMYK16 img) = dyn2rgb8 $ ImageRGB16 $ convertImage img
 dyn2rgb8 (ImageRGBF   img) = Just $ pixelMap pFtoRGB8 img
   where
@@ -45,7 +40,6 @@ dyn2rgb8 (ImageRGBF   img) = Just $ pixelMap pFtoRGB8 img
     PixelRGB8 (round r) (round g) (round b)
 --dyn2rgb8 (ImageYF     img) = undefined
 dyn2rgb8 _                 = Nothing
-
 
 
 -- for Debugging
@@ -76,10 +70,10 @@ main1 args = do
     putStrLn $ show args
     checkArgs args
 
-loadPng :: FilePath -> IO DynamicImage
-loadPng path = do
-    temp <- readPng path >>= either error return
-    return temp
+-- loadPng :: FilePath -> IO DynamicImage
+-- loadPng path = do
+--     temp <- readPng path >>= either error return
+--     return temp
 
 
 checkArgs :: [String] -> IO()
@@ -118,10 +112,10 @@ processImage opt pathIn pathOut = do
         safesave pOut (Just img) = saveImage pathOut $ ImageRGB8 $ imgConverter opt img
         safesave _    Nothing    = putStrLn "Error with Image to RGB8 conversion!"
 
-saveImage :: FilePath -> DynamicImage -> IO ()
-saveImage name img  = do 
-    savePngImage (name ++ ".png") img
-    putStrLn "Saved." 
+-- saveImage :: FilePath -> DynamicImage -> IO ()
+-- saveImage name img  = do 
+--     savePngImage (name ++ ".png") img
+--     putStrLn "Saved." 
 
 imgConverter :: Int -> Image PixelRGB8 -> Image PixelRGB8
 imgConverter state img@( Image {  imageWidth  = w
