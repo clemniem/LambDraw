@@ -6,10 +6,21 @@ import MakeIMG
 import Codec.Picture.Types
 import Data.List as L
 import Data.Ord
+import           Data.Vector          (Vector, (!))
+import qualified Data.Vector.Storable as V
+import           Control.Monad( foldM, liftM, ap )
+import           Control.Monad.ST as ST
+import           Control.Monad.Primitive ( PrimMonad, PrimState )
+import           Data.Bits( unsafeShiftL, unsafeShiftR, (.|.), (.&.),shiftR )
+import           Data.Word( Word8, Word16, Word32, Word64 )
+import qualified Data.Vector.Storable.Mutable as M
+import           Data.Maybe
+
 
 dynDith = ImageRGB8 picDith
 
 picDith = ditherFloydRGB8 rgbPixls pic
+picPath = generateImage (pixelungls $ starSort 50 50 testList) 50 50
 
 -- Checks Pixel == Pixel 
 checkColor :: PixelRGB8 -> PixelRGB8 -> Bool
@@ -25,16 +36,58 @@ colorSplicer img@(Image { imageWidth  = w,
                           imageHeight = h }) pix =
     [(x,y)| x <- [0..w-1], y <-[0..h-1], checkColor (pixelAt img x y) pix]
 
--- helper Functions for ghci
-lsAccessor :: (Maybe Point,Float,[Point]) -> [Point]
-lsAccessor (_,_,xs) = xs
 
-pAccessor :: (Maybe Point,Float,[Point]) -> Point
-pAccessor (Just p,_,_) = p
-pAccessor (Nothing,_,_) = (-1,-1)
+saveDith = saveImage "./images/picDith" $ ImageRGB8 $ picDith
+savePicPath = saveImage "./images/picPath" $ ImageRGB8 $ picPath
 
-flAccessor :: (Maybe Point,Float,[Point]) -> Float
-flAccessor (_,f,_) = f
+testList = colorSplicer picDith bluePix
+dshortestPath = distSort $ (0,0):testList
+mathShortestPath = distOptimizer $ (0,0):testList
+shortestPath = L.reverse $ snd dshortestPath
+
+starls = starSort 50 50 testList
+lengthStarls = lsDistance starls
+
+smallList = [(x,y) | x <- [0,2..40], y<-[0..20]] :: [Point]
+
+lsDistance :: [Point] -> Distance
+lsDistance []     = 0
+lsDistance (a:[]) = 0
+lsDistance (a:b:cs) = distance a b + lsDistance (b:cs)
+
+-- sortByNext :: [Point] -> [Point]
+-- sortByNext [] = []
+-- sortByNext (x:xs) = x : getNext x xs 
+--     getNext p pts = 
+
+
+
+-- STARSORT *
+--
+--  \ 1|2 /
+--  8\ | /3
+-- ----c----
+--  7/ | \4
+--  /6 |5 \
+starSort :: Int -> Int -> [Point] -> [Point]
+starSort w h []  = []
+starSort w h pts = (  
+                       ds [(x,y) | (x,y) <- nw, x>y   ]
+                    ++ ds (L.reverse $ sortByY [(x,y) | (x,y) <- no, x<=h-y]) -- Maybe needs sortByY
+                    ++ ds (L.reverse [(x,y) | (x,y) <- no, x>h-y ]) -- Maybe needs L.reverse
+                    ++ ds [(x,y) | (x,y) <- so, x>y   ]
+                    ++ ds (L.reverse [(x,y) | (x,y) <- so, x<=y  ]) -- Maybe needs L.reverse
+                    ++ ds (L.reverse [(x,y) | (x,y) <- sw, x>h-y ]) -- Maybe needs L.reverse
+                    ++ ds (L.reverse $ sortByY [(x,y) | (x,y) <- sw, x<=h-y]) -- Maybe needs sortByY
+                    ++ ds (L.reverse [(x,y) | (x,y) <- nw, x<=y  ])
+                    ) 
+    where nw = [(x,y) | (x,y) <- pts, x<=w', y<=h']
+          no = [(x,y) | (x,y) <- pts, x>w' , y<=h']
+          sw = [(x,y) | (x,y) <- pts, x<=w', y>h']
+          so = [(x,y) | (x,y) <- pts, x>w' , y>h']
+          w' = truncate $ fromIntegral w/2
+          h' = truncate $ fromIntegral h/2
+          ds ls = L.reverse $ snd $ distSort ls 
 
 -- calculates euclidian distance between two Points.
 distance:: Point -> Point -> Distance
@@ -85,8 +138,34 @@ distOptimizer ls@(x:xs) = distOptimizerAcc ls xs $ distSort ls
 
 
 
+generateImagels :: 
+              [Point]       -- ^ List of Points where a Pixel should be
+              -> Int        -- ^ Width in pixels
+              -> Int        -- ^ Height in pixels
+              -> Image PixelRGB8
+generateImagels ls w h = Image { imageWidth = w, imageHeight = h, imageData = generated }
+  where compCount = componentCount (undefined :: PixelRGB8)
+        generated = runST $ do
+            arr <- M.new (w * h * compCount)
+            let lineGenerator _ y | y >= h = return ()
+                lineGenerator lineIdx y = column lineIdx 0
+                  where column idx x | x >= w = lineGenerator idx $ y + 1
+                        column idx x = do
+                            unsafeWritePixel arr idx (PixelRGB8 255 255 255)
+                            column (idx + compCount) $ x + 1
 
+            lineGenerator 0 0
+            blub w arr 0 ls
+            V.unsafeFreeze arr
 
+--blub :: [Point
+blub w arr _     []     = return ()
+blub w arr count ((x,y):ps) = do unsafeWritePixel arr p' (PixelRGB8 count 255 count')
+                                 blub w arr (count+1) ps
+                                  where p' = (x+y*w)*3
+                                        count' = if count < 10
+                                                    then 255
+                                                    else 0
 
 
 

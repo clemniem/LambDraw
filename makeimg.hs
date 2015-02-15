@@ -26,11 +26,25 @@ rgbPixls   = [redPix,greenPix,bluePix,blackPix,whitePix]
 cmykPixls  = [cyanPix,magentaPix,yellowPix,blackPix,whitePix]
 
 
+-- ====== IMAGESIZE <---------------<--------
+pic :: Image PixelRGB8
+pic = generateImage pixelung 50 50 
+
+pixelungls :: [Point] -> Int -> Int -> PixelRGB8
+pixelungls ls x y
+    | pointInList ls (x,y) = magentaPix
+    | otherwise = whitePix
+        where pointInList :: [Point] -> Point -> Bool
+              pointInList [] _ = False
+              pointInList ((px,py):pts) (x,y)
+                | and [x==px,y==py] = True
+                | otherwise = pointInList pts (x,y)
+
 pixelung :: Int -> Int -> PixelRGB8
 pixelung x y = PixelRGB8 u v (u*v)
     where
-        u = fromIntegral x*30 :: Pixel8
-        v = fromIntegral y*30 :: Pixel8
+        u = fromIntegral x*10 :: Pixel8
+        v = fromIntegral y*10 :: Pixel8
 
 pixelung16 :: Int -> Int -> PixelRGB16
 pixelung16 x y = PixelRGB16 u v (u*v)
@@ -38,8 +52,7 @@ pixelung16 x y = PixelRGB16 u v (u*v)
         u = fromIntegral x :: Pixel16
         v = fromIntegral y :: Pixel16
 
-pic :: Image PixelRGB8
-pic = generateImage pixelung 5 5 
+
 
 dynpic :: DynamicImage
 dynpic = ImageRGB8 (pic)
