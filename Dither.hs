@@ -55,6 +55,9 @@ colorDist8 :: PixelRGB8 -> PixelRGB8 -> Distance
 colorDist8 (PixelRGB8 r1 g1 b1) (PixelRGB8 r2 g2 b2) = sqrt $ (2 + r'/256)   * dr^2 
                                                             +  4             * dg^2 
                                                             + (2+(255-r'/256)* db^2)
+-- colorDist8 (PixelRGB8 r1 g1 b1) (PixelRGB8 r2 g2 b2) = sqrt $ dr^2 
+--                                                             + dg^2 
+--                                                             + db^2
     where
     r' = (fromIntegral r1)/2 + (fromIntegral r2)/2
     dr = fromIntegral r1 - fromIntegral r2
@@ -203,8 +206,6 @@ ditherFloydRGB8 pxls img@(Image { imageWidth  = w,
 --                     | res >= 255 = 255
 --                     | otherwise  = fromIntegral res
 --                     where res = fromIntegral p' + ((fac*(fromIntegral e') `shiftR` 4))
-
-
 
 
 

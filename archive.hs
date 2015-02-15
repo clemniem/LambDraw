@@ -18,8 +18,9 @@ distMax = distance (0,0) (drawWidth,drawHeight)
 
 
 -- Type Declarations
--- type Point = (Int,Int)
--- type Distance = Float
+--type Point = (Int,Int)
+--type Distance = Float
+
 
 
 -- helper Functions for ghci
@@ -37,7 +38,7 @@ flAccessor (_,f,_) = f
 distance:: Point -> Point -> Distance
 distance (x1,y1) (x2,y2) = sqrt $ fromIntegral $ (x1-x2)^2 + (y1-y2)^2
 
--- calculates the closest Point from a list to a given Pint. 
+-- calculates the closest Point from a list to a given Point. 
 -- Returns: (closest Point, distance, rest of the list)
 nextPoint :: Point -> [Point] -> (Maybe Point,Distance,[Point])
 nextPoint p [] = (Nothing,0,[])
@@ -121,6 +122,7 @@ cvtoCV8 CVN = head $ drop 4 varCVs
 
 -- -- Getters for pixel components, as the constructor does not
 -- -- provide any public ones.
+
 red, blue, green :: Accessor
 red   (PixelRGB8 r _ _) = r
 green (PixelRGB8 _ g _) = g
@@ -243,14 +245,19 @@ type ConvFactor = Int
 
 
 
+-- -- Setup
+-- drawWidth  = 510 :: Int
+-- drawHeight = 510 :: Int
+-- varDrawMax = (drawHeight,drawWidth)
 
--- Compute the average value of a list of pixels.
-average :: [PixelRGB8] -> PixelRGB8
-average pixels = PixelRGB8 (avg red) (avg green) (avg blue)
-  where
-    len   = toInteger    $ length pixels
-    avg c = fromIntegral $ (sum $ map (toInteger . c) pixels) `div` len
+-- varMinDist = 1500 :: Distance
+-- -- Help Variables for testing
+-- pic = generateImage pixelunggrey 100 100 
+-- varConF = 2
 
+
+
+-- e
 -- Perform a componentwise pixel operation.
 compwise2 :: (Word8 -> Word8 -> Word8) -> PixelRGB8 -> PixelRGB8 -> PixelRGB8
 compwise2 f (PixelRGB8 ra ga ba) (PixelRGB8 rb gb bb) =
