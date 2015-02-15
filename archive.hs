@@ -11,15 +11,15 @@ import System.Environment
 import Codec.Picture
 import Codec.Picture.Types
 import Data.Array
-
+import Dither
 
 -- HelperVariables
 distMax = distance (0,0) (drawWidth,drawHeight)
 
 
 -- Type Declarations
-type Point = (Int,Int)
-type Distance = Float
+-- type Point = (Int,Int)
+-- type Distance = Float
 
 
 -- helper Functions for ghci
@@ -119,24 +119,24 @@ cvtoCV8 CV3 = head $ drop 2 varCVs
 cvtoCV8 CV4 = head $ drop 3 varCVs
 cvtoCV8 CVN = head $ drop 4 varCVs
 
--- Getters for pixel components, as the constructor does not
--- provide any public ones.
+-- -- Getters for pixel components, as the constructor does not
+-- -- provide any public ones.
 red, blue, green :: Accessor
 red   (PixelRGB8 r _ _) = r
 green (PixelRGB8 _ g _) = g
 blue  (PixelRGB8 _ _ b) = b
 
--- HelperVariables for Testing
-redPix   = PixelRGB8 255 0   0
-greenPix = PixelRGB8 0   255 0
-bluePix  = PixelRGB8 0   0   255
-blackPix = PixelRGB8 0   0   0
-whitePix = PixelRGB8 255 255 255
-greyPix  = PixelRGB8 188 188 188
+-- -- HelperVariables for Testing
+-- redPix   = PixelRGB8 255 0   0
+-- greenPix = PixelRGB8 0   255 0
+-- bluePix  = PixelRGB8 0   0   255
+-- blackPix = PixelRGB8 0   0   0
+-- whitePix = PixelRGB8 255 255 255
+-- greyPix  = PixelRGB8 188 188 188
 
-listPix      = [redPix,greenPix,bluePix,blackPix,whitePix]
-testListPix  = [PixelRGB8 124 124 124,PixelRGB8 200 30 210,PixelRGB8 0 0 0,PixelRGB8 200 100 100,PixelRGB8 100 100 130,PixelRGB8 255 255 255,PixelRGB8 25 150 0]
-testListPixS = [PixelRGB8 30 124 124,PixelRGB8 200 30 210,PixelRGB8 0 0 0]
+-- listPix      = [redPix,greenPix,bluePix,blackPix,whitePix]
+-- testListPix  = [PixelRGB8 124 124 124,PixelRGB8 200 30 210,PixelRGB8 0 0 0,PixelRGB8 200 100 100,PixelRGB8 100 100 130,PixelRGB8 255 255 255,PixelRGB8 25 150 0]
+-- testListPixS = [PixelRGB8 30 124 124,PixelRGB8 200 30 210,PixelRGB8 0 0 0]
 
 -- Helper Functions
 -- encodes a Word16 to Word8
@@ -161,25 +161,25 @@ compPix  ls p q = comPixAcc (delete p ls) p q $ colorDist8 p q
 		| dist > (colorDist8 x q) = False
 		| otherwise = comPixAcc xs p q dist
 
-colorMinDist :: PixelRGB8 -> [PixelRGB8] -> PixelRGB8
-colorMinDist p []     = PixelRGB8 255 255 255
-colorMinDist p (x:xs) = colorMinDistAcc p xs ((colorDist8 p x),x) 
-    where
-    colorMinDistAcc :: PixelRGB8 -> [PixelRGB8] -> (Distance,PixelRGB8) -> PixelRGB8
-    colorMinDistAcc p []     (_,pixAcc)    = pixAcc
-    colorMinDistAcc p (x:xs) (dist,pixAcc)
-        | dist' < dist = colorMinDistAcc p xs (dist',x)
-        | otherwise    = colorMinDistAcc p xs (dist ,pixAcc)
-        where
-        dist' = colorDist8 p x 
+-- colorMinDist :: PixelRGB8 -> [PixelRGB8] -> PixelRGB8
+-- colorMinDist p []     = PixelRGB8 255 255 255
+-- colorMinDist p (x:xs) = colorMinDistAcc p xs ((colorDist8 p x),x) 
+--     where
+--     colorMinDistAcc :: PixelRGB8 -> [PixelRGB8] -> (Distance,PixelRGB8) -> PixelRGB8
+--     colorMinDistAcc p []     (_,pixAcc)    = pixAcc
+--     colorMinDistAcc p (x:xs) (dist,pixAcc)
+--         | dist' < dist = colorMinDistAcc p xs (dist',x)
+--         | otherwise    = colorMinDistAcc p xs (dist ,pixAcc)
+--         where
+--         dist' = colorDist8 p x 
 
-colorDist8 :: PixelRGB8 -> PixelRGB8 -> Distance
-colorDist8 (PixelRGB8 r1 g1 b1) (PixelRGB8 r2 g2 b2) = sqrt $ (2 + r'/256) * dr^2 + 4 * dg^2 + (2+(255-r'/256)*db^2)
-    where
-    r' = (fromIntegral r1)/2 + (fromIntegral r2)/2
-    dr = fromIntegral r1 - fromIntegral r2
-    dg = fromIntegral g1 - fromIntegral g2
-    db = fromIntegral b1 - fromIntegral b2
+-- colorDist8 :: PixelRGB8 -> PixelRGB8 -> Distance
+-- colorDist8 (PixelRGB8 r1 g1 b1) (PixelRGB8 r2 g2 b2) = sqrt $ (2 + r'/256) * dr^2 + 4 * dg^2 + (2+(255-r'/256)*db^2)
+--     where
+--     r' = (fromIntegral r1)/2 + (fromIntegral r2)/2
+--     dr = fromIntegral r1 - fromIntegral r2
+--     dg = fromIntegral g1 - fromIntegral g2
+--     db = fromIntegral b1 - fromIntegral b2
 -- colorDist8 (PixelRGB8 r1 g1 b1) (PixelRGB8 r2 g2 b2) = sqrt $ dr^2 + dg^2 + db^2
 --     where
 --     r' = (fromIntegral r1)/2 + (fromIntegral r2)/2
@@ -242,17 +242,7 @@ type ImgMax = Point
 type ConvFactor = Int
 
 
--- Setup
-drawWidth  = 510 :: Int
-drawHeight = 510 :: Int
-varDrawMax = (drawHeight,drawWidth)
 
-varMinDist = 1500 :: Distance
--- Help Variables for testing
-pic = generateImage pixelunggrey 10 10 
-varConF = 2
-
-picArray Image {imageData = arr} = arr 
 
 -- Compute the average value of a list of pixels.
 average :: [PixelRGB8] -> PixelRGB8
@@ -310,7 +300,17 @@ multDiv16 fact val = (fact*(fromIntegral val)) `shiftR` 4
 -- pixelBaseIndex :: Image a -> Int -> Int -> Int
 -- pixelBaseIndex (Image { imageWidth = w }) x y =
 --         (x + y * w) * componentCount (undefined :: a)
+-- Setup
+drawWidth  = 510 :: Int
+drawHeight = 510 :: Int
+varDrawMax = (drawHeight,drawWidth)
 
+varMinDist = 1500 :: Distance
+-- Help Variables for testing
+pic = generateImage pixelunggrey 10 10 
+varConF = 2
+
+picArray Image {imageData = arr} = arr 
 newPic = generateImage newPixelung drawWidth drawHeight
 newDynPic = ImageRGB8 newPic
 
@@ -485,6 +485,16 @@ toVecPos :: Int -> (Point, PixelRGB8) -> [(Int,Word8)]
 toVecPos w ((x,y),(PixelRGB8 r g b)) = [((baseInd + 0),r),((baseInd + 1),g),((baseInd + 2),b)]
   where baseInd = (x + y * w) * componentCount (undefined :: PixelRGB8)
 
+
+calcErr' :: Word8 -> Int -> Int -> Word8
+calcErr' p' e' fac
+        | res <= 0   = 0
+        | res >= 255 = 255
+        | otherwise  = fromIntegral res
+        where res = fromIntegral p' + ((fac*(fromIntegral e') `shiftR` 4))
+
+
+
 ------------------------------------Colorquant-------------------------------
 
 -- addWordError :: Int -> Word8 -> Int -> Word8
@@ -512,6 +522,40 @@ toVecPos w ((x,y),(PixelRGB8 r g b)) = [((baseInd + 0),r),((baseInd + 1),g),((ba
 -- getvarImgMax img = (imageWidth img,imageHeight img)    
 
 -- imgPls w h = [(x,y)| x <- [0..w-1], y <- [0..h-1]]
+
+-- ------------------------------------------------------------------------
+-- -- Just a small Image(Vector) for testing.
+-- -- It has one white Pixel on the top left corner, rest is black
+-- imgVector :: VS.Vector (PixelBaseComponent PixelRGB8)
+-- imgVector = getPicVec pic
+--   where getPicVec Image {imageData = vec} = vec 
+--         pic = generateImage pixelung 5 5 
+--         pixelung :: Int -> Int -> PixelRGB8
+--         pixelung 0 0 = PixelRGB8 255 255 255
+--         pixelung _ _ = PixelRGB8 0   0   0 
+
+
+
+-- stMonadFoo :: VS.Vector (PixelBaseComponent PixelRGB8) -> VS.Vector (PixelBaseComponent PixelRGB8)
+-- stMonadFoo imgVec = runST $ do
+--   oldArr <- VS.thaw imgVec
+--   -- -- pix :: PixelRGB8 -- Hasn't pix this type?  
+--   (pix :: PixelRGB8) <- unsafeReadPixel oldArr 0 
+--   unsafeWritePixel oldArr 3 pix
+--   VS.unsafeFreeze oldArr
+-- --------------------------------------------------------------------------
+
+
+
+compwiseErr1 :: Int -> PixError -> PixelRGB8 -> PixelRGB8
+compwiseErr1 fac (PixError r' g' b') (PixelRGB8 r g b) = PixelRGB8 (calcErr r r') (calcErr g g') (calcErr b b')
+  where
+  calcErr :: Pixel8 -> Int -> Pixel8
+  calcErr p' e'
+            | res <= 0   = 0
+            | res >= 255 = 255
+            | otherwise  = fromIntegral res
+            where res = fromIntegral p' + ((fac*(fromIntegral e') `shiftR` 4))
 
 
 
