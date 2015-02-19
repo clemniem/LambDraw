@@ -1,5 +1,8 @@
 {-# LANGUAGE TypeFamilies #-}
 
+
+module LoadImage where
+
 import MakeIMG
 import Dither
 import Resize
@@ -60,43 +63,43 @@ dyn2string (ImageCMYK8 d)    = putStrLn "ImageCMYK8"
 dyn2string (ImageCMYK16 d)   = putStrLn "ImageCMYK16"
 
 
-main :: IO ()
-main = do
-    putStrLn "Hallo zu LambDraw!"
-    args <- getArgs
-    checkArgs args
+-- main :: IO ()
+-- main = do
+--     putStrLn "Hallo zu LambDraw!"
+--     args <- getArgs
+--     checkArgs args
 
-main1 :: [String] -> IO()
-main1 args = do
-    putStrLn $ show args
-    checkArgs args
+-- main1 :: [String] -> IO()
+-- main1 args = do
+--     putStrLn $ show args
+--     checkArgs args
 
-checkArgs :: [String] -> IO()
-checkArgs [pathIn,pathOut] = do 
-    putStrLn "Choose Option:"
-    putStrLn "1 rgbPallette  Floyd-Steinberg Dither"
-    putStrLn "2 cmykPallette Floyd-Steinberg Dither"
-    putStrLn "3 noDither conversion"  
-    putStrLn "4 resize"
-    opt <- getLine
-    checkopt $ (read opt :: Int)
-    processImage (read opt :: Int) pathIn pathOut
-    where 
-    checkopt :: Int -> IO()
-    checkopt 1  = putStrLn "Starting rgb  conversion."    
-    checkopt 2  = putStrLn "Starting cmyk conversion"     
-    checkopt 3  = putStrLn "Starting noDither conversion" 
-    checkopt _ = do 
-      putStrLn "Wrong Input"
-      checkArgs [pathIn,pathOut] 
-checkArgs _                = hilfstext
-    where 
-    hilfstext :: IO ()
-    hilfstext = do
-      putStrLn "Input needed:"
-      putStrLn "<pathIn.png> <pathOut>"
-      args'  <- getLine
-      checkArgs $ words args'
+-- checkArgs :: [String] -> IO()
+-- checkArgs [pathIn,pathOut] = do 
+--     putStrLn "Choose Option:"
+--     putStrLn "1 rgbPallette  Floyd-Steinberg Dither"
+--     putStrLn "2 cmykPallette Floyd-Steinberg Dither"
+--     putStrLn "3 noDither conversion"  
+--     putStrLn "4 resize"
+--     opt <- getLine
+--     checkopt $ (read opt :: Int)
+--     processImage (read opt :: Int) pathIn pathOut
+--     where 
+--     checkopt :: Int -> IO()
+--     checkopt 1  = putStrLn "Starting rgb  conversion."    
+--     checkopt 2  = putStrLn "Starting cmyk conversion"     
+--     checkopt 3  = putStrLn "Starting noDither conversion" 
+--     checkopt _ = do 
+--       putStrLn "Wrong Input"
+--       checkArgs [pathIn,pathOut] 
+-- checkArgs _                = hilfstext
+--     where 
+--     hilfstext :: IO ()
+--     hilfstext = do
+--       putStrLn "Input needed:"
+--       putStrLn "<pathIn.png> <pathOut>"
+--       args'  <- getLine
+--       checkArgs $ words args'
 
 
 processImage :: Int -> FilePath -> FilePath -> IO()
