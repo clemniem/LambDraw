@@ -21,6 +21,10 @@ import Control.Applicative
 import System.FilePath
 import System.Directory
 
+-- DIN A4 210 x 297 mm
+-- DIN A5 148 x 210 mm
+-- DIN A6 105 x 148 mm
+-- DIN A7 74 x 105 mm
 
 
 type Accessor = PixelRGB8 -> Pixel8

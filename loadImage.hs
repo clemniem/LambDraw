@@ -71,12 +71,6 @@ main1 args = do
     putStrLn $ show args
     checkArgs args
 
--- loadPng :: FilePath -> IO DynamicImage
--- loadPng path = do
---     temp <- readPng path >>= either error return
---     return temp
-
-
 checkArgs :: [String] -> IO()
 checkArgs [pathIn,pathOut] = do 
     putStrLn "Choose Option:"
@@ -102,21 +96,10 @@ checkArgs _                = hilfstext
       putStrLn "Input needed:"
       putStrLn "<pathIn.png> <pathOut>"
       args'  <- getLine
-      main1 $ words args'
+      checkArgs $ words args'
 
 
 processImage :: Int -> FilePath -> FilePath -> IO()
--- processImage 4 pathIn pathOut   = do 
---     dynImg <- loadPng pathIn
---     dyn2string dynImg -- Debugging Helper
---     putStrLn "Bildgroesse: ("++(print ih) ++ "," ++(print iw) ++ ")"
---     putStr "Please enter maxBound (is compared to max): "
---     inVal <- getLine
---     let dh = read inVal :: Int
---     safeResize pathOut $ (dyn2rgb8 dynImg)
---         where 
---         safeResize pOut (Just img) = saveImage pathOut $ ImageRGB8 $ imgResizer dh img
---         safeResize _    Nothing    = putStrLn "Error with Image to RGB8 conversion!"
 processImage opt pathIn pathOut = do
     dynImg <- loadPng pathIn
     dyn2string dynImg -- Debugging Helper
@@ -124,11 +107,6 @@ processImage opt pathIn pathOut = do
         where 
         safesave pOut (Just img) = saveImage pathOut $ ImageRGB8 $ imgConverter opt img
         safesave _    Nothing    = putStrLn "Error with Image to RGB8 conversion!"
-
--- saveImage :: FilePath -> DynamicImage -> IO ()
--- saveImage name img  = do 
---     savePngImage (name ++ ".png") img
---     putStrLn "Saved." 
 
 imgConverter :: Int -> Image PixelRGB8 -> Image PixelRGB8
 imgConverter state img@( Image {  imageWidth  = w
