@@ -1,5 +1,5 @@
 import Control.Monad
-
+import Safe 
 import qualified Graphics.UI.Threepenny as UI
 import Graphics.UI.Threepenny.Core
 import Dither
@@ -7,6 +7,16 @@ import LoadImage
 {-----------------------------------------------------------------------------
     Main
 ------------------------------------------------------------------------------}
+numCols = 4
+
+safeColor :: Maybe Int -> Maybe Int -> Maybe Int -> UI.Color 
+safeColor mr mg mb = UI.RGB (tst mr) (tst mg) (tst mb)
+    where tst Nothing  = 0
+          tst (Just i)
+            | i > 255   = 255
+            | i < 0     = 0
+            | otherwise = i 
+
 main :: IO ()
 main = startGUI defaultConfig { 
             tpStatic     = Just "./images"
@@ -20,6 +30,10 @@ setup window = do
     canvas <- UI.canvas
         # set UI.height 35
         # set UI.width  35
+        # set style [("border", "solid black 1px")]
+    palCanvas <- UI.canvas
+        # set UI.height 35
+        # set UI.width  (35*4)
         # set style [("border", "solid black 1px")]
     imgur  <- UI.image
         # set UI.height 300
@@ -35,17 +49,27 @@ setup window = do
     drawHeight  <- UI.input -- dh
     applyResize <- UI.button #+ [string "Apply new Size."]
     
-    rVal <- UI.input
-    gVal <- UI.input
-    bVal <- UI.input
+    elrVal <- UI.input
+    elgVal <- UI.input
+    elbVal <- UI.input
 
-    addColor    <- UI.button #+ [string "Add Color to Palette     "]
+    addCol1    <- UI.button #+ [string "A"]
+    addCol2    <- UI.button #+ [string "B"]
+    addCol3    <- UI.button #+ [string "C"]
+    addCol4    <- UI.button #+ [string "D"]
+
     removeColor <- UI.button #+ [string "Remove Color from Palette"]
 
-    colPick <- UI.div #+ [grid [[string "R",element rVal], [string "G", element gVal],[string "B", element bVal]]
-                         ,row [element canvas, column [element addColor, element removeColor]]
-                         ]
+    -- elCol1chek <-  UI.input # set UI.type_ "checkbox"
+    -- elCol2chek <-  UI.input # set UI.type_ "checkbox"
+    -- elCol3chek <-  UI.input # set UI.type_ "checkbox"
+    -- elCol4chek <-  UI.input # set UI.type_ "checkbox"
 
+    colPick <- UI.div #+ [row [column [grid [[string "R",element elrVal], [string "G", element elgVal],[string "B", element elbVal]]
+                         ,row [element canvas, column [row [element addCol1,element addCol2,element addCol3,element addCol4]
+                                                      ,element removeColor]]]
+                         ,column [element palCanvas]]
+                         ]
         # set UI.height 300
         # set UI.width  300
         # set style [("left", "50 px")]
@@ -64,28 +88,48 @@ setup window = do
         ]
 
         -- row [column [ element imgur,
-        --        row  [ grid [[string "Red", element rVal]
-        --               ,[string "Green",element gVal]
-        --               ,[string "Blue",element bVal]]]
+        --        row  [ grid [[string "Red", element elrVal]
+        --               ,[string "Green",element elgVal]
+        --               ,[string "Blue",element elbVal]]]
         --             ,element canvas]] 
         -- ,grid [[string "DrawWidth :" , element drawWidth  ]
         --       ,[string "drawHeight:" , element drawHeight ]
         --       ,[element applyResize]]
         -- , element addRects, element addArcs, element clear
 
-    bRIn <- stepper "0" $ UI.valueChange rVal
-    bGIn <- stepper "0" $ UI.valueChange gVal
-    bBIn <- stepper "0" $ UI.valueChange bVal
+    -- How can I make this smaller?
+    bRIn <- stepper "0" $ UI.valueChange elrVal
+    bGIn <- stepper "0" $ UI.valueChange elgVal
+    bBIn <- stepper "0" $ UI.valueChange elbVal
 
-    on UI.click addColor $ const $ do
+    let updateCol = const $ do 
         rIn  <- currentValue bRIn
         gIn  <- currentValue bGIn
         bIn  <- currentValue bBIn
-        element canvas # set UI.fillStyle (UI.solidColor $ UI.RGB (read rIn :: Int) 
-                                                                  (read gIn :: Int) 
-                                                                  (read bIn :: Int))
+        element canvas # set UI.fillStyle (UI.solidColor $ safeColor (readMay rIn :: Maybe Int) 
+                                                                     (readMay gIn :: Maybe Int) 
+                                                                     (readMay bIn :: Maybe Int))
         UI.fillRect (0,0) 35 35 canvas
-        --liftIOLater $ putStrLn rIn
+    
+    -- How can I make this smaller?
+    on UI.valueChange elrVal updateCol
+    on UI.valueChange elgVal updateCol
+    on UI.valueChange elbVal updateCol
+
+    let updatePal nr = const $ do
+        rIn  <- currentValue bRIn
+        gIn  <- currentValue bGIn
+        bIn  <- currentValue bBIn
+        element palCanvas # set UI.fillStyle (UI.solidColor $ safeColor (readMay rIn :: Maybe Int) 
+                                                                     (readMay gIn :: Maybe Int) 
+                                                                     (readMay bIn :: Maybe Int))
+        UI.fillRect ((nr*35),0) 35 35 palCanvas
+    
+    -- How can I make this smaller?
+    on UI.click addCol1 $ updatePal 0
+    on UI.click addCol2 $ updatePal 1
+    on UI.click addCol3 $ updatePal 2
+    on UI.click addCol4 $ updatePal 3
 
     on UI.click removeColor $ const $ UI.clearCanvas canvas
 
@@ -100,9 +144,9 @@ setup window = do
     on UI.click applyResize $ return $ element imgur # set UI.src "static/tempDith.png"
 
 
-    let rects = [ (x , y, 10, 10, "red") |  y <-[0,10..200], x <- [0,20..300] 
+    let rects = [ (x , 0, 35, 35, 0) | x <- [0..3]]
 
-                ]
+                
     let drawRect (x,y,w,h,col) = do
           element canvas # set UI.fillStyle (UI.solidColor $ UI.RGB 255 255 0)
           UI.fillRect (x,y) w h canvas
