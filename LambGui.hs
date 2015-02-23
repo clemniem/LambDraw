@@ -9,9 +9,6 @@ import Colorsplicer
 import qualified Graphics.UI.Threepenny as UI
 import Graphics.UI.Threepenny.Core
 import Codec.Picture.Types
-{-----------------------------------------------------------------------------
-    Main
-------------------------------------------------------------------------------}
 
 -- to UI (PixelRGB8) is also possible just change from fst to snd after the return
 getCanvCol :: UI.Canvas -> UI.Point -> UI (PixelRGB8) 
@@ -61,41 +58,55 @@ safeColorRGB8 mr mg mb = PixelRGB8 (tst mr) (tst mg) (tst mb)
             | i < 0     = 0
             | otherwise = fromIntegral i
 
+
+{-----------------------------------------------------------------------------
+    Main
+------------------------------------------------------------------------------}
+
 main :: IO ()
 main = startGUI defaultConfig { 
             tpStatic     = Just "./images"
             } setup
 
+{-----------------------------------------------------------------------------
+    Setup
+------------------------------------------------------------------------------}
+
 setup :: Window -> UI ()
 setup window = do
     return window # set title "LambDraw"
+    ---------------------- SETUP --------------------------
+    elDivHIDE <- UI.div -- used to Hide elements
 
-    canvas <- UI.canvas
-        # set UI.height 35
-        # set UI.width  35
-        # set style [("border", "solid black 1px")]
-    palCanvas <- UI.canvas
-        # set UI.height 35
-        # set UI.width  (35*4)
-        # set style [("border", "solid black 1px")]
-        # set UI.fillStyle (UI.solidColor $ UI.RGB 255 255 255)
-    UI.fillRect (0,0) (35*4) (35) palCanvas
-    imgur  <- UI.image
+    ---------------------- LOADIMG -------------------------
+    elIpathIn <- UI.input #+ [string "PathIN"]
+    elBload   <- UI.button #+ [string "Load File."]
+
+
+    elDload   <- UI.div #+ [row [element elIpathIn,element elBload]] 
+    elDimgs   <- UI.div
+    elIimgOrig  <- UI.image
         # set UI.height 300
         # set UI.width  300
         # set style [("border", "solid black 1px")]
         # set UI.src "static/canvas.png"
-    imgur2  <- UI.image
+
+    ---------------------- RESIZE --------------------------
+    elIimgWidth    <- UI.input -- img w
+    elIimgHeight   <- UI.input -- img h    
+
+    elIdrawWidth   <- UI.input -- dw
+    elIdrawHeight  <- UI.input -- dh    
+
+    elIimgRes      <- UI.image
         # set UI.height 300
         # set UI.width  300
         # set style [("border", "solid black 1px")]
         # set UI.src "static/t2.png"
-    drawWidth   <- UI.input -- dw
-    drawHeight  <- UI.input -- dh
-    elBapplyResize <- UI.button #+ [string "Apply Resize."]
 
-    elBapplyDither <- UI.button #+ [string "Apply Dither."]
-    
+
+    elBapplyResize <- UI.button #+ [string "Apply Resize."]
+    ---------------------- COLOR PICKER --------------------
     elrVal <- UI.input
     elgVal <- UI.input
     elbVal <- UI.input
@@ -108,10 +119,17 @@ setup window = do
     elBgetPall <- UI.button #+ [string "Get Pallette"]
     removeColor <- UI.button #+ [string "Remove Color"]
 
-    -- elCol1chek <-  UI.input # set UI.type_ "checkbox"
-    -- elCol2chek <-  UI.input # set UI.type_ "checkbox"
-    -- elCol3chek <-  UI.input # set UI.type_ "checkbox"
-    -- elCol4chek <-  UI.input # set UI.type_ "checkbox"
+    canvas <- UI.canvas
+        # set UI.height 35
+        # set UI.width  35
+        # set style [("border", "solid black 1px")]
+    palCanvas <- UI.canvas
+        # set UI.height 35
+        # set UI.width  (35*4)
+        # set style [("border", "solid black 1px")]
+        # set UI.fillStyle (UI.solidColor $ UI.RGB 255 255 255)
+    UI.fillRect (0,0) (35*4) (35) palCanvas
+
     colPick <- UI.div #+ [row [column [grid [[string "R",element elrVal], [string "G", element elgVal],[string "B", element elbVal]]
                          ,row [element canvas, column [row [element addCol1,element addCol2,element addCol3,element addCol4]
                                                       ,element removeColor]]]
@@ -122,13 +140,47 @@ setup window = do
         # set style [("left", "50 px")]
         # set UI.align "top"
         # set UI.valign "left"
+    ---------------------- DITHER --------------------------
+    elBapplyDither <- UI.button #+ [string "Apply Dither."]
+    elDdither <- UI.div #+ [element elBapplyDither, element elBapplyResize]    
 
-    elDdither <- UI.div #+ [element elBapplyDither]    
-
-    getBody window #+ [
-        element colPick, row [element imgur], element elBapplyDither
+    ---------------------- COLORSPLICER --------------------
+    ---------------------- GCODE ---------------------------
+    ---------------------- SAVEFILE ------------------------
+    -- ======
+--------------------------- BODY ----------------------------
+    getBody window #+ [ 
+        element elDload,
+        row [element elDimgs],
+        element elDdither, 
+        element colPick
         ]
 
+{-----------------------------------------------------------------------------
+                        Start GUI
+    ------------------------------------------------------------------------------}
+
+
+    -------GUI--------------- SETUP ---------------------------
+
+    -------GUI--------------- LOADIMG -------------------------
+    bUrlIn <- stepper "" $ UI.valueChange elIpathIn
+    on UI.click elBload $ const $ do urlIn <- currentValue bUrlIn
+                                     uri <- loadFile "image" urlIn
+                                     return elIimgOrig # set UI.src uri
+                                     return elDimgs #+ [element elIimgOrig]  
+
+
+
+
+    -------GUI--------------- RESIZE --------------------------
+    dwIn   <- stepper "0" $ UI.valueChange elIdrawWidth
+    on UI.click elBapplyResize $ const $ element elIdrawHeight # sink value dwIn
+    
+
+
+    on UI.click elBapplyResize $ return $ element elDivHIDE #+ [element elIimgRes]
+    -------GUI--------------- COLOR PICKER --------------------
     -- How can I make this smaller?
     bRIn <- stepper "0" $ UI.valueChange elrVal
     bGIn <- stepper "0" $ UI.valueChange elgVal
@@ -158,18 +210,30 @@ setup window = do
     let getPallette = const $ do  val <- mapM (getCanvCol palCanvas) [(1,1),(36,1),(72,1),(108,1)] 
                                   liftIOLater $ print $ val
     on UI.click elBgetPall getPallette
-
-
-
-
-
-    dwIn   <- stepper "0" $ UI.valueChange drawWidth
-    on UI.click elBapplyDither $ const $ element drawHeight # sink value dwIn
-    
+    -------GUI--------------- DITHER --------------------------    
     -- apply Dither and change to new imgDith
     on UI.click elBapplyDither $ return $ do pal <- mapM (getCanvCol palCanvas) [(1,1),(36,1),(72,1),(108,1)]
                                              liftIOLater $ processImagels pal "./images/canvas.png" "./images/tempDith"
-    on UI.click elBapplyDither $ return $ element imgur # set UI.src "static/tempDith.png"
+    on UI.click elBapplyDither $ return $    element elIimgOrig # set UI.src "static/tempDith.png"
+    -------GUI--------------- COLORSPLICER --------------------
+    -------GUI--------------- GCODE ---------------------------
+    -------GUI--------------- SAVEFILE ------------------------
+    -------GUI--------------- BODY ----------------------------
+
+
+
+    -- elCHbox <-  UI.input # set UI.type_ "checkbox"
+
+
+
+
+
+
+
+
+
+
+
 
 
     -- let rects = [ (x , 0, 35, 35, 0) | x <- [0..3]]
