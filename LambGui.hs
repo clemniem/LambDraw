@@ -78,6 +78,8 @@ setup window = do
         # set UI.height 35
         # set UI.width  (35*4)
         # set style [("border", "solid black 1px")]
+        # set UI.fillStyle (UI.solidColor $ UI.RGB 255 255 255)
+    UI.fillRect (0,0) (35*4) (35) palCanvas
     imgur  <- UI.image
         # set UI.height 300
         # set UI.width  300
@@ -124,7 +126,7 @@ setup window = do
     elDdither <- UI.div #+ [element elBapplyDither]    
 
     getBody window #+ [
-        element colPick, row [element imgur, element imgur2], element elBapplyDither
+        element colPick, row [element imgur], element elBapplyDither
         ]
 
     -- How can I make this smaller?
