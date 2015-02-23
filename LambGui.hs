@@ -14,13 +14,13 @@ import Codec.Picture.Types
 ------------------------------------------------------------------------------}
 
 -- to UI (PixelRGB8) is also possible just change from fst to snd after the return
-getCanvCol :: UI.Canvas -> UI.Point -> UI (UI.Color) 
+getCanvCol :: UI.Canvas -> UI.Point -> UI (PixelRGB8) 
 getCanvCol canvas (x,y) = do  
   str <- callFunction $ ffi ("(%1.getContext('2d').getImageData(%2,%3,1,1).data[0])+\
                             \\",\"+(%1.getContext('2d').getImageData(%2,%3,1,1).data[1])+\
                             \\",\"+(%1.getContext('2d').getImageData(%2,%3,1,1).data[2])") 
                             canvas x y
-  return $ fst $ tripleToCol $ lsToRGB $ wordsWhen (==',') str
+  return $ snd $ tripleToCol $ lsToRGB $ wordsWhen (==',') str
    where
    -- could also use splitOn
    wordsWhen     :: (Char -> Bool) -> String -> [String]
@@ -36,21 +36,6 @@ getCanvCol canvas (x,y) = do
    tripleToCol :: (Int,Int,Int) -> (UI.Color, PixelRGB8)
    tripleToCol (r,g,b) = ((UI.RGB r g b),(PixelRGB8 r' g' b'))
      where (r',g',b') = (fromIntegral r,fromIntegral g,fromIntegral b) 
-    
-
-
-
-numCols = 4
-type QuadPixRGB8 = (PixelRGB8,PixelRGB8,PixelRGB8,PixelRGB8)
-
-valPallette = (whitePix,whitePix,whitePix,whitePix) :: QuadPixRGB8
-
--- demo :: Int -> (Maybe Int,Maybe Int,Maybe Int) -> QuadPixRGB8
--- demo nr val = fst $ (flip runState) val $ do 
---             x <- get
---             put $ pluss 10 x
---             y <- get
---             return y
 
 toPallette :: (PixelRGB8,PixelRGB8,PixelRGB8,PixelRGB8) -> [PixelRGB8]
 toPallette (a,b,c,d) = remWhite [a,b,c,d]
@@ -85,7 +70,6 @@ setup :: Window -> UI ()
 setup window = do
     return window # set title "LambDraw"
 
-    defPallette <- return valPallette
     canvas <- UI.canvas
         # set UI.height 35
         # set UI.width  35
@@ -106,9 +90,9 @@ setup window = do
         # set UI.src "static/t2.png"
     drawWidth   <- UI.input -- dw
     drawHeight  <- UI.input -- dh
-    applyResize <- UI.button #+ [string "Apply Resize."]
+    elBapplyResize <- UI.button #+ [string "Apply Resize."]
 
-    applyDither <- UI.button #+ [string "Apply Dither."]
+    elBapplyDither <- UI.button #+ [string "Apply Dither."]
     
     elrVal <- UI.input
     elgVal <- UI.input
@@ -126,7 +110,6 @@ setup window = do
     -- elCol2chek <-  UI.input # set UI.type_ "checkbox"
     -- elCol3chek <-  UI.input # set UI.type_ "checkbox"
     -- elCol4chek <-  UI.input # set UI.type_ "checkbox"
-    elStringC <- UI.span # set UI.text "s"
     colPick <- UI.div #+ [row [column [grid [[string "R",element elrVal], [string "G", element elgVal],[string "B", element elbVal]]
                          ,row [element canvas, column [row [element addCol1,element addCol2,element addCol3,element addCol4]
                                                       ,element removeColor]]]
@@ -138,8 +121,10 @@ setup window = do
         # set UI.align "top"
         # set UI.valign "left"
 
+    elDdither <- UI.div #+ [element elBapplyDither]    
+
     getBody window #+ [
-        element colPick, row [element imgur, element imgur2]
+        element colPick, row [element imgur, element imgur2], element elBapplyDither
         ]
 
     -- How can I make this smaller?
@@ -177,12 +162,12 @@ setup window = do
 
 
     dwIn   <- stepper "0" $ UI.valueChange drawWidth
-    on UI.click applyDither $ const $ element drawHeight # sink value dwIn
+    on UI.click elBapplyDither $ const $ element drawHeight # sink value dwIn
     
     -- apply Dither and change to new imgDith
-    on UI.click applyDither $ return $ liftIOLater 
-                            $ processImage 1 "./images/canvas.png" "./images/tempDith"
-    on UI.click applyDither $ return $ element imgur # set UI.src "static/tempDith.png"
+    on UI.click elBapplyDither $ return $ do pal <- mapM (getCanvCol palCanvas) [(1,1),(36,1),(72,1),(108,1)]
+                                             liftIOLater $ processImagels pal "./images/canvas.png" "./images/tempDith"
+    on UI.click elBapplyDither $ return $ element imgur # set UI.src "static/tempDith.png"
 
 
     -- let rects = [ (x , 0, 35, 35, 0) | x <- [0..3]]

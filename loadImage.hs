@@ -123,7 +123,14 @@ imgConverter state img@( Image {  imageWidth  = w
 
 -- imgResizer :: Int 
 
-
+processImagels :: [PixelRGB8] -> FilePath -> FilePath -> IO()
+processImagels pixls pathIn pathOut = do
+    dynImg <- loadPng pathIn
+    dyn2string dynImg -- Debugging Helper
+    safesave pathOut $ (dyn2rgb8 dynImg)
+        where 
+        safesave pOut (Just img) = saveImage pathOut $ ImageRGB8 $ ditherFloydRGB8 pixls img
+        safesave _    Nothing    = putStrLn "Error with Image to RGB8 conversion!"
 
 
 
