@@ -5,6 +5,7 @@ import Dither
 import LoadImage
 import MakeIMG
 import Colorsplicer
+import Data.Ratio
 
 import qualified Graphics.UI.Threepenny as UI
 import Graphics.UI.Threepenny.Core
@@ -72,6 +73,14 @@ safeColorRGB8 mr mg mb = PixelRGB8 (tst mr) (tst mg) (tst mb)
             | otherwise = fromIntegral i
 
 
+
+safeTupel :: (String,String) -> (Int,Int)
+safeTupel (str1,str2) = (toInt (readMay str1),toInt (readMay str2))
+  where 
+    toInt :: Maybe Int -> Int
+    toInt (Just nr) = nr
+    toInt _         = 0  
+
 {-----------------------------------------------------------------------------
     Main
 ------------------------------------------------------------------------------}
@@ -111,18 +120,28 @@ setup window = do
                               # set style padding
     elIdrawWidth   <- UI.input -- dw
     elIdrawHeight  <- UI.input -- dh    
+    
     elimgSizeVal   <- UI.input -- (imgW,imgH)
+    
     elIimgRes      <- UI.image
         -- # set UI.height 300
         -- # set UI.width  300
         # set style [("border", "solid black 1px")]
         # set UI.src "static/t2.png"
-    elBgetSize    <- UI.button #+ [string "getSize"]
-    elUgetSize    <- UI.input
-
-    elBapplyResize <- UI.button #+ [string "Apply Resize."]
+    elBcalcSize    <- UI.button #+ [string "Calc New Size"] 
+    
+    elresFac      <- UI.new
+    
+    elBlsresize   <- UI.div #+ [element elBcalcSize, element elresFac]
+    elBapplyResize <- UI.button #+ [string "Apply Resize"]
     elDresize <- UI.div
-
+    elDresizeInv <- UI.div #+ [string "Image too big, needs Resizing:",
+                               row [element elBlsresize] # set style padding, 
+                                grid [[string "img Width: ", element elIimgWidth, 
+                                        string "dWidth:", element elIdrawWidth  ],
+                                      [string "img Height: ",element elIimgHeight, 
+                                        string "dHeight:", element elIdrawHeight]]]
+                           # set style padding
     ---------------------- COLOR PICKER --------------------
     elrVal <- UI.input
     elgVal <- UI.input
@@ -159,7 +178,7 @@ setup window = do
         # set UI.valign "left"
     ---------------------- DITHER --------------------------
     elBapplyDither <- UI.button #+ [string "Apply Dither."]
-    elDdither <- UI.div #+ [element elBapplyDither, element elBapplyResize]    
+    elDdither <- UI.div #+ [element elBapplyDither]    
 
     ---------------------- COLORSPLICER --------------------
     ---------------------- GCODE ---------------------------
@@ -184,19 +203,19 @@ setup window = do
     -------GUI--------------- LOADIMG -------------------------
     bUrlIn <- stepper "" $ UI.valueChange elIpathIn
     
-    let readSize = do urlIn <- currentValue bUrlIn
+    let readSize = do urlIn   <- currentValue bUrlIn
+                      -- ??? Wie kann ich einfacher die IO wegbekommen. bzw IO -> UI
                       ioMsize <- liftIO $ return $ getImgSize urlIn
-                      mSize <- liftIO ioMsize
+                      mSize   <- liftIO ioMsize
                       let sze    = ifSize mSize -- (width,height)
                       let width  = show $ fst sze
                       let height = show $ snd sze
-                      element elIimgHeight # set UI.text height
-                      element elIimgWidth  # set UI.text width
+                      element elIimgHeight # set UI.text  height
+                                           # set UI.value height
+                      element elIimgWidth  # set UI.text  width
+                                           # set UI.value width
                       if sze > drawMax
-                        then element elDresize #+ [element elBgetSize, grid [[string "img Width: ", element elIimgWidth, 
-                                                                          string "dWidth:", element elIdrawWidth  ],
-                                                                        [string "img Height: ",element elIimgHeight, 
-                                                                          string "dHeight:", element elIdrawHeight]]]
+                        then element elDresize #+ [element elDresizeInv]
                         else element elDresize #+ [string "No Resize necessary"]
                       liftIOLater $ print sze
 
@@ -211,11 +230,28 @@ setup window = do
 
     -------GUI--------------- RESIZE --------------------------
 
-    dwIn   <- stepper "0" $ UI.valueChange elIdrawWidth
-    dhIn   <- stepper "0" $ UI.valueChange elIdrawHeight
+    rwIn   <- stepper "0" $ UI.valueChange elIdrawWidth
+    rhIn   <- stepper "0" $ UI.valueChange elIdrawHeight
 
-    on UI.click elBapplyResize $ const $ element elIdrawHeight # sink value dwIn
-    
+    --on UI.valueChange rwIn $ updateResizeInput
+
+    on UI.click elBcalcSize $ return $ do rwStr  <- currentValue rwIn
+                                          rhStr  <- currentValue rhIn
+                                          [imwStr] <- getValuesList [elIimgWidth]
+                                          [imhStr] <- getValuesList [elIimgHeight]
+                                          liftIOLater $ print imwStr
+                                          let d@(dW,dH)   = drawMax 
+                                          let i@(imW,imH) = safeTupel (imwStr,imhStr)
+                                          let r@(rW,rH)   = safeTupel (rwStr,rhStr)
+                                          let fact        = rW%imW
+                                          if (not $ and [d>r,r<i,r>(0,0)])
+                                             then do element elIdrawWidth # set UI.value "invalid"
+                                                     element elDivHIDE #+ [element elBapplyResize]
+                                                     liftIOLater $ print "Wrong Input. Size is still to big"
+                                             else do element elresFac # set UI.value "123"
+                                                     element elDresize #+ [element elBapplyResize]
+                                                     liftIOLater $ print "Right input"
+                                           
 
 
     on UI.click elBapplyResize $ return $ element elDivHIDE #+ [element elIimgRes]
