@@ -231,8 +231,9 @@ setup window = do
     on UI.click elBgetPall getPallette
     -------GUI--------------- DITHER --------------------------    
     -- apply Dither and change to new imgDith
-    on UI.click elBapplyDither $ return $ do pal <- mapM (getCanvCol palCanvas) [(1,1),(36,1),(72,1),(108,1)]
-                                             liftIOLater $ processImagels pal "./images/canvas.png" "./images/tempDith"
+    on UI.click elBapplyDither $ return $ do uri <- currentValue bUrlIn
+                                             pal <- mapM (getCanvCol palCanvas) [(1,1),(36,1),(72,1),(108,1)]
+                                             liftIOLater $ processImagels pal uri "./images/tempDith"
     on UI.click elBapplyDither $ return $    element elIimgOrig # set UI.src "static/tempDith.png"
     -------GUI--------------- COLORSPLICER --------------------
     -------GUI--------------- GCODE ---------------------------
