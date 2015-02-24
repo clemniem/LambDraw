@@ -99,8 +99,8 @@ setup window = do
     elIdrawHeight  <- UI.input -- dh    
 
     elIimgRes      <- UI.image
-        # set UI.height 300
-        # set UI.width  300
+        -- # set UI.height 300
+        -- # set UI.width  300
         # set style [("border", "solid black 1px")]
         # set UI.src "static/t2.png"
 
@@ -116,7 +116,7 @@ setup window = do
     addCol3    <- UI.button #+ [string "C"]
     addCol4    <- UI.button #+ [string "D"]
 
-    elBgetPall <- UI.button #+ [string "Get Pallette"]
+    elBgetPall <- UI.button #+ [string "Get Pallette*DEBUG*"]
     removeColor <- UI.button #+ [string "Remove Color"]
 
     canvas <- UI.canvas

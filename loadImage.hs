@@ -7,6 +7,7 @@ import MakeIMG
 import Dither
 import Resize
 
+import Codec.Picture
 import Codec.Picture.Types 
 import System.Environment
 import Data.Bits( unsafeShiftR )
@@ -62,6 +63,11 @@ dyn2string (ImageYCbCr8 d)   = putStrLn "ImageYCbCr8"
 dyn2string (ImageCMYK8 d)    = putStrLn "ImageCMYK8"
 dyn2string (ImageCMYK16 d)   = putStrLn "ImageCMYK16"
 
+getImgSize :: FilePath -> IO (Maybe (Int,Int))
+getImgSize pIn = do dyn <- readPng pIn >>= either error return
+                    return $ getSize $ dyn2rgb8 dyn
+    where getSize (Just img) = Just (imageWidth img, imageHeight img)
+          getSize _             = Nothing
 
 -- main :: IO ()
 -- main = do

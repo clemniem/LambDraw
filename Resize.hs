@@ -36,6 +36,14 @@ red, blue, green :: Accessor
 red   (PixelRGB8 r _ _) = r
 green (PixelRGB8 _ g _) = g
 blue  (PixelRGB8 _ _ b) = b
+
+getImgSize :: FilePath -> IO (Maybe (Int,Int))
+getImgSize pIn = do b <- readImage pIn >>= either error return
+                    return $ f b
+    where f (ImageRGB8 i) = Just (imageWidth i, imageHeight i)
+          f _             = Nothing
+
+
 -- Source: https://gist.github.com/eflister/5456125
 goResize :: FilePath -> FilePath -> Int -> IO ()
 goResize inF outF h = either error f =<< readImage inF
