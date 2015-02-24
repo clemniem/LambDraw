@@ -10,6 +10,11 @@ import qualified Graphics.UI.Threepenny as UI
 import Graphics.UI.Threepenny.Core
 import Codec.Picture.Types
 
+ifSize :: Maybe (Int,Int) -> (Int,Int)
+ifSize (Just msize) = msize
+ifSize _           = (0,0)
+
+
 -- to UI (PixelRGB8) is also possible just change from fst to snd after the return
 getCanvCol :: UI.Canvas -> UI.Point -> UI (PixelRGB8) 
 getCanvCol canvas (x,y) = do  
@@ -92,8 +97,8 @@ setup window = do
         # set UI.src "static/canvas.png"
 
     ---------------------- RESIZE --------------------------
-    elIimgWidth    <- UI.input -- img w
-    elIimgHeight   <- UI.input -- img h    
+    elIimgWidth    <- UI.span # set UI.text "---" -- img w
+    elIimgHeight   <- UI.span # set UI.text "---"-- img h    
 
     elIdrawWidth   <- UI.input -- dw
     elIdrawHeight  <- UI.input -- dh    
@@ -103,9 +108,12 @@ setup window = do
         -- # set UI.width  300
         # set style [("border", "solid black 1px")]
         # set UI.src "static/t2.png"
-
+    elBgetSize    <- UI.button #+ [string "getSize"]
+    elUgetSize    <- UI.input
 
     elBapplyResize <- UI.button #+ [string "Apply Resize."]
+    elDresize <- UI.div #+ [element elBgetSize, grid [[string "img Width: ", element elIimgWidth ],
+                                                      [string "img Height: ",element elIimgHeight]]]
     ---------------------- COLOR PICKER --------------------
     elrVal <- UI.input
     elgVal <- UI.input
@@ -151,6 +159,7 @@ setup window = do
 --------------------------- BODY ----------------------------
     getBody window #+ [ 
         element elDload,
+        element elDresize,
         row [element elDimgs],
         element elDdither, 
         element colPick
@@ -174,6 +183,16 @@ setup window = do
 
 
     -------GUI--------------- RESIZE --------------------------
+    on UI.click elBgetSize $ const $ do urlIn <- currentValue bUrlIn
+                                        ioMsize <- liftIO $ return $ getImgSize urlIn
+                                        mSize <- liftIO ioMsize
+                                        let sze    = ifSize mSize -- (width,height)
+                                        let width  = show $ fst sze
+                                        let height = show $ snd sze
+                                        element elIimgHeight # set UI.text height
+                                        element elIimgWidth # set UI.text width
+                                        liftIOLater $ print sze
+    
     dwIn   <- stepper "0" $ UI.valueChange elIdrawWidth
     on UI.click elBapplyResize $ const $ element elIdrawHeight # sink value dwIn
     
