@@ -18,7 +18,7 @@ ifSize _           = (0,0)
 drawMax = (210,297) -- (width,height)
 
 
-
+padding = [("padding","10px 10px 10px 10px")]
 -- ImgMax -> DrawMax -> Bool
 imgTooBig :: (Int,Int) -> (Int,Int) -> Bool
 imgTooBig (imW,imH) (dW,dH) = and [imW>dW,imH>dH]
@@ -106,11 +106,12 @@ setup window = do
 
     ---------------------- RESIZE --------------------------
     elIimgWidth    <- UI.span # set UI.text "---" -- img w
+                              # set style padding
     elIimgHeight   <- UI.span # set UI.text "---"-- img h    
-
+                              # set style padding
     elIdrawWidth   <- UI.input -- dw
     elIdrawHeight  <- UI.input -- dh    
-
+    elimgSizeVal   <- UI.input -- (imgW,imgH)
     elIimgRes      <- UI.image
         -- # set UI.height 300
         -- # set UI.width  300
@@ -121,14 +122,7 @@ setup window = do
 
     elBapplyResize <- UI.button #+ [string "Apply Resize."]
     elDresize <- UI.div
------->>>>>>>>>>>>>>>>>>>>> --change hardcode to getSize erstes Argument imgTooBig    
-    if (imgTooBig (1020,1020) drawMax) 
-      then
-           element elDresize #+ [element elBgetSize, grid [[string "img Width: ", element elIimgWidth, 
-                                                        string "dWidth:", element elIdrawWidth  ],
-                                                      [string "img Height: ",element elIimgHeight, 
-                                                        string "dHeight:", element elIdrawHeight]]]
-      else element elDresize #+ [string "No Resize necessary"]
+
     ---------------------- COLOR PICKER --------------------
     elrVal <- UI.input
     elgVal <- UI.input
@@ -189,25 +183,34 @@ setup window = do
 
     -------GUI--------------- LOADIMG -------------------------
     bUrlIn <- stepper "" $ UI.valueChange elIpathIn
+    
+    let readSize = do urlIn <- currentValue bUrlIn
+                      ioMsize <- liftIO $ return $ getImgSize urlIn
+                      mSize <- liftIO ioMsize
+                      let sze    = ifSize mSize -- (width,height)
+                      let width  = show $ fst sze
+                      let height = show $ snd sze
+                      element elIimgHeight # set UI.text height
+                      element elIimgWidth  # set UI.text width
+                      if sze > drawMax
+                        then element elDresize #+ [element elBgetSize, grid [[string "img Width: ", element elIimgWidth, 
+                                                                          string "dWidth:", element elIdrawWidth  ],
+                                                                        [string "img Height: ",element elIimgHeight, 
+                                                                          string "dHeight:", element elIdrawHeight]]]
+                        else element elDresize #+ [string "No Resize necessary"]
+                      liftIOLater $ print sze
+
     on UI.click elBload $ const $ do urlIn <- currentValue bUrlIn
                                      uri <- loadFile "image" urlIn
                                      return elIimgOrig # set UI.src uri
-                                     return elDimgs #+ [element elIimgOrig]  
+                                     return elDimgs #+ [element elIimgOrig]
+                                     readSize  
 
 
 
 
     -------GUI--------------- RESIZE --------------------------
-    on UI.click elBgetSize $ const $ do urlIn <- currentValue bUrlIn
-                                        ioMsize <- liftIO $ return $ getImgSize urlIn
-                                        mSize <- liftIO ioMsize
-                                        let sze    = ifSize mSize -- (width,height)
-                                        let width  = show $ fst sze
-                                        let height = show $ snd sze
-                                        element elIimgHeight # set UI.text height
-                                        element elIimgWidth # set UI.text width
-                                        liftIOLater $ print sze
-    
+
     dwIn   <- stepper "0" $ UI.valueChange elIdrawWidth
     dhIn   <- stepper "0" $ UI.valueChange elIdrawHeight
 
