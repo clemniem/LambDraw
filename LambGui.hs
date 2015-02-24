@@ -14,6 +14,14 @@ ifSize :: Maybe (Int,Int) -> (Int,Int)
 ifSize (Just msize) = msize
 ifSize _           = (0,0)
 
+-- DIN A4 210 x 297 mm
+drawMax = (210,297) -- (width,height)
+
+
+
+-- ImgMax -> DrawMax -> Bool
+imgTooBig :: (Int,Int) -> (Int,Int) -> Bool
+imgTooBig (imW,imH) (dW,dH) = and [imW>dW,imH>dH]
 
 -- to UI (PixelRGB8) is also possible just change from fst to snd after the return
 getCanvCol :: UI.Canvas -> UI.Point -> UI (PixelRGB8) 
@@ -112,8 +120,15 @@ setup window = do
     elUgetSize    <- UI.input
 
     elBapplyResize <- UI.button #+ [string "Apply Resize."]
-    elDresize <- UI.div #+ [element elBgetSize, grid [[string "img Width: ", element elIimgWidth ],
-                                                      [string "img Height: ",element elIimgHeight]]]
+    elDresize <- UI.div
+------>>>>>>>>>>>>>>>>>>>>> --change hardcode to getSize erstes Argument imgTooBig    
+    if (imgTooBig (1020,1020) drawMax) 
+      then
+           element elDresize #+ [element elBgetSize, grid [[string "img Width: ", element elIimgWidth, 
+                                                        string "dWidth:", element elIdrawWidth  ],
+                                                      [string "img Height: ",element elIimgHeight, 
+                                                        string "dHeight:", element elIdrawHeight]]]
+      else element elDresize #+ [string "No Resize necessary"]
     ---------------------- COLOR PICKER --------------------
     elrVal <- UI.input
     elgVal <- UI.input
@@ -194,6 +209,8 @@ setup window = do
                                         liftIOLater $ print sze
     
     dwIn   <- stepper "0" $ UI.valueChange elIdrawWidth
+    dhIn   <- stepper "0" $ UI.valueChange elIdrawHeight
+
     on UI.click elBapplyResize $ const $ element elIdrawHeight # sink value dwIn
     
 
