@@ -3,7 +3,7 @@ import Safe
 
 import Dither
 import LoadImage
-import MakeIMG
+import MakeIMG as I
 import Colorsplicer
 import Data.Ratio
 import Resize
@@ -129,12 +129,12 @@ setup window = do
         # set UI.src "static/t2.png"
     elBcalcSize    <- UI.button #+ [string "Calc New Size"] 
     
-    elresFac      <- UI.new
+    elresFac       <- UI.new
     
-    elBlsresize   <- UI.div #+ [element elBcalcSize, element elresFac]
+    elBlsresize    <- UI.div #+ [element elBcalcSize, element elresFac]
     elBapplyResize <- UI.button #+ [string "Apply Resize"]
-    elDresize <- UI.div
-    elDresizeInv <- UI.div #+ [string "Image too big, needs Resizing:",
+    elDresize      <- UI.div
+    elDresizeInv   <- UI.div #+ [string "Image too big, needs Resizing:",
                                row [element elBlsresize] # set style padding, 
                                 grid [[string "img Width: ", element elIimgWidth, 
                                         string "dWidth:", element elIdrawWidth  ],
@@ -177,9 +177,11 @@ setup window = do
         # set UI.valign "left"
     ---------------------- DITHER --------------------------
     elBapplyDither <- UI.button #+ [string "Apply Dither."]
-    elDdither <- UI.div #+ [element elBapplyDither]    
+    elDdither      <- UI.div #+ [element elBapplyDither]    
 
     ---------------------- COLORSPLICER --------------------
+    elBsplice <- UI.button #+ [string "Apply Splice"]
+    elDsplice <- UI.div #+ [element elBsplice]
     ---------------------- GCODE ---------------------------
     ---------------------- SAVEFILE ------------------------
     -- ======
@@ -190,7 +192,8 @@ setup window = do
         element elDresize,
         row [element elDimgs],
         element elDdither, 
-        element colPick
+        element colPick,
+        element elDsplice
         ]
 
 {-----------------------------------------------------------------------------
@@ -261,7 +264,7 @@ setup window = do
                                                                 # set UI.height rh'
                                                                 # set UI.width  rw'
                                              element elDimgs #+ [element elIimgRes]
-                                             element elURL # set UI.value "./images/tempRes.png"
+                                             element elURL   # set UI.value "./images/tempRes.png"
                                              liftIOLater $ print rh' 
     -------GUI--------------- COLOR PICKER --------------------
     -- How can I make this smaller?
@@ -295,17 +298,40 @@ setup window = do
 
     on UI.click removeColor $ return $ UI.clearCanvas canvas
     
-    let getPallette = const $ do  val <- mapM (getCanvCol palCanvas) [(1,1),(36,1),(72,1),(108,1)] 
-                                  liftIOLater $ print $ val
-    on UI.click elBgetPall getPallette
+    let getPallette = mapM (getCanvCol palCanvas) [(1,1),(36,1),(72,1),(108,1)]
+    
+    on UI.click elBgetPall $ const $ do val <- getPallette
+                                        liftIOLater $ print $ val
     -------GUI--------------- DITHER --------------------------    
     -- apply Dither and change to new imgDith
     on UI.click elBapplyDither $ return $ do [url] <- getValuesList [elURL]
                                              liftIO $ print url
-                                             pal <- mapM (getCanvCol palCanvas) [(1,1),(36,1),(72,1),(108,1)]
-                                             liftIO $ processImagels pal url "./images/tempDith"
+                                             pal   <- getPallette
+                                             liftIO $ processDither pal url "./images/tempDith"
                                              element elIimgOrig # set UI.src "static/tempDith.png"
+                                             element elURL # set UI.value "./images/tempDith.png"
     -------GUI--------------- COLORSPLICER --------------------
+    on UI.click elBsplice $ return $ do [url] <- getValuesList [elURL]
+                                        [pixA,pixB,pixC,pixD] <- getPallette
+                                        liftIO $ print pixA
+                                        liftIO $ print pixB
+                                        liftIO $ print pixC
+                                        liftIO $ print pixD
+                                        let getls p = if checkColor p whitePix
+                                                        then return []
+                                                        else do iols <- return $ liftIO $ processSplice url p
+                                                                ls   <- iols
+                                                                return ls
+                                        lsA   <- getls pixA
+                                        lsB   <- getls pixB 
+                                        lsC   <- getls pixC
+                                        lsD   <- getls pixD 
+                                        liftIO $ print lsA
+                                        liftIO $ print lsB 
+                                        liftIO $ print lsC 
+                                        liftIO $ print lsD 
+
+
     -------GUI--------------- GCODE ---------------------------
     -------GUI--------------- SAVEFILE ------------------------
     -------GUI--------------- BODY ----------------------------

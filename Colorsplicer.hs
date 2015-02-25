@@ -51,8 +51,8 @@ lengthStarls = lsDistance starls
 smallList = [(x,y) | x <- [0,2..40], y<-[0..20]] :: [Point]
 
 lsDistance :: [Point] -> Distance
-lsDistance []     = 0
-lsDistance (a:[]) = 0
+lsDistance []       = 0
+lsDistance (a:[])   = 0
 lsDistance (a:b:cs) = distance a b + lsDistance (b:cs)
 
 -- sortByNext :: [Point] -> [Point]
@@ -72,14 +72,14 @@ lsDistance (a:b:cs) = distance a b + lsDistance (b:cs)
 starSort :: Int -> Int -> [Point] -> [Point]
 starSort w h []  = []
 starSort w h pts = (  
-                       ds [(x,y) | (x,y) <- nw, x>y   ]
+                       ds                      [(x,y) | (x,y) <- nw, x>y   ]
                     ++ ds (L.reverse $ sortByY [(x,y) | (x,y) <- no, x<=h-y]) -- Maybe needs sortByY
-                    ++ ds (L.reverse [(x,y) | (x,y) <- no, x>h-y ]) -- Maybe needs L.reverse
-                    ++ ds [(x,y) | (x,y) <- so, x>y   ]
-                    ++ ds (L.reverse [(x,y) | (x,y) <- so, x<=y  ]) -- Maybe needs L.reverse
-                    ++ ds (L.reverse [(x,y) | (x,y) <- sw, x>h-y ]) -- Maybe needs L.reverse
+                    ++ ds (L.reverse           [(x,y) | (x,y) <- no, x>h-y ]) -- Maybe needs L.reverse
+                    ++ ds                      [(x,y) | (x,y) <- so, x>y   ]
+                    ++ ds (L.reverse           [(x,y) | (x,y) <- so, x<=y  ]) -- Maybe needs L.reverse
+                    ++ ds (L.reverse           [(x,y) | (x,y) <- sw, x>h-y ]) -- Maybe needs L.reverse
                     ++ ds (L.reverse $ sortByY [(x,y) | (x,y) <- sw, x<=h-y]) -- Maybe needs sortByY
-                    ++ ds (L.reverse [(x,y) | (x,y) <- nw, x<=y  ])
+                    ++ ds (L.reverse           [(x,y) | (x,y) <- nw, x<=y  ])
                     ) 
     where nw = [(x,y) | (x,y) <- pts, x<=w', y<=h']
           no = [(x,y) | (x,y) <- pts, x>w' , y<=h']

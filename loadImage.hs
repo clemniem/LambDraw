@@ -6,6 +6,7 @@ module LoadImage where
 import MakeIMG
 import Dither
 import Resize
+import Colorsplicer
 
 import Codec.Picture
 import Codec.Picture.Types 
@@ -129,8 +130,8 @@ imgConverter state img@( Image {  imageWidth  = w
 
 -- imgResizer :: Int 
 
-processImagels :: [PixelRGB8] -> FilePath -> FilePath -> IO()
-processImagels pixls pathIn pathOut = do
+processDither :: [PixelRGB8] -> FilePath -> FilePath -> IO()
+processDither pixls pathIn pathOut = do
     dynImg <- loadPng pathIn
     dyn2string dynImg -- Debugging Helper
     safesave pathOut $ (dyn2rgb8 dynImg)
@@ -138,7 +139,13 @@ processImagels pixls pathIn pathOut = do
         safesave pOut (Just img) = saveImage pathOut $ ImageRGB8 $ ditherFloydRGB8 pixls img
         safesave _    Nothing    = putStrLn "Error with Image to RGB8 conversion!"
 
-
+processSplice :: FilePath -> PixelRGB8 -> IO([Point])
+processSplice pathIn pix = do
+    dynImg <- loadPng pathIn
+    safesplice (dyn2rgb8 dynImg)
+        where 
+        safesplice (Just img) = return $ colorSplicer img pix
+        safesplice Nothing    = return []
 
 
 
