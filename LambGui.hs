@@ -6,6 +6,7 @@ import LoadImage
 import MakeIMG
 import Colorsplicer
 import Data.Ratio
+import Resize
 
 import qualified Graphics.UI.Threepenny as UI
 import Graphics.UI.Threepenny.Core
@@ -99,7 +100,7 @@ setup window = do
     return window # set title "LambDraw"
     ---------------------- SETUP --------------------------
     elDivHIDE <- UI.div -- used to Hide elements
-
+    elURL     <- UI.div 
     ---------------------- LOADIMG -------------------------
     elIpathIn <- UI.input #+ [string "PathIN"]
     elBload   <- UI.button #+ [string "Load File."]
@@ -124,8 +125,6 @@ setup window = do
     elimgSizeVal   <- UI.input -- (imgW,imgH)
     
     elIimgRes      <- UI.image
-        -- # set UI.height 300
-        -- # set UI.width  300
         # set style [("border", "solid black 1px")]
         # set UI.src "static/t2.png"
     elBcalcSize    <- UI.button #+ [string "Calc New Size"] 
@@ -186,6 +185,7 @@ setup window = do
     -- ======
 --------------------------- BODY ----------------------------
     getBody window #+ [ 
+        element elURL,
         element elDload,
         element elDresize,
         row [element elDimgs],
@@ -221,12 +221,10 @@ setup window = do
 
     on UI.click elBload $ const $ do urlIn <- currentValue bUrlIn
                                      uri <- loadFile "image" urlIn
-                                     return elIimgOrig # set UI.src uri
-                                     return elDimgs #+ [element elIimgOrig]
+                                     element elURL # set UI.value urlIn
+                                     element elIimgOrig # set UI.src uri
+                                     element elDimgs #+ [element elIimgOrig]
                                      readSize  
-
-
-
 
     -------GUI--------------- RESIZE --------------------------
 
@@ -234,7 +232,7 @@ setup window = do
     rhIn   <- stepper "0" $ UI.valueChange elIdrawHeight
 
     --on UI.valueChange rwIn $ updateResizeInput
-
+    -- 
     on UI.click elBcalcSize $ return $ do rwStr  <- currentValue rwIn
                                           rhStr  <- currentValue rhIn
                                           [imwStr] <- getValuesList [elIimgWidth]
@@ -243,18 +241,28 @@ setup window = do
                                           let d@(dW,dH)   = drawMax 
                                           let i@(imW,imH) = safeTupel (imwStr,imhStr)
                                           let r@(rW,rH)   = safeTupel (rwStr,rhStr)
-                                          let fact        = rW%imW
+                                          let fact        = (show rW)++" "++show rH
                                           if (not $ and [d>r,r<i,r>(0,0)])
                                              then do element elIdrawWidth # set UI.value "invalid"
                                                      element elDivHIDE #+ [element elBapplyResize]
                                                      liftIOLater $ print "Wrong Input. Size is still to big"
-                                             else do element elresFac # set UI.value "123"
+                                             else do element elresFac # set UI.value fact
                                                      element elDresize #+ [element elBapplyResize]
                                                      liftIOLater $ print "Right input"
                                            
 
 
-    on UI.click elBapplyResize $ return $ element elDivHIDE #+ [element elIimgRes]
+    on UI.click elBapplyResize $ return $ do urlIn <- currentValue bUrlIn
+                                             [balub] <- getValuesList [elresFac]
+                                             let [rh,rw] = words balub
+                                             let (rh',rw')   = safeTupel (rh,rw)
+                                             liftIO $ goResize urlIn "./images/tempRes.png" rh'
+                                             element elIimgRes  # set UI.src "static/tempRes.png"
+                                                                # set UI.height rh'
+                                                                # set UI.width  rw'
+                                             element elDimgs #+ [element elIimgRes]
+                                             element elURL # set UI.value "./images/tempRes.png"
+                                             liftIOLater $ print rh' 
     -------GUI--------------- COLOR PICKER --------------------
     -- How can I make this smaller?
     bRIn <- stepper "0" $ UI.valueChange elrVal
@@ -265,8 +273,13 @@ setup window = do
         rIn  <- currentValue bRIn
         gIn  <- currentValue bGIn
         bIn  <- currentValue bBIn
-        let (r',g',b') = (readMay rIn,readMay gIn,readMay bIn) :: (Maybe Int,Maybe Int,Maybe Int)
-        element canv # set UI.fillStyle (UI.solidColor $ safeColorUI r' g' b')
+        let (r',g',b')  = (readMay rIn,readMay gIn,readMay bIn)
+        let col@(UI.RGB r g b) =  safeColorUI r' g' b'
+        element canv # set UI.fillStyle (UI.solidColor col)
+        -- immediate Update of Inputs if >255 or <0
+        element elrVal # set UI.value (show r)
+        element elgVal # set UI.value (show g)
+        element elbVal # set UI.value (show b)        
         UI.fillRect ((nr*35),0) 35 35 canv
 
     -- How can I make this smaller?
@@ -287,10 +300,11 @@ setup window = do
     on UI.click elBgetPall getPallette
     -------GUI--------------- DITHER --------------------------    
     -- apply Dither and change to new imgDith
-    on UI.click elBapplyDither $ return $ do uri <- currentValue bUrlIn
+    on UI.click elBapplyDither $ return $ do [url] <- getValuesList [elURL]
+                                             liftIO $ print url
                                              pal <- mapM (getCanvCol palCanvas) [(1,1),(36,1),(72,1),(108,1)]
-                                             liftIOLater $ processImagels pal uri "./images/tempDith"
-    on UI.click elBapplyDither $ return $    element elIimgOrig # set UI.src "static/tempDith.png"
+                                             liftIO $ processImagels pal url "./images/tempDith"
+                                             element elIimgOrig # set UI.src "static/tempDith.png"
     -------GUI--------------- COLORSPLICER --------------------
     -------GUI--------------- GCODE ---------------------------
     -------GUI--------------- SAVEFILE ------------------------
