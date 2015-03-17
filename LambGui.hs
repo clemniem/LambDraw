@@ -1,12 +1,12 @@
+import MakeIMG as I
+import Dither
+import Resize
+import ProcessImage
+import Colorsplicer
+
 import Control.Monad
 import Safe 
-
-import Dither
-import LoadImage
-import MakeIMG as I
-import Colorsplicer
 import Data.Ratio
-import Resize
 
 import qualified Graphics.UI.Threepenny as UI
 import Graphics.UI.Threepenny.Core
@@ -25,6 +25,7 @@ padding = [("padding","10px 10px 10px 10px")]
 imgTooBig :: (Int,Int) -> (Int,Int) -> Bool
 imgTooBig (imW,imH) (dW,dH) = and [imW>dW,imH>dH]
 
+-- getter for specific Color () of a Canvas at a specific Point
 -- to UI (PixelRGB8) is also possible just change from fst to snd after the return
 getCanvCol :: UI.Canvas -> UI.Point -> UI (PixelRGB8) 
 getCanvCol canvas (x,y) = do  
@@ -49,13 +50,13 @@ getCanvCol canvas (x,y) = do
    tripleToCol (r,g,b) = ((UI.RGB r g b),(PixelRGB8 r' g' b'))
      where (r',g',b') = (fromIntegral r,fromIntegral g,fromIntegral b) 
 
-toPallette :: (PixelRGB8,PixelRGB8,PixelRGB8,PixelRGB8) -> [PixelRGB8]
-toPallette (a,b,c,d) = remWhite [a,b,c,d]
-  where remWhite :: [PixelRGB8] -> [PixelRGB8]
-        remWhite [] = []
-        remWhite (x:xs)
-          | checkColor x whitePix = remWhite xs
-          | otherwise             = x : remWhite xs
+-- toPallette :: (PixelRGB8,PixelRGB8,PixelRGB8,PixelRGB8) -> [PixelRGB8]
+-- toPallette (a,b,c,d) = remWhite [a,b,c,d]
+--   where remWhite :: [PixelRGB8] -> [PixelRGB8]
+--         remWhite [] = []
+--         remWhite (x:xs)
+--           | checkColor x whitePix = remWhite xs
+--           | otherwise             = x : remWhite xs
 
 safeColorUI :: Maybe Int -> Maybe Int -> Maybe Int -> UI.Color 
 safeColorUI mr mg mb = UI.RGB (tst mr) (tst mg) (tst mb)
@@ -102,7 +103,7 @@ setup window = do
     elDivHIDE <- UI.div -- used to Hide elements
     elURL     <- UI.div 
     ---------------------- LOADIMG -------------------------
-    elIpathIn <- UI.input #+ [string "PathIN"]
+    elIpathIn <- UI.input  #+ [string "PathIN"]
     elBload   <- UI.button #+ [string "Load File."]
 
 
@@ -140,11 +141,10 @@ setup window = do
                                         string "dWidth:", element elIdrawWidth  ],
                                       [string "img Height: ",element elIimgHeight, 
                                         string "dHeight:", element elIdrawHeight]]]
-                           # set style padding
+                             # set style padding
     ---------------------- COLOR PICKER --------------------
-    elrVal <- UI.input
-    elgVal <- UI.input
-    elbVal <- UI.input
+    [elrVal,elgVal,elbVal] <- mapM (UI.input #+) [[string "0"],[string "0"],[string "0"]]
+
 
     addCol1    <- UI.button #+ [string "A"]
     addCol2    <- UI.button #+ [string "B"]
@@ -166,7 +166,7 @@ setup window = do
     UI.fillRect (0,0) (35*4) (35) palCanvas
 
     colPick <- UI.div #+ [row [column [grid [[string "R",element elrVal], [string "G", element elgVal],[string "B", element elbVal]]
-                         ,row [element canvas, column [row [element addCol1,element addCol2,element addCol3,element addCol4]
+                         ,row [element canvas # set style [("vertical-align","top")], column [row [element addCol1,element addCol2,element addCol3,element addCol4] # set style [("vertical-align","top")]
                                                       ,element removeColor]]]
                          ,column [element palCanvas, element elBgetPall]]
                          ]
@@ -231,11 +231,8 @@ setup window = do
 
     -------GUI--------------- RESIZE --------------------------
 
-    rwIn   <- stepper "0" $ UI.valueChange elIdrawWidth
-    rhIn   <- stepper "0" $ UI.valueChange elIdrawHeight
+    [rwIn ,rhIn]  <- mapM (stepper "0") $ map UI.valueChange [elIdrawWidth,elIdrawHeight]
 
-    --on UI.valueChange rwIn $ updateResizeInput
-    -- 
     on UI.click elBcalcSize $ return $ do rwStr  <- currentValue rwIn
                                           rhStr  <- currentValue rhIn
                                           [imwStr] <- getValuesList [elIimgWidth]
@@ -257,7 +254,7 @@ setup window = do
 
     on UI.click elBapplyResize $ return $ do urlIn <- currentValue bUrlIn
                                              [balub] <- getValuesList [elresFac]
-                                             let [rh,rw] = words balub
+                                             let [rw,rh] = words balub
                                              let (rh',rw')   = safeTupel (rh,rw)
                                              liftIO $ goResize urlIn "./images/tempRes.png" rh'
                                              element elIimgRes  # set UI.src "static/tempRes.png"
@@ -267,15 +264,12 @@ setup window = do
                                              element elURL   # set UI.value "./images/tempRes.png"
                                              liftIOLater $ print rh' 
     -------GUI--------------- COLOR PICKER --------------------
-    -- How can I make this smaller?
-    bRIn <- stepper "0" $ UI.valueChange elrVal
-    bGIn <- stepper "0" $ UI.valueChange elgVal
-    bBIn <- stepper "0" $ UI.valueChange elbVal
+    -- update Values in Color Picker
+    [bRIn,bGIn,bBIn] <- mapM (stepper "0") $ map UI.valueChange [elrVal,elgVal,elbVal]
     
+    -- function to update a canvas
     let updateCanv canv nr = const $ do
-        rIn  <- currentValue bRIn
-        gIn  <- currentValue bGIn
-        bIn  <- currentValue bBIn
+        [rIn,gIn,bIn]  <- mapM currentValue [bRIn,bGIn,bBIn]
         let (r',g',b')  = (readMay rIn,readMay gIn,readMay bIn)
         let col@(UI.RGB r g b) =  safeColorUI r' g' b'
         element canv # set UI.fillStyle (UI.solidColor col)
@@ -307,102 +301,20 @@ setup window = do
     on UI.click elBapplyDither $ return $ do [url] <- getValuesList [elURL]
                                              liftIO $ print url
                                              pal   <- getPallette
-                                             liftIO $ processDither pal url "./images/tempDith"
-                                             element elIimgOrig # set UI.src "static/tempDith.png"
-                                             element elURL # set UI.value "./images/tempDith.png"
-    -------GUI--------------- COLORSPLICER --------------------
+                                             liftIO $ testDither (whitePix:pal) url "./images/temp"
+                                             delete elIimgOrig
+                                             elIimgOrig  <- UI.image
+                                                                # set UI.height 300
+                                                                # set UI.width  300
+                                                                # set style [("border", "solid black 1px")]
+                                                                # set UI.src "static/temp_dith.png"
+                                             element elDimgs #+ [element elIimgOrig]
+
     on UI.click elBsplice $ return $ do [url] <- getValuesList [elURL]
-                                        [pixA,pixB,pixC,pixD] <- getPallette
-                                        liftIO $ print pixA
-                                        liftIO $ print pixB
-                                        liftIO $ print pixC
-                                        liftIO $ print pixD
-                                        let getls p = if checkColor p whitePix
-                                                        then return []
-                                                        else do iols <- return $ liftIO $ processSplice url p
-                                                                ls   <- iols
-                                                                return ls
-                                        lsA   <- getls pixA
-                                        lsB   <- getls pixB 
-                                        lsC   <- getls pixC
-                                        lsD   <- getls pixD 
-                                        liftIO $ print lsA
-                                        liftIO $ print lsB 
-                                        liftIO $ print lsC 
-                                        liftIO $ print lsD 
-
-
-    -------GUI--------------- GCODE ---------------------------
-    -------GUI--------------- SAVEFILE ------------------------
-    -------GUI--------------- BODY ----------------------------
-
-
-
-    -- elCHbox <-  UI.input # set UI.type_ "checkbox"
-
-
-
-
-
-
-
-
-
-
-
-
-
-    -- let rects = [ (x , 0, 35, 35, 0) | x <- [0..3]]
-
-                
-    -- let drawRect (x,y,w,h,col) = do
-    --       element canvas # set UI.fillStyle (UI.solidColor $ UI.RGB 255 255 0)
-    --       UI.fillRect (x,y) w h canvas
-
-    -- on UI.mousedown addRects $ const $ forM_ rects drawRect
-
-    -- let circles = [ (200, 200, 25, "orange")
-    --               , (300, 180, 15, "plum")
-    --               , (100, 180, 15, "plum")
-    --               ]
-    -- let drawCircle (x,y,r,col) = do
-    --       element canvas # set UI.fillStyle (UI.htmlColor col)
-    --       UI.beginPath canvas
-    --       UI.arc (x,y) r 0 (2*pi) canvas
-    --       UI.fill canvas
-
-    -- let slices = [ (325, 115, 25, 1, 2, "lightblue")
-    --              , (325, 145, 25, 1, 2, "lightblue")
-    --              ]
-    -- let drawSlice (x,y,r,start,end,col) = do
-    --       element canvas # set UI.fillStyle (UI.htmlColor col)
-    --       UI.beginPath canvas
-    --       UI.arc (x,y) r start end canvas
-    --       UI.lineTo (x,y) canvas
-    --       UI.stroke canvas
-    --       UI.closePath canvas
-    --       UI.fill canvas
-
-    -- on UI.click addArcs $ const $ do
-    --   forM_ circles drawCircle
-    --   forM_ slices  drawSlice
-    --   element canvas # set UI.textFont "42pt sans-serif"
-    --   UI.fillText "Canvas" (100,100) canvas
-    --   UI.strokeText "Canvas" (100,100) canvas
-
-    -- on UI.click clear  $ const $ UI.clearCanvas canvas
-
-
-
-
-
-
-
-
-
-
-
-
+                                        liftIO $ print url
+                                        pal   <- getPallette
+                                        liftIO $ processImage (whitePix:pal) url "./images/temp"
+                                        element elIimgOrig # set UI.src "static/temp_dith.png"
 
 
 

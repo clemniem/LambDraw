@@ -13,6 +13,14 @@ import           Data.Word( Word8, Word16, Word32, Word64 )
 import qualified Data.Vector.Storable.Mutable as M
 import           Data.Maybe
 
+
+type DithErr = (Int,(Int,Int)) 
+{- (ErrorValue,(PixelXDirection,PixelYDirection))
+                                
+PixelXDirection = number how many pixels i need to go in x direction to get to 
+the Neighbour Pixel who should carry the Error from my current Pixel
+-}
+
 -- operation to drop used colors to a list of colors
 noDither :: [PixelRGB8] -> PixelRGB8 -> PixelRGB8
 noDither ls p = colorMinDist p ls
@@ -44,6 +52,8 @@ colorMinDist p (x:xs) = colorMinDistAcc p xs ((colorDist8 p x),x)
         where
         dist' = colorDist8 p x 
 
+-- Debugging function for grey->chess Problem, turns out:
+-- its more a Problem of the Error Calculation (rounding 7/16 etc...)
 colorDistGrey :: PixelRGB8 -> PixelRGB8
 colorDistGrey (PixelRGB8 g1 g2 g3)
                       | (and [g1==g2,g1==g3,g1>= 123]) = whitePix
@@ -55,9 +65,6 @@ colorDist8 :: PixelRGB8 -> PixelRGB8 -> Distance
 colorDist8 (PixelRGB8 r1 g1 b1) (PixelRGB8 r2 g2 b2) = sqrt $ (2 + r'/256)   * dr^2 
                                                             +  4             * dg^2 
                                                             + (2+(255-r'/256)* db^2)
--- colorDist8 (PixelRGB8 r1 g1 b1) (PixelRGB8 r2 g2 b2) = sqrt $ dr^2 
---                                                             + dg^2 
---                                                             + db^2
     where
     r' = (fromIntegral r1)/2 + (fromIntegral r2)/2
     dr = fromIntegral r1 - fromIntegral r2
@@ -78,9 +85,15 @@ addTupel :: Num a => (a,a) -> (a,a) -> (a,a)
 addTupel (x1,x2) (y1,y2) = (x1 + y1, x2 + y2)
 
 -- Floyd-Steinberg Algorithm for a Palette (= [PixelRGB8]) and an Image PixelRGB8
+-- ditherFloydRGB8 :: [PixelRGB8] -> Image PixelRGB8 -> Image PixelRGB8
+-- ditherFloydRGB8 = ditherRGB8 [(7,(1,0)),(3,((-1),1)),(5,(0,1)),(1,(1,1))]
 ditherFloydRGB8 :: [PixelRGB8] -> Image PixelRGB8 -> Image PixelRGB8
-ditherFloydRGB8 []   img                               = img 
-ditherFloydRGB8 pxls img@(Image { imageWidth  = w, 
+ditherFloydRGB8 = ditherRGB8 [(1,(1,0)),(1,((-1),1)),(1,(0,1)),(1,(1,1))]
+
+-- generic Dither Function
+ditherRGB8 :: [DithErr] -> [PixelRGB8] -> Image PixelRGB8 -> Image PixelRGB8
+ditherRGB8 errls []   img                               = img 
+ditherRGB8 errls pxls img@(Image { imageWidth  = w, 
                            imageHeight = h, 
                            imageData   = vec }) =
   Image w h pixels
@@ -99,7 +112,7 @@ ditherFloydRGB8 pxls img@(Image { imageWidth  = w,
                                 newPix <- return $ colorMinDist oldPix pxls 
                                 unsafeWritePixel oldArr writeIdx newPix
                                 errPix <- return $ subtPixel oldPix newPix                              
-                                unsafeWritePixel' oldArr [(7,(1,0)),(3,((-1),1)),(5,(0,1)),(1,(1,1))] errPix
+                                unsafeWritePixel' oldArr errls errPix
                                 colMapper (readIdx  + sourceCompCount)
                                           (writeIdx + destComponentCount)
                                           (x + 1)
@@ -146,6 +159,8 @@ ditherFloydRGB8 pxls img@(Image { imageWidth  = w,
             -- safe because newArray can't be referenced as a mutable array
             -- outside of this where block
             VS.unsafeFreeze oldArr
+
+
 
                                     
 -- -- Floyd-Steinberg Algorithm for a Palette (= [PixelRGB8]) and an Image PixelRGB8

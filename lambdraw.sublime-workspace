@@ -4,6 +4,190 @@
 		"selected_items":
 		[
 			[
+				"pix",
+				"PixelRGB8"
+			],
+			[
+				"elD",
+				"elDsplice"
+			],
+			[
+				"pixB",
+				"pixB"
+			],
+			[
+				"get",
+				"getPallette"
+			],
+			[
+				"urL",
+				"urlIn"
+			],
+			[
+				"lif",
+				"liftIOLater"
+			],
+			[
+				"add",
+				"addCol1"
+			],
+			[
+				"ur",
+				"urlIn"
+			],
+			[
+				"elI",
+				"elIimgRes"
+			],
+			[
+				"el",
+				"elBapplyResize"
+			],
+			[
+				"che",
+				"checkSize"
+			],
+			[
+				"max",
+				"drawMax"
+			],
+			[
+				"elIim",
+				"elIimgWidth"
+			],
+			[
+				"im",
+				"imhStr"
+			],
+			[
+				"imw",
+				"imwStr"
+			],
+			[
+				"elR",
+				"elresFac"
+			],
+			[
+				"str",
+				"str2"
+			],
+			[
+				"read",
+				"readMay"
+			],
+			[
+				"dh",
+				"dhIn"
+			],
+			[
+				"elB",
+				"elBlsresize"
+			],
+			[
+				"st",
+				"style"
+			],
+			[
+				"elDr",
+				"elDresizeInv"
+			],
+			[
+				"draw",
+				"drawMax"
+			],
+			[
+				"m",
+				"mSize"
+			],
+			[
+				"is",
+				"ifSize"
+			],
+			[
+				"elIi",
+				"elIimgHeight"
+			],
+			[
+				"li",
+				"liftIOLater"
+			],
+			[
+				"if",
+				"ifSize"
+			],
+			[
+				"elb",
+				"elBgetSize"
+			],
+			[
+				"ima",
+				"imageHeight"
+			],
+			[
+				"val",
+				"valueChange"
+			],
+			[
+				"img",
+				"imgur2"
+			],
+			[
+				"pal",
+				"palCanvas"
+			],
+			[
+				"dr",
+				"drawRect"
+			],
+			[
+				"up",
+				"updatePall"
+			],
+			[
+				"upda",
+				"updatePal"
+			],
+			[
+				"to",
+				"toPallette"
+			],
+			[
+				"a",
+				"a"
+			],
+			[
+				"addC",
+				"addCol4"
+			],
+			[
+				"can",
+				"palCanvas"
+			],
+			[
+				"B",
+				"B"
+			],
+			[
+				"Li",
+				"liftIOLater"
+			],
+			[
+				"soli",
+				"solidColor"
+			],
+			[
+				"fill",
+				"fillStyle"
+			],
+			[
+				"col",
+				"colPick"
+			],
+			[
+				"pr",
+				"procImg"
+			],
+			[
 				"main",
 				"mainLoadImage"
 			],
@@ -100,10 +284,6 @@
 				"PixelRGB8"
 			],
 			[
-				"img",
-				"imgVector"
-			],
-			[
 				"pixe",
 				"pixelung"
 			],
@@ -184,10 +364,6 @@
 				"ST"
 			],
 			[
-				"pix",
-				"pixErr"
-			],
-			[
 				"ST",
 				"runST"
 			],
@@ -198,10 +374,6 @@
 			[
 				"imag",
 				"imageWidth"
-			],
-			[
-				"im",
-				"imgResizer"
 			],
 			[
 				"cal",
@@ -218,10 +390,6 @@
 			[
 				"err",
 				"errBases"
-			],
-			[
-				"che",
-				"checkopt"
 			],
 			[
 				"ar",
@@ -252,14 +420,6 @@
 				"PixError"
 			],
 			[
-				"add",
-				"addWordError"
-			],
-			[
-				"to",
-				"toVal"
-			],
-			[
 				"s",
 				"sourceComponentCount"
 			],
@@ -278,10 +438,6 @@
 			[
 				"Data",
 				"data"
-			],
-			[
-				"col",
-				"colX"
 			],
 			[
 				"line",
@@ -358,162 +514,6 @@
 			[
 				"pall",
 				"colorPallette"
-			],
-			[
-				"pal",
-				"palPixelung"
-			],
-			[
-				"der",
-				"deriving"
-			],
-			[
-				"pixelun",
-				"pixelungrot"
-			],
-			[
-				"cv8",
-				"cv8toCV"
-			],
-			[
-				"v",
-				"v"
-			],
-			[
-				"sum",
-				"sumbyAcc"
-			],
-			[
-				"st",
-				"static"
-			],
-			[
-				"pxs",
-				"pxs"
-			],
-			[
-				"Colo",
-				"ColorVal"
-			],
-			[
-				"Dista",
-				"Distance"
-			],
-			[
-				"var",
-				"varCVs"
-			],
-			[
-				"Color",
-				"ColorVal8"
-			],
-			[
-				"pixl",
-				"pixlCVmap"
-			],
-			[
-				"draw",
-				"drawHeight"
-			],
-			[
-				"get",
-				"getPixCoords"
-			],
-			[
-				"I",
-				"ImgMax"
-			],
-			[
-				"max",
-				"maxColorDistAcc"
-			],
-			[
-				"bl",
-				"bluePix"
-			],
-			[
-				"w",
-				"whitePix"
-			],
-			[
-				"cv",
-				"cv8toCV"
-			],
-			[
-				"cvC",
-				"cvCount"
-			],
-			[
-				"cvc",
-				"cvCountUp"
-			],
-			[
-				"Cv",
-				"CVCount"
-			],
-			[
-				"cvCo",
-				"cvCountUp"
-			],
-			[
-				"CV",
-				"CVCount"
-			],
-			[
-				"count",
-				"countMostCommonCV"
-			],
-			[
-				"CVCou",
-				"CVCount"
-			],
-			[
-				"pixt",
-				"pixtoCVAcc"
-			],
-			[
-				"dist",
-				"colorDist8"
-			],
-			[
-				"CVN",
-				"CVNope"
-			],
-			[
-				"Col",
-				"ColorVal"
-			],
-			[
-				"C",
-				"CVNope"
-			],
-			[
-				"arra",
-				"arrRadLs"
-			],
-			[
-				"arrH",
-				"arrHls"
-			],
-			[
-				"arrRad",
-				"arrRadLs"
-			],
-			[
-				"from",
-				"fromIntegral"
-			],
-			[
-				"load",
-				"loadPng"
-			],
-			[
-				"per",
-				"periphHelpls"
-			],
-			[
-				"Arr",
-				"ArrHelperXY"
 			]
 		]
 	},
@@ -523,26 +523,15 @@
 			"file": "loadImage.hs",
 			"settings":
 			{
-				"buffer_size": 4570,
+				"buffer_size": 5682,
 				"line_ending": "Unix"
 			}
 		},
 		{
-			"file": "Resize.hs",
+			"file": "LambGui.hs",
 			"settings":
 			{
-				"buffer_size": 6825,
-				"line_ending": "Unix"
-			}
-		},
-		{
-			"contents": "module Dither where \n\nimport           MakeIMG\n\nimport           Data.Vector          (Vector, (!))\nimport qualified Data.Vector.Storable as VS\nimport           Codec.Picture.Types\nimport           Control.Monad( foldM, liftM, ap )\nimport           Control.Monad.ST as ST\nimport           Control.Monad.Primitive ( PrimMonad, PrimState )\nimport           Data.Bits( unsafeShiftL, unsafeShiftR, (.|.), (.&.),shiftR )\nimport           Data.Word( Word8, Word16, Word32, Word64 )\nimport qualified Data.Vector.Storable.Mutable as M\nimport           Data.Maybe\n\n-- operation to drop used colors to a list of colors\nnoDither :: [PixelRGB8] -> PixelRGB8 -> PixelRGB8\nnoDither ls p = colorMinDist p ls\n\n-------------------------------------------------------------------------------\n----            Dithering\n-------------------------------------------------------------------------------\n\n-- calculates the difference between two pixels\n-- saves values as Int so negative values can be saved \nsubtPixel :: PixelRGB8 -> PixelRGB8 -> PixError\nsubtPixel (PixelRGB8 r1 g1 b1) (PixelRGB8 r2 g2 b2) = PixError r' g' b'\n    where\n    r' = fromIntegral r1 - fromIntegral r2\n    g' = fromIntegral g1 - fromIntegral g2\n    b' = fromIntegral b1 - fromIntegral b2\n\n-- takes a pixel and a palette (= list of pixels)\n-- returns the perceived closest pixel from the palette\ncolorMinDist :: PixelRGB8 -> [PixelRGB8] -> PixelRGB8\ncolorMinDist p []     = PixelRGB8 255 255 255\ncolorMinDist p (x:xs) = colorMinDistAcc p xs ((colorDist8 p x),x) \n    where\n    colorMinDistAcc :: PixelRGB8 -> [PixelRGB8] -> (Distance,PixelRGB8) -> PixelRGB8\n    colorMinDistAcc p []     (_   ,pixAcc)    = pixAcc\n    colorMinDistAcc p (x:xs) (dist,pixAcc)\n        | dist' < dist = colorMinDistAcc p xs (dist',x)\n        | otherwise    = colorMinDistAcc p xs (dist ,pixAcc)\n        where\n        dist' = colorDist8 p x \n\ncolorDistGrey :: PixelRGB8 -> PixelRGB8\ncolorDistGrey (PixelRGB8 g1 g2 g3)\n                      | (and [g1==g2,g1==g3,g1>= 123]) = whitePix\n                      | otherwise = blackPix\n\n-- calculates perceived color-distance between two pixels\n-- Source for function: http://www.compuphase.com/cmetric.htm\ncolorDist8 :: PixelRGB8 -> PixelRGB8 -> Distance\ncolorDist8 (PixelRGB8 r1 g1 b1) (PixelRGB8 r2 g2 b2) = sqrt $ (2 + r'/256)   * dr^2 \n                                                            +  4             * dg^2 \n                                                            + (2+(255-r'/256)* db^2)\n-- colorDist8 (PixelRGB8 r1 g1 b1) (PixelRGB8 r2 g2 b2) = sqrt $ dr^2 \n--                                                             + dg^2 \n--                                                             + db^2\n    where\n    r' = (fromIntegral r1)/2 + (fromIntegral r2)/2\n    dr = fromIntegral r1 - fromIntegral r2\n    dg = fromIntegral g1 - fromIntegral g2\n    db = fromIntegral b1 - fromIntegral b2\n\n-- simple euclidian Distance between two pixels\ncolorDistEuclid ::  PixelRGB8 -> PixelRGB8 -> Distance\ncolorDistEuclid (PixelRGB8 r1 g1 b1) (PixelRGB8 r2 g2 b2) = sqrt $ dr^2  + dg^2 + db^2\n    where\n    r' = (fromIntegral r1)/2 + (fromIntegral r2)/2\n    dr = fromIntegral r1 - fromIntegral r2\n    dg = fromIntegral g1 - fromIntegral g2\n    db = fromIntegral b1 - fromIntegral b2\n\n-- used to calculate Neighbour-Points\naddTupel :: Num a => (a,a) -> (a,a) -> (a,a)\naddTupel (x1,x2) (y1,y2) = (x1 + y1, x2 + y2)\n\n-- Floyd-Steinberg Algorithm for a Palette (= [PixelRGB8]) and an Image PixelRGB8\nditherFloydRGB8 :: [PixelRGB8] -> Image PixelRGB8 -> Image PixelRGB8\nditherFloydRGB8 []   img                               = img \nditherFloydRGB8 pxls img@(Image { imageWidth  = w, \n                           imageHeight = h, \n                           imageData   = vec }) =\n  Image w h pixels\n    where sourceCompCount    = componentCount (undefined :: PixelRGB8)\n          destComponentCount = componentCount (undefined :: PixelRGB8)\n\n          pixels = runST $ do\n            oldArr <- VS.thaw vec \n            --newArr <- M.new (w * h * sourceCompCount)\n            let lineMapper _ _ y | y >= h = return ()\n                lineMapper readIdxLine writeIdxLine y = colMapper readIdxLine writeIdxLine 0 \n                  where colMapper readIdx writeIdx x\n                            | x >= w    = lineMapper readIdx writeIdx $ y + 1\n                            | otherwise = do\n                                oldPix <- unsafeReadPixel' oldArr readIdx\n                                newPix <- return $ colorMinDist oldPix pxls \n                                unsafeWritePixel oldArr writeIdx newPix\n                                errPix <- return $ subtPixel oldPix newPix                              \n                                unsafeWritePixel' oldArr [(7,(1,0)),(3,((-1),1)),(5,(0,1)),(1,(1,1))] errPix\n                                colMapper (readIdx  + sourceCompCount)\n                                          (writeIdx + destComponentCount)\n                                          (x + 1)\n                                    where\n                                    -- Still needed as it only works with RGB8 Pixels uptil now\n                                    unsafeReadPixel' :: PrimMonad m => M.STVector (PrimState m) (PixelBaseComponent PixelRGB8) -> Int -> m PixelRGB8\n                                    unsafeReadPixel' vec idx =\n                                            PixelRGB8 `liftM` M.unsafeRead vec idx\n                                                      `ap`    M.unsafeRead vec (idx + 1)\n                                                      `ap`    M.unsafeRead vec (idx + 2)\n                                    -- Takes a List of Error Factors and Neighbours (Int,(Int,Int)) and shares the Error\n                                    unsafeWritePixel' v []       _  = return ()\n                                    unsafeWritePixel' v (eb:ebs) pe =  do if mbaseE == Nothing \n                                                                            then do unsafeWritePixel' v ebs pe\n                                                                            else do oldPixE <- unsafeReadPixel' oldArr baseE \n                                                                                    unsafeWritePixel v baseE $ newPixE (fst eb) oldPixE\n                                                                                    unsafeWritePixel' v ebs pe\n                                                                          where\n                                                                          newPixE fac ol = compwiseErr fac pe ol\n                                                                          baseE          = fromJust mbaseE\n                                                                          mbaseE         = baseId $ addTupel (x,y) $ snd eb \n                                    -- calculates the BaseId for any given Point in the Image (checks bounds)\n                                    baseId :: Point -> Maybe Int\n                                    baseId (a,b)\n                                        | a <  0    = Nothing\n                                        | a >= w    = Nothing\n                                        | b >= h    = Nothing\n                                        | otherwise = Just $ (a + b * w) * sourceCompCount\n                                    -- adds the Error to a given Pixel with the corresponding Factor\n                                    compwiseErr :: Int -> PixError -> PixelRGB8 -> PixelRGB8\n                                    compwiseErr fac (PixError r' g' b') (PixelRGB8 r g b) = PixelRGB8 (calcErr r r') (calcErr g g') (calcErr b b')\n                                      where\n                                      calcErr :: Pixel8 -> Int -> Pixel8\n                                      calcErr p' e'\n                                                | res <= 0   = 0\n                                                | res >= 255 = 255\n                                                | otherwise  = fromIntegral res\n                                                where res = fromIntegral p' + ((fac*(fromIntegral e') `shiftR` 4))\n\n\n            lineMapper 0 0 0\n\n            -- unsafeFreeze avoids making a second copy and it will be\n            -- safe because newArray can't be referenced as a mutable array\n            -- outside of this where block\n            VS.unsafeFreeze oldArr\n\n                                    \n-- -- Floyd-Steinberg Algorithm for a Palette (= [PixelRGB8]) and an Image PixelRGB8\n-- ditherFloydRGB8old :: [PixelRGB8] -> Image PixelRGB8 -> Image PixelRGB8\n-- ditherFloydRGB8old [] img = img\n-- ditherFloydRGB8old ls img@(Image { imageWidth  = w, \n--                                 imageHeight = h, \n--                                 imageData   = vec }) =\n--   Image w h vecSweep\n--     where \n--     compCount = componentCount (undefined :: PixelRGB8)\n--     vecSweep = lineSweep vec 0 0\n--     lineSweep arrY lineX y -- sweep lines 0 to h\n--       | y >= h = arrY\n--       | otherwise  = colSweep arrY lineX\n--       where \n--       colSweep arrX x -- sweep columns 0 to w\n--         | x >= w  = lineSweep arrX 0 (y+1)\n--         | otherwise  = colSweep (dither arrX) (x+1)\n--         where \n--         dither arrD = arrD VS.// updateVals (findPix ls) errBases []\n--         -- calculate indices where a pixel starts (= base) and check for bounds\n--         baseId :: Point -> Maybe BasID\n--         baseId (a,b)\n--             | a <  0    = Nothing\n--             | a >= w    = Nothing\n--             | b >= h    = Nothing\n--             | otherwise = Just $ (a + b * w) * compCount\n--         -- base of pixel of the current point (x,y)\n--         baseA :: BasID\n--         baseA = (x + y * w) * compCount\n--         -- calculate closest color from palette and pixError for current pixel\n--         findPix :: [PixelRGB8] -> (PixelRGB8, PixError)\n--         findPix pxls = (newPix,pixErr)\n--           where \n--           newPix = colorMinDist oldPix pxls\n--           oldPix = unsafePixelAt arrX baseA\n--           pixErr = subtPixel oldPix newPix\n--         -- calculate error distribution bases\n--         errBases :: [(ErrorFac, Maybe BasID)]\n--         errBases         = [(7,(baseId (x+1,y  )))\n--                            ,(3,(baseId (x-1,y+1)))\n--                            ,(5,(baseId (x  ,y+1)))\n--                            ,(1,(baseId (x+1,y+1)))]\n--         -- calculate list of updates for //-operator\n--         updateVals :: (PixelRGB8,PixError) -> [(ErrorFac, Maybe BasID)] -> [(BasID,Word8)] -> [(BasID,Word8)]\n--         updateVals   ((PixelRGB8 rn gn bn),_  ) []     acc = (baseA,rn):(baseA+1,gn):(baseA+2,bn):acc\n--         updateVals v@(p                   ,err) (x:xs) acc = (shareError x err) ++ (updateVals v xs acc)\n--           where\n--           shareError (fac, Nothing   ) (PixError r' g' b')= []\n--           shareError (fac,(Just base)) (PixError r' g' b')= addError oldPix'\n--             where\n--             oldPix' = unsafePixelAt arrX base\n--             addError (PixelRGB8 r g b) = [(base,(calcErr r r')),(base+1,(calcErr g g')),(base+2,(calcErr b b'))]\n--             calcErr :: Word8 -> Int -> Word8\n--             calcErr p' e'\n--                     | res <= 0   = 0\n--                     | res >= 255 = 255\n--                     | otherwise  = fromIntegral res\n--                     where res = fromIntegral p' + ((fac*(fromIntegral e') `shiftR` 4))\n\n\n\n\n\n\n\n",
-			"file": "Dither.hs",
-			"file_size": 11467,
-			"file_write_time": 130684693460000000,
-			"settings":
-			{
-				"buffer_size": 11467,
+				"buffer_size": 16934,
 				"line_ending": "Unix"
 			}
 		},
@@ -550,15 +539,31 @@
 			"file": "Colorsplicer.hs",
 			"settings":
 			{
-				"buffer_size": 6634,
+				"buffer_size": 6720,
 				"line_ending": "Unix"
 			}
 		},
 		{
-			"file": "LambDraw.hs",
+			"file": "Resize.hs",
 			"settings":
 			{
-				"buffer_size": 2220,
+				"buffer_size": 6828,
+				"line_ending": "Unix"
+			}
+		},
+		{
+			"file": "Dither.hs",
+			"settings":
+			{
+				"buffer_size": 11467,
+				"line_ending": "Unix"
+			}
+		},
+		{
+			"file": "/Users/clem/Downloads/threepenny-gui-0.5.0.0/samples/CurrencyConverter.hs",
+			"settings":
+			{
+				"buffer_size": 1183,
 				"line_ending": "Unix"
 			}
 		},
@@ -567,14 +572,6 @@
 			"settings":
 			{
 				"buffer_size": 1846,
-				"line_ending": "Unix"
-			}
-		},
-		{
-			"file": "archive.hs",
-			"settings":
-			{
-				"buffer_size": 18552,
 				"line_ending": "Unix"
 			}
 		}
@@ -667,6 +664,12 @@
 	],
 	"file_history":
 	[
+		"/Users/clem/Desktop/gestalt_node_BOM.csv",
+		"/Users/clem/Dropbox/LMU/FUN/LambDraw/statetest.hs",
+		"/Users/clem/Dropbox/LMU/FUN/LambDraw/colorPick.hs",
+		"/Users/clem/Dropbox/LMU/FUN/LambDraw/LambDraw.hs",
+		"/Users/clem/Dropbox/LMU/FUN/LambDraw/archive.hs",
+		"/Users/clem/Downloads/threepenny-gui-0.5.0.0/samples/DrumMachine.hs",
 		"/Users/clem/Dropbox/LMU/FUN/LambDraw/ToolpathNext.prof",
 		"/Users/clem/Dropbox/LMU/FUN/LambDraw/ToolpathStar100.prof",
 		"/Users/clem/Dropbox/LMU/FUN/LambDraw/Toolpath.prof",
@@ -787,6 +790,16 @@
 		"case_sensitive": false,
 		"find_history":
 		[
+			"ds",
+			"f",
+			"imgur",
+			"imgur2",
+			"applyDither",
+			"ddrawImage",
+			"applyResize",
+			"bVal",
+			"gVal",
+			"rVal",
 			"(0,0)",
 			"plusPair",
 			"show",
@@ -854,7 +867,7 @@
 	"groups":
 	[
 		{
-			"selected": 0,
+			"selected": 4,
 			"sheets":
 			[
 				{
@@ -863,15 +876,15 @@
 					"semi_transient": false,
 					"settings":
 					{
-						"buffer_size": 4570,
+						"buffer_size": 5682,
 						"regions":
 						{
 						},
 						"selection":
 						[
 							[
-								2860,
-								2860
+								5673,
+								5673
 							]
 						],
 						"settings":
@@ -882,27 +895,89 @@
 							"translate_tabs_to_spaces": true
 						},
 						"translation.x": 0.0,
-						"translation.y": 0.0,
+						"translation.y": 2421.0,
 						"zoom_level": 1.0
 					},
-					"stack_index": 0,
+					"stack_index": 4,
 					"type": "text"
 				},
 				{
 					"buffer": 1,
-					"file": "Resize.hs",
+					"file": "LambGui.hs",
 					"semi_transient": false,
 					"settings":
 					{
-						"buffer_size": 6825,
+						"buffer_size": 16934,
 						"regions":
 						{
 						},
 						"selection":
 						[
 							[
-								674,
-								674
+								14715,
+								14715
+							]
+						],
+						"settings":
+						{
+							"side_bar_folders_auto_load_folder": 1,
+							"syntax": "Packages/SublimeHaskell/Syntaxes/Haskell-SublimeHaskell.tmLanguage",
+							"tab_size": 2,
+							"translate_tabs_to_spaces": true
+						},
+						"translation.x": 0.0,
+						"translation.y": 5891.0,
+						"zoom_level": 1.0
+					},
+					"stack_index": 3,
+					"type": "text"
+				},
+				{
+					"buffer": 2,
+					"file": "Colorsplicer.hs",
+					"semi_transient": false,
+					"settings":
+					{
+						"buffer_size": 6720,
+						"regions":
+						{
+						},
+						"selection":
+						[
+							[
+								757,
+								767
+							]
+						],
+						"settings":
+						{
+							"side_bar_folders_auto_load_folder": 1,
+							"syntax": "Packages/SublimeHaskell/Syntaxes/Haskell-SublimeHaskell.tmLanguage",
+							"tab_size": 2,
+							"translate_tabs_to_spaces": true
+						},
+						"translation.x": 0.0,
+						"translation.y": 1203.0,
+						"zoom_level": 1.0
+					},
+					"stack_index": 1,
+					"type": "text"
+				},
+				{
+					"buffer": 3,
+					"file": "Resize.hs",
+					"semi_transient": false,
+					"settings":
+					{
+						"buffer_size": 6828,
+						"regions":
+						{
+						},
+						"selection":
+						[
+							[
+								533,
+								551
 							]
 						],
 						"settings":
@@ -920,7 +995,7 @@
 					"type": "text"
 				},
 				{
-					"buffer": 2,
+					"buffer": 4,
 					"file": "Dither.hs",
 					"semi_transient": false,
 					"settings":
@@ -932,8 +1007,8 @@
 						"selection":
 						[
 							[
-								0,
-								0
+								4727,
+								4727
 							]
 						],
 						"settings":
@@ -944,27 +1019,33 @@
 							"translate_tabs_to_spaces": true
 						},
 						"translation.x": 0.0,
-						"translation.y": 1254.0,
+						"translation.y": 1483.0,
 						"zoom_level": 1.0
 					},
-					"stack_index": 1,
+					"stack_index": 0,
 					"type": "text"
-				},
+				}
+			]
+		},
+		{
+			"selected": 1,
+			"sheets":
+			[
 				{
-					"buffer": 3,
-					"file": "Colorsplicer.hs",
+					"buffer": 5,
+					"file": "/Users/clem/Downloads/threepenny-gui-0.5.0.0/samples/CurrencyConverter.hs",
 					"semi_transient": false,
 					"settings":
 					{
-						"buffer_size": 6634,
+						"buffer_size": 1183,
 						"regions":
 						{
 						},
 						"selection":
 						[
 							[
-								1944,
-								1944
+								574,
+								574
 							]
 						],
 						"settings":
@@ -975,49 +1056,14 @@
 							"translate_tabs_to_spaces": true
 						},
 						"translation.x": 0.0,
-						"translation.y": 237.0,
+						"translation.y": 104.0,
 						"zoom_level": 1.0
 					},
-					"stack_index": 3,
+					"stack_index": 6,
 					"type": "text"
 				},
 				{
-					"buffer": 4,
-					"file": "LambDraw.hs",
-					"semi_transient": false,
-					"settings":
-					{
-						"buffer_size": 2220,
-						"regions":
-						{
-						},
-						"selection":
-						[
-							[
-								397,
-								397
-							]
-						],
-						"settings":
-						{
-							"side_bar_folders_auto_load_folder": 1,
-							"syntax": "Packages/Haskell/Haskell.tmLanguage"
-						},
-						"translation.x": 0.0,
-						"translation.y": 0.0,
-						"zoom_level": 1.0
-					},
-					"stack_index": 4,
-					"type": "text"
-				}
-			]
-		},
-		{
-			"selected": 0,
-			"sheets":
-			[
-				{
-					"buffer": 5,
+					"buffer": 6,
 					"file": "makeimg.hs",
 					"semi_transient": false,
 					"settings":
@@ -1029,8 +1075,8 @@
 						"selection":
 						[
 							[
-								710,
-								710
+								914,
+								1016
 							]
 						],
 						"settings":
@@ -1041,41 +1087,10 @@
 							"translate_tabs_to_spaces": true
 						},
 						"translation.x": 0.0,
-						"translation.y": 0.0,
+						"translation.y": 430.0,
 						"zoom_level": 1.0
 					},
 					"stack_index": 5,
-					"type": "text"
-				},
-				{
-					"buffer": 6,
-					"file": "archive.hs",
-					"semi_transient": false,
-					"settings":
-					{
-						"buffer_size": 18552,
-						"regions":
-						{
-						},
-						"selection":
-						[
-							[
-								8332,
-								8104
-							]
-						],
-						"settings":
-						{
-							"side_bar_folders_auto_load_folder": 1,
-							"syntax": "Packages/Haskell/Haskell.tmLanguage",
-							"tab_size": 4,
-							"translate_tabs_to_spaces": true
-						},
-						"translation.x": 0.0,
-						"translation.y": 10217.0,
-						"zoom_level": 1.0
-					},
-					"stack_index": 6,
 					"type": "text"
 				}
 			]
@@ -1109,7 +1124,7 @@
 		"cols":
 		[
 			0.0,
-			0.683087749734,
+			0.877551708633,
 			1.0
 		],
 		"rows":
@@ -1119,6 +1134,10 @@
 		]
 	},
 	"menu_visible": true,
+	"output.exec":
+	{
+		"height": 29.0
+	},
 	"output.find_results":
 	{
 		"height": 0.0
@@ -1165,7 +1184,7 @@
 	"show_open_files": true,
 	"show_tabs": true,
 	"side_bar_visible": true,
-	"side_bar_width": 220.0,
+	"side_bar_width": 50.0,
 	"status_bar_visible": true,
 	"template_settings":
 	{
