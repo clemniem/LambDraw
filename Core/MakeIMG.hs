@@ -36,7 +36,7 @@ cyanPix    = PixelRGB8 0   255 255
 rgbPixls   = [redPix,greenPix,bluePix,blackPix,whitePix]
 cmykPixls  = [cyanPix,magentaPix,yellowPix,blackPix,whitePix]
 
-picW = 10
+picW = 100
 
 -- ====== IMAGESIZE <---------------<--------
 pic :: Image PixelRGB8
@@ -50,6 +50,10 @@ pixelung x y = PixelRGB8 u v (u*v)
     where
         u = fromIntegral x*10 :: Pixel8
         v = fromIntegral y*10 :: Pixel8
+
+pixelungGrad :: Int -> Int -> PixelRGB8
+pixelungGrad x _ = PixelRGB8 255 g 0
+  where g = fromIntegral x :: Pixel8
 
 pixelung16 :: Int -> Int -> PixelRGB16
 pixelung16 x y = PixelRGB16 u v (u*v)

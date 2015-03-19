@@ -1,3 +1,4 @@
+module Gui.LambGui where
 
 import Core.MakeIMG as I
 import Core.Colorsplicer
@@ -20,8 +21,8 @@ ifSize _           = (0,0)
 -- DIN A4 210 x 297 mm
 drawMax = (210,297) -- (width,height)
 
-
-padding = [("padding","10px 10px 10px 10px")]
+stva = set style [("vertical-align","top")]
+padding = set style [("padding","10px 10px 10px 10px")]
 -- ImgMax -> DrawMax -> Bool
 imgTooBig :: (Int,Int) -> (Int,Int) -> Bool
 imgTooBig (imW,imH) (dW,dH) = and [imW>dW,imH>dH]
@@ -51,14 +52,7 @@ getCanvCol canvas (x,y) = do
    tripleToCol (r,g,b) = ((UI.RGB r g b),(PixelRGB8 r' g' b'))
      where (r',g',b') = (fromIntegral r,fromIntegral g,fromIntegral b) 
 
--- toPallette :: (PixelRGB8,PixelRGB8,PixelRGB8,PixelRGB8) -> [PixelRGB8]
--- toPallette (a,b,c,d) = remWhite [a,b,c,d]
---   where remWhite :: [PixelRGB8] -> [PixelRGB8]
---         remWhite [] = []
---         remWhite (x:xs)
---           | checkColor x whitePix = remWhite xs
---           | otherwise             = x : remWhite xs
-
+-- | safe Conversion to Color 
 safeColorUI :: Maybe Int -> Maybe Int -> Maybe Int -> UI.Color 
 safeColorUI mr mg mb = UI.RGB (tst mr) (tst mg) (tst mb)
     where tst Nothing  = 0
@@ -75,21 +69,23 @@ safeColorRGB8 mr mg mb = PixelRGB8 (tst mr) (tst mg) (tst mb)
             | i < 0     = 0
             | otherwise = fromIntegral i
 
-
-
 safeTupel :: (String,String) -> (Int,Int)
 safeTupel (str1,str2) = (toInt (readMay str1),toInt (readMay str2))
   where 
     toInt :: Maybe Int -> Int
     toInt (Just nr) = nr
-    toInt _         = 0  
+    toInt _         = 1  
+
+-- used to calculate Neighbour-Points
+--funTupel :: (a -> b) -> (a,a) -> (a,a) -> (b,b)
+funTupel f (x1,x2) (y1,y2) = (f x1 y1,f x2 y2)
 
 {-----------------------------------------------------------------------------
-    Main
+    Gui-Main
 ------------------------------------------------------------------------------}
 
-main :: IO ()
-main = startGUI defaultConfig { 
+startGui :: IO ()
+startGui = startGUI defaultConfig { 
             tpStatic     = Just "./images"
             } setup
 
@@ -100,15 +96,23 @@ main = startGUI defaultConfig {
 setup :: Window -> UI ()
 setup window = do
     return window # set title "LambDraw"
+    UI.addStyleSheet window "LambGui.css"
     ---------------------- SETUP --------------------------
     elDivHIDE <- UI.div -- used to Hide elements
     elURL     <- UI.div 
     ---------------------- LOADIMG -------------------------
-    elIpathIn <- UI.input  #+ [string "PathIN"]
-    elBload   <- UI.button #+ [string "Load File."]
+    elDW <- UI.input # set UI.value (show $ fst drawMax)
+    elDH <- UI.input # set UI.value (show $ snd drawMax)
+
+    elIpathIn <- UI.input
+    elBload   <- UI.button #+ [string "Load PNG"]
 
 
-    elDload   <- UI.div #+ [row [element elIpathIn,element elBload]] 
+    elDload   <- UI.div #+ [row [element elIpathIn,
+                                 element elBload,
+                                 column [element elDW,
+                                         element elDH] # set style [("padding","20px")
+                            ]   ]       ] 
     elDimgs   <- UI.div
     elIimgOrig  <- UI.image
         # set UI.height 300
@@ -118,9 +122,9 @@ setup window = do
 
     ---------------------- RESIZE --------------------------
     elIimgWidth    <- UI.span # set UI.text "---" -- img w
-                              # set style padding
+                              # padding
     elIimgHeight   <- UI.span # set UI.text "---"-- img h    
-                              # set style padding
+                              # padding
     elIdrawWidth   <- UI.input -- dw
     elIdrawHeight  <- UI.input -- dh    
     
@@ -136,23 +140,22 @@ setup window = do
     elBlsresize    <- UI.div #+ [element elBcalcSize, element elresFac]
     elBapplyResize <- UI.button #+ [string "Apply Resize"]
     elDresize      <- UI.div
-    elDresizeInv   <- UI.div #+ [string "Image too big, needs Resizing:",
-                               row [element elBlsresize] # set style padding, 
+    elDresizeInv   <- UI.div #+ [string "Image too big, needs Resizing:" # padding, 
                                 grid [[string "img Width: ", element elIimgWidth, 
                                         string "dWidth:", element elIdrawWidth  ],
                                       [string "img Height: ",element elIimgHeight, 
-                                        string "dHeight:", element elIdrawHeight]]]
-                             # set style padding
+                                        string "dHeight:", element elIdrawHeight]],
+                                row [element elBlsresize] # padding]
+                             # padding
     ---------------------- COLOR PICKER --------------------
     [elrVal,elgVal,elbVal] <- mapM (UI.input #+) [[string "0"],[string "0"],[string "0"]]
-
 
     addCol1    <- UI.button #+ [string "A"]
     addCol2    <- UI.button #+ [string "B"]
     addCol3    <- UI.button #+ [string "C"]
     addCol4    <- UI.button #+ [string "D"]
 
-    elBgetPall <- UI.button #+ [string "Get Pallette*DEBUG*"]
+    elBclearPal <- UI.button #+ [string "Clear Pallette"]
     removeColor <- UI.button #+ [string "Remove Color"]
 
     canvas <- UI.canvas
@@ -167,9 +170,9 @@ setup window = do
     UI.fillRect (0,0) (35*4) (35) palCanvas
 
     colPick <- UI.div #+ [row [column [grid [[string "R",element elrVal], [string "G", element elgVal],[string "B", element elbVal]]
-                         ,row [element canvas # set style [("vertical-align","top")], column [row [element addCol1,element addCol2,element addCol3,element addCol4] # set style [("vertical-align","top")]
-                                                      ,element removeColor]]]
-                         ,column [element palCanvas, element elBgetPall]]
+                         ,row [element canvas # stva, column [row [element addCol1,element addCol2,element addCol3,element addCol4] # stva
+                                                      ,element removeColor]]] # stva
+                         ,column [element palCanvas # stva , element elBclearPal]]
                          ]
         # set UI.height 300
         # set UI.width  300
@@ -205,23 +208,42 @@ setup window = do
     -------GUI--------------- SETUP ---------------------------
 
     -------GUI--------------- LOADIMG -------------------------
-    bUrlIn <- stepper "" $ UI.valueChange elIpathIn
+    bUrlIn <- stepper "./images/piemont.png" $ UI.valueChange elIpathIn
     
-    let readSize = do urlIn   <- currentValue bUrlIn
-                      -- ??? Wie kann ich einfacher die IO wegbekommen. bzw IO -> UI
-                      ioMsize <- liftIO $ return $ getImgSize urlIn
-                      mSize   <- liftIO ioMsize
-                      let sze    = ifSize mSize -- (width,height)
-                      let width  = show $ fst sze
-                      let height = show $ snd sze
-                      element elIimgHeight # set UI.text  height
-                                           # set UI.value height
-                      element elIimgWidth  # set UI.text  width
-                                           # set UI.value width
-                      if sze > drawMax
-                        then element elDresize #+ [element elDresizeInv]
-                        else element elDresize #+ [string "No Resize necessary"]
-                      liftIOLater $ print sze
+    -- | reloads size inputs and calculates new ratio etc.
+    let reloadSize = do  
+            [strdW,strdH,strWidth,strHeight] <- getValuesList [elDW,elDH,elIimgWidth,elIimgHeight]
+            let size@(width,height) = safeTupel (strWidth,strHeight)
+                dwh@(draW,drawH)    = safeTupel (strdW,strdH)
+                rat@(h_rat,w_rat)   = funTupel (%) dwh size
+            element elDresize #+ [element elDresizeInv]
+            element elIimgHeight  # set UI.text  strHeight
+                                  # set UI.value strHeight
+            element elIimgWidth   # set UI.text  strWidth
+                                  # set UI.value strWidth
+            
+            liftIOLater $ do putStrLn ("drawW: "++strdW++" drawH: "++strdH)
+                             putStrLn ("Ratio: "++show rat)
+            let ratio = uncurry min rat
+            element elIdrawWidth  # set UI.value (show $ round (ratio* fromIntegral width))
+            element elIdrawHeight # set UI.value (show $ round (ratio* fromIntegral height))
+
+    let readSize = do 
+            urlIn   <- currentValue bUrlIn
+            ioMsize <- liftIO $ return $ getImgSize urlIn
+            mSize   <- liftIO ioMsize
+            let size@(width,height) = ifSize mSize
+                (strWidth,strHeight) = (show width,show height)
+                res2canv = fromIntegral $ round $ (height%300) * (fromIntegral width)
+            element elIimgOrig    # set UI.width res2canv
+            element elIimgWidth   # set UI.text  strWidth
+                                  # set UI.value strWidth                      
+            element elIimgHeight  # set UI.text  strHeight
+                                  # set UI.value strHeight
+            if size > drawMax
+              then reloadSize   
+              else element elDresize #+ [string "No Resize necessary"]
+            liftIOLater $ print size
 
     on UI.click elBload $ const $ do urlIn <- currentValue bUrlIn
                                      uri <- loadFile "image" urlIn
@@ -234,23 +256,13 @@ setup window = do
 
     [rwIn ,rhIn]  <- mapM (stepper "0") $ map UI.valueChange [elIdrawWidth,elIdrawHeight]
 
-    on UI.click elBcalcSize $ return $ do rwStr  <- currentValue rwIn
-                                          rhStr  <- currentValue rhIn
-                                          [imwStr] <- getValuesList [elIimgWidth]
-                                          [imhStr] <- getValuesList [elIimgHeight]
-                                          liftIOLater $ print imwStr
-                                          let d@(dW,dH)   = drawMax 
-                                          let i@(imW,imH) = safeTupel (imwStr,imhStr)
-                                          let r@(rW,rH)   = safeTupel (rwStr,rhStr)
-                                          let fact        = (show rW)++" "++show rH
-                                          if (not $ and [d>r,r<i,r>(0,0)])
-                                             then do element elIdrawWidth # set UI.value "invalid"
-                                                     element elDivHIDE #+ [element elBapplyResize]
-                                                     liftIOLater $ print "Wrong Input. Size is still to big"
-                                             else do element elresFac # set UI.value fact
-                                                     element elDresize #+ [element elBapplyResize]
-                                                     liftIOLater $ print "Right input"
-                                           
+    on UI.click elBcalcSize $ return reloadSize
+
+    --forM_ (map (on UI.valueChange) [elIdrawWidth,elIdrawHeight,elDW,elDH]) (return reloadSize)                                 
+    on UI.valueChange elIdrawWidth  $ return reloadSize
+    on UI.valueChange elIdrawHeight $ return reloadSize
+    on UI.valueChange elDW $ return reloadSize
+    on UI.valueChange elDH $ return reloadSize
 
 
     on UI.click elBapplyResize $ return $ do urlIn <- currentValue bUrlIn
@@ -271,9 +283,6 @@ setup window = do
     -- function to update a canvas
     let updateCanv canv nr = const $ do
                                 [rIn,gIn,bIn]  <- mapM currentValue [bRIn,bGIn,bBIn]
-                                -- rIn <- currentValue bRIn
-                                -- gIn <- currentValue bGIn
-                                -- bIn <- currentValue bBIn
                                 let (r',g',b')  = (readMay rIn,readMay gIn,readMay bIn)
                                 let col@(UI.RGB r g b) =  safeColorUI r' g' b'
                                 element canv # set UI.fillStyle (UI.solidColor col)
@@ -284,6 +293,7 @@ setup window = do
                                 UI.fillRect ((nr*35),0) 35 35 canv
 
     -- How can I make this smaller?
+
     on UI.valueChange elrVal $ updateCanv canvas 0
     on UI.valueChange elgVal $ updateCanv canvas 0
     on UI.valueChange elbVal $ updateCanv canvas 0
@@ -294,12 +304,14 @@ setup window = do
     on UI.click addCol3 $ updateCanv palCanvas 2
     on UI.click addCol4 $ updateCanv palCanvas 3
 
-    on UI.click removeColor $ return $ UI.clearCanvas canvas
+    on UI.click removeColor $ return $ do UI.clearCanvas canvas
+                                          forM (map element [elrVal,elgVal,elbVal]) (# set UI.value "0")
     
     let getPallette = mapM (getCanvCol palCanvas) [(1,1),(36,1),(72,1),(108,1)]
     
-    on UI.click elBgetPall $ const $ do val <- getPallette
-                                        liftIOLater $ print $ val
+    on UI.click elBclearPal $ const $ do UI.clearCanvas canvas
+                                        --val <- getPallette
+                                        --liftIOLater $ print $ val
     -------GUI--------------- DITHER --------------------------    
     -- apply Dither and change to new imgDith
     on UI.click elBapplyDither $ return $ do [url] <- getValuesList [elURL]
