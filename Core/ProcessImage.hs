@@ -12,81 +12,10 @@ import Codec.Picture
 import Codec.Picture.Types 
 import System.IO
 import System.Environment
-import Data.Bits( unsafeShiftR )
 import Data.Word( Word8, Word16 )
-import qualified Data.Vector.Storable as V
 import Control.Monad
 import Control.Parallel.Strategies
 import Control.DeepSeq
--------------------------------------------------------------------------------
-----            Image Loading
--------------------------------------------------------------------------------
-
-
--- DynamicImage to Image PixelRGB8 converter
-dyn2rgb8 :: DynamicImage -> Maybe (Image PixelRGB8)
-dyn2rgb8 (ImageRGB8   img) = Just $ img
-dyn2rgb8 (ImageY8     img) = Just $ promoteImage img
-dyn2rgb8 (ImageY16    img) = dyn2rgb8 $ ImageRGB16 $ promoteImage img
-dyn2rgb8 (ImageYA8    img) = Just $ promoteImage $ pixelMap dropTransparency img
-dyn2rgb8 (ImageYA16   img) = dyn2rgb8 $ ImageY16 $ pixelMap dropTransparency img
-dyn2rgb8 (ImageRGBA8  img) = Just $ pixelMap dropTransparency img
-dyn2rgb8 (ImageRGBA16 img) = dyn2rgb8 $ ImageRGB16 $ pixelMap dropTransparency img
-dyn2rgb8 (ImageYCbCr8 img) = Just $ convertImage img
-dyn2rgb8 (ImageCMYK8  img) = Just $ convertImage img
-dyn2rgb8 (ImageRGB16  img) = Just $ from16to8' img
-  where
-  -- Source: http://hackage.haskell.org/package/JuicyPixels-3.2.2/docs/src/Codec-Picture-Saving.html
-  from16to8' :: ( PixelBaseComponent source ~ Word16
-                , PixelBaseComponent dest   ~ Word8 )
-            => Image source -> Image dest
-  from16to8' Image { imageWidth = w, imageHeight = h
-                  , imageData = arr } = Image w h transformed
-     where transformed = V.map toWord8 arr
-           toWord8 v = fromIntegral (v `unsafeShiftR` 8)
-dyn2rgb8 (ImageCMYK16 img) = dyn2rgb8 $ ImageRGB16 $ convertImage img
-dyn2rgb8 (ImageRGBF   img) = Just $ pixelMap pFtoRGB8 img
-  where
-  -- Source: http://hackage.haskell.org/package/JuicyPixels-3.1.5/docs/src/Codec-Picture-ColorQuant.html
-  pFtoRGB8 :: PixelRGBF -> PixelRGB8
-  pFtoRGB8 (PixelRGBF r g b) =
-    PixelRGB8 (round r) (round g) (round b)
---dyn2rgb8 (ImageYF     img) = undefined
-dyn2rgb8 _                 = Nothing
-
-
--- Helper for Debugging
-dyn2string :: DynamicImage -> IO()
-dyn2string (ImageY8 d)       = putStrLn "ImageY8 loading..."
-dyn2string (ImageY16 d)      = putStrLn "ImageY16 loading..."
-dyn2string (ImageYF d)       = putStrLn "ImageYF loading..."
-dyn2string (ImageYA8 d)      = putStrLn "ImageYA8 loading..."
-dyn2string (ImageYA16 d)     = putStrLn "ImageYA16 loading..."
-dyn2string (ImageRGB8 d)     = putStrLn "ImageRGB8 loading..."
-dyn2string (ImageRGB16 d)    = putStrLn "ImageRGB16 loading..."
-dyn2string (ImageRGBF d)     = putStrLn "ImageRGBF loading..."
-dyn2string (ImageRGBA8 d)    = putStrLn "ImageRGBA8 loading..."
-dyn2string (ImageRGBA16 d)   = putStrLn "ImageRGBA16 loading..."
-dyn2string (ImageYCbCr8 d)   = putStrLn "ImageYCbCr8 loading..."
-dyn2string (ImageCMYK8 d)    = putStrLn "ImageCMYK8 loading..."
-dyn2string (ImageCMYK16 d)   = putStrLn "ImageCMYK16 loading..."
-
-getImgSize :: FilePath -> IO (Maybe (Int,Int))
-getImgSize pIn = do dyn <- readPng pIn >>= either error return
-                    return $ getSize $ dyn2rgb8 dyn
-    where getSize (Just img) = Just (imageWidth img, imageHeight img)
-          getSize _          = Nothing
-
-
-
-
-
-parMapf :: (a -> b) -> [a] -> Eval [b]
-parMapf f [] = return []
-parMapf f (a:as) = do
-   b <- rpar (f a)
-   bs <- parMap1 f as
-   return (b:bs)
 
 -------------------------------------------------------------------------------
 ----            Image Processing

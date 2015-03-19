@@ -33,13 +33,22 @@ type ImgMax = (Int,Int)
 
 -- Source: https://gist.github.com/eflister/5456125
 goResize :: FilePath -> FilePath -> Int -> IO ()
-goResize inF outF h = either error f =<< readImage inF
-    where f (ImageRGB8 i) = if fact < 1 
-                                then do putStrLn $ "making " ++ outF
-                                        savePngImage outF . ImageRGB8 $ resize fact i   
-                                else error "only shrinks"
-                            where fact = h % (imageHeight i)
-          f _             = error "only does ImageRGB8"          
+goResize pin pout h  = do dyn <- loadPng pin
+                          mayImg <- return $  dyn2rgb8 dyn
+                          if (isNothing mayImg)
+                            then do print "Error with loading PNG"
+                            else do (Just img) <- return mayImg
+                                    let fact = h % (imageHeight img)
+                                    saveImage "Resize done" pout $ ImageRGB8 $ resize fact img 
+                              where isNothing Nothing = True
+                                    isNothing _       = False
+-- goResize inF outF h = either error f =<< readImage inF
+--     where f (ImageRGB8 i) = if fact < 1 
+--                                 then do putStrLn $ "making " ++ outF
+--                                         savePngImage outF . ImageRGB8 $ resize fact i   
+--                                 else error "only shrinks"
+--                             where fact = h % (imageHeight i)
+--           f _             = error "only does ImageRGB8"         
  
 --i hate that this is png/PixelRGB8 specific, but see https://github.com/Twinside/Juicy.Pixels/issues/1
 --resize :: (RealFrac a, Pixel b) => a -> Image b -> Image b

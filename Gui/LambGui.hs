@@ -127,21 +127,19 @@ setup window = do
                               # padding
     elIdrawWidth   <- UI.input -- dw
     elIdrawHeight  <- UI.input -- dh    
-    
-    elimgSizeVal   <- UI.input -- (imgW,imgH)
-    
+        
     elIimgRes      <- UI.image
         # set style [("border", "solid black 1px")]
         # set UI.src "static/t2.png"
-    elBcalcSize    <- UI.button #+ [string "Calc New Size"] 
-    
+
     elresFac       <- UI.new
     
-    elBlsresize    <- UI.div #+ [element elBcalcSize, element elresFac]
     elBapplyResize <- UI.button #+ [string "Apply Resize"]
+
+    elBlsresize    <- UI.div #+ [element elBapplyResize, element elresFac]
+
     elDresize      <- UI.div
-    elDresizeInv   <- UI.div #+ [string "Image too big, needs Resizing:" # padding, 
-                                grid [[string "img Width: ", element elIimgWidth, 
+    elDresizeInv   <- UI.div #+ [ grid [[string "img Width: ", element elIimgWidth, 
                                         string "dWidth:", element elIdrawWidth  ],
                                       [string "img Height: ",element elIimgHeight, 
                                         string "dHeight:", element elIdrawHeight]],
@@ -208,14 +206,14 @@ setup window = do
     -------GUI--------------- SETUP ---------------------------
 
     -------GUI--------------- LOADIMG -------------------------
-    bUrlIn <- stepper "./images/piemont.png" $ UI.valueChange elIpathIn
+    bUrlIn <- stepper "./images/canvas.png" $ UI.valueChange elIpathIn
     
     -- | reloads size inputs and calculates new ratio etc.
     let reloadSize = do  
             [strdW,strdH,strWidth,strHeight] <- getValuesList [elDW,elDH,elIimgWidth,elIimgHeight]
             let size@(width,height) = safeTupel (strWidth,strHeight)
                 dwh@(draW,drawH)    = safeTupel (strdW,strdH)
-                rat@(h_rat,w_rat)   = funTupel (%) dwh size
+                rat@(h_rat,w_rat)   = funTupel (%) (funTupel min dwh size) size
             element elDresize #+ [element elDresizeInv]
             element elIimgHeight  # set UI.text  strHeight
                                   # set UI.value strHeight
@@ -234,7 +232,7 @@ setup window = do
             mSize   <- liftIO ioMsize
             let size@(width,height) = ifSize mSize
                 (strWidth,strHeight) = (show width,show height)
-                res2canv = fromIntegral $ round $ (height%300) * (fromIntegral width)
+                res2canv = fromIntegral $ round $ (300%height) * (fromIntegral width)
             element elIimgOrig    # set UI.width res2canv
             element elIimgWidth   # set UI.text  strWidth
                                   # set UI.value strWidth                      
@@ -242,7 +240,7 @@ setup window = do
                                   # set UI.value strHeight
             if size > drawMax
               then reloadSize   
-              else element elDresize #+ [string "No Resize necessary"]
+              else reloadSize--element elDresize #+ [string "No Resize necessary"]
             liftIOLater $ print size
 
     on UI.click elBload $ const $ do urlIn <- currentValue bUrlIn
@@ -256,7 +254,7 @@ setup window = do
 
     [rwIn ,rhIn]  <- mapM (stepper "0") $ map UI.valueChange [elIdrawWidth,elIdrawHeight]
 
-    on UI.click elBcalcSize $ return reloadSize
+    --on UI.click elBcalcSize $ return reloadSize
 
     --forM_ (map (on UI.valueChange) [elIdrawWidth,elIdrawHeight,elDW,elDH]) (return reloadSize)                                 
     on UI.valueChange elIdrawWidth  $ return reloadSize
@@ -266,16 +264,17 @@ setup window = do
 
 
     on UI.click elBapplyResize $ return $ do urlIn <- currentValue bUrlIn
-                                             [balub] <- getValuesList [elresFac]
-                                             let [rw,rh] = words balub
-                                             let (rh',rw')   = safeTupel (rh,rw)
-                                             liftIO $ goResize urlIn "./images/tempRes.png" rh'
+                                             [strdW,strdH,strWidth,strHeight] <- getValuesList [elDW,elDH,elIimgWidth,elIimgHeight]
+                                             let size@(width,height) = safeTupel (strWidth,strHeight)
+                                                 dwh@(draW,drawH)    = safeTupel (strdW,strdH)
+                                                 rat@(h_rat,w_rat)   = funTupel (%) dwh size
+                                             liftIO $ goResize urlIn "./images/tempRes.png" height
                                              element elIimgRes  # set UI.src "static/tempRes.png"
-                                                                # set UI.height rh'
-                                                                # set UI.width  rw'
+                                                                # set UI.height height
+                                                                # set UI.width  width
                                              element elDimgs #+ [element elIimgRes]
                                              element elURL   # set UI.value "./images/tempRes.png"
-                                             liftIOLater $ print rh' 
+                                             liftIOLater $ do mapM_ print $ show rat:(map show [size,dwh])  
     -------GUI--------------- COLOR PICKER --------------------
     -- update Values in Color Picker
     [bRIn,bGIn,bBIn] <- mapM (stepper "0") $ map UI.valueChange [elrVal,elgVal,elbVal]
