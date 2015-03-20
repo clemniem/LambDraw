@@ -12,17 +12,45 @@ import Codec.Picture
 import Codec.Picture.Types 
 import System.IO
 import System.Environment
-import Data.Word( Word8, Word16 )
 import Control.Monad
 import Control.Parallel.Strategies
 import Control.DeepSeq
+import Data.Word( Word8, Word16 )
+import Data.Ratio
+import System.Directory
 
 -------------------------------------------------------------------------------
 ----            Image Processing
 -------------------------------------------------------------------------------
+preProcessImage :: (Image PixelRGB8 -> [PixelRGB8] -> FilePath -> IO()) 
+                -> [PixelRGB8] -> FilePath -> FilePath -> IO()
+preProcessImage fun pixls pathIn pathOut = do
+    createDirectoryIfMissing False "./images/temp/"
+    dynImg <- loadPng pathIn
+    dyn2string dynImg -- Debugging Helper
+    mayImg <- return $ dyn2rgb8 dynImg
+    if (isNothing mayImg)
+      then do print "Error with loading PNG"
+      else do
+        (Just img) <- return mayImg
+        fun img pixls pathOut 
+        putStrLn "Image Processed."
+     where isNothing Nothing = True
+           isNothing _       = False
+
+doResize :: Int -> Image PixelRGB8 -> [PixelRGB8] -> FilePath -> IO ()
+doResize hnew img _ pathOut = do let fact = hnew % (imageHeight img)
+                                 saveImage "Resize done" (pathOut++"_res") $ ImageRGB8 $ resize fact img
+
+doTestDither :: Image PixelRGB8 -> [PixelRGB8] -> FilePath -> IO ()
+doTestDither img pixls pathOut = do dithImg    <- processDither pixls img pathOut
+                                    putStrLn "Test Done."
+
 
 processImage :: [PixelRGB8] -> FilePath -> FilePath -> IO()
 processImage pixls pathIn pathOut = do
+    createDirectoryIfMissing False "./images/temp/"
+    let checkFile = doesFileExist pathIn 
     dynImg <- loadPng pathIn
     dyn2string dynImg -- Debugging Helper
     mayImg <- return $ dyn2rgb8 dynImg
@@ -36,21 +64,6 @@ processImage pixls pathIn pathOut = do
         putStrLn "Image Processed."
      where isNothing Nothing = True
            isNothing _       = False
-
-testDither :: [PixelRGB8] -> FilePath -> FilePath -> IO()
-testDither pixls pathIn pathOut = do
-    dynImg <- loadPng pathIn
-    dyn2string dynImg -- Debugging Helper
-    mayImg <- return $ dyn2rgb8 dynImg
-    if (isNothing mayImg)
-      then do print "Error with loading PNG"
-      else do
-        (Just img) <- return mayImg
-        dithImg    <- processDither pixls img pathOut
-        putStrLn "Test Done."
-     where isNothing Nothing = True
-           isNothing _       = False
-
 
 processDither :: [PixelRGB8] -> Image PixelRGB8 -> FilePath -> IO(Image PixelRGB8)
 processDither pal img pathOut = do

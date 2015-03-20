@@ -31,17 +31,7 @@ import System.Directory
 type DrawMax = (Int,Int)
 type ImgMax = (Int,Int)
 
--- Source: https://gist.github.com/eflister/5456125
-goResize :: FilePath -> FilePath -> Int -> IO ()
-goResize pin pout h  = do dyn <- loadPng pin
-                          mayImg <- return $  dyn2rgb8 dyn
-                          if (isNothing mayImg)
-                            then do print "Error with loading PNG"
-                            else do (Just img) <- return mayImg
-                                    let fact = h % (imageHeight img)
-                                    saveImage "Resize done" pout $ ImageRGB8 $ resize fact img 
-                              where isNothing Nothing = True
-                                    isNothing _       = False
+
 -- goResize inF outF h = either error f =<< readImage inF
 --     where f (ImageRGB8 i) = if fact < 1 
 --                                 then do putStrLn $ "making " ++ outF

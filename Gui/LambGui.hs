@@ -9,25 +9,32 @@ import Core.ProcessImage
 import Control.Monad
 import Safe 
 import Data.Ratio
+import System.Directory
+import System.FilePath.Posix
 
 import qualified Graphics.UI.Threepenny as UI
 import Graphics.UI.Threepenny.Core
 import Codec.Picture.Types
+import System.Random as R
 
-ifSize :: Maybe (Int,Int) -> (Int,Int)
-ifSize (Just msize) = msize
-ifSize _           = (0,0)
 
--- DIN A4 210 x 297 mm
+
+-- | DIN A4 210 x 297 mm
 drawMax = (210,297) -- (width,height)
 
 stva = set style [("vertical-align","top")]
 padding = set style [("padding","10px 10px 10px 10px")]
--- ImgMax -> DrawMax -> Bool
+
+-- | ImgMax -> DrawMax -> Bool
 imgTooBig :: (Int,Int) -> (Int,Int) -> Bool
 imgTooBig (imW,imH) (dW,dH) = and [imW>dW,imH>dH]
 
--- getter for specific Color () of a Canvas at a specific Point
+-- | Bound Checking Helper Function
+ifSize :: Maybe (Int,Int) -> (Int,Int)
+ifSize (Just msize) = msize
+ifSize _           = (0,0)
+
+-- | getter for specific Color () of a Canvas at a specific Point
 -- to UI (PixelRGB8) is also possible just change from fst to snd after the return
 getCanvCol :: UI.Canvas -> UI.Point -> UI (PixelRGB8) 
 getCanvCol canvas (x,y) = do  
@@ -61,6 +68,7 @@ safeColorUI mr mg mb = UI.RGB (tst mr) (tst mg) (tst mb)
             | i < 0     = 0
             | otherwise = i
 
+-- | Safe Conversion to PixelRGB8
 safeColorRGB8 :: Maybe Int -> Maybe Int -> Maybe Int -> PixelRGB8 
 safeColorRGB8 mr mg mb = PixelRGB8 (tst mr) (tst mg) (tst mb)
     where tst Nothing  = 0
@@ -69,6 +77,7 @@ safeColorRGB8 mr mg mb = PixelRGB8 (tst mr) (tst mg) (tst mb)
             | i < 0     = 0
             | otherwise = fromIntegral i
 
+-- | Safe Conversion String -> Int
 safeTupel :: (String,String) -> (Int,Int)
 safeTupel (str1,str2) = (toInt (readMay str1),toInt (readMay str2))
   where 
@@ -76,9 +85,14 @@ safeTupel (str1,str2) = (toInt (readMay str1),toInt (readMay str2))
     toInt (Just nr) = nr
     toInt _         = 1  
 
--- used to calculate Neighbour-Points
---funTupel :: (a -> b) -> (a,a) -> (a,a) -> (b,b)
+-- | operate a Function on Tuples, elementwise
+funTupel :: (t -> t1 -> t2) -> (t, t) -> (t1, t1) -> (t2, t2)
 funTupel f (x1,x2) (y1,y2) = (f x1 y1,f x2 y2)
+
+getRand :: [Char] -> [Char]
+getRand char = take 3 (randomRs ('0', '9') gen)
+    where gen = (mkStdGen (read char))
+
 
 {-----------------------------------------------------------------------------
     Gui-Main
@@ -97,9 +111,15 @@ setup :: Window -> UI ()
 setup window = do
     return window # set title "LambDraw"
     UI.addStyleSheet window "LambGui.css"
+    
+    statURLOut <- return "static/temp/temp"
     ---------------------- SETUP --------------------------
     elDivHIDE <- UI.div -- used to Hide elements
-    elURL     <- UI.div 
+    elURLin   <- UI.div
+    elURLout  <- UI.div
+    elURL  <- UI.div
+    elRand <- UI.div # set UI.value "0"
+    elcanvWidth <- UI.div
     ---------------------- LOADIMG -------------------------
     elDW <- UI.input # set UI.value (show $ fst drawMax)
     elDH <- UI.input # set UI.value (show $ snd drawMax)
@@ -189,7 +209,6 @@ setup window = do
     -- ======
 --------------------------- BODY ----------------------------
     getBody window #+ [ 
-        element elURL,
         element elDload,
         element elDresize,
         row [element elDimgs],
@@ -206,7 +225,7 @@ setup window = do
     -------GUI--------------- SETUP ---------------------------
 
     -------GUI--------------- LOADIMG -------------------------
-    bUrlIn <- stepper "./images/canvas.png" $ UI.valueChange elIpathIn
+    bUrlIn <- stepper "" $ UI.valueChange elIpathIn
     
     -- | reloads size inputs and calculates new ratio etc.
     let reloadSize = do  
@@ -233,7 +252,7 @@ setup window = do
             let size@(width,height) = ifSize mSize
                 (strWidth,strHeight) = (show width,show height)
                 res2canv = fromIntegral $ round $ (300%height) * (fromIntegral width)
-            element elIimgOrig    # set UI.width res2canv
+            forM [element elIimgOrig,element elcanvWidth]  (# set UI.width res2canv)
             element elIimgWidth   # set UI.text  strWidth
                                   # set UI.value strWidth                      
             element elIimgHeight  # set UI.text  strHeight
@@ -244,8 +263,13 @@ setup window = do
             liftIOLater $ print size
 
     on UI.click elBload $ const $ do urlIn <- currentValue bUrlIn
-                                     uri <- loadFile "image" urlIn
-                                     element elURL # set UI.value urlIn
+                                     dir <- return $ dropFileName urlIn
+                                     let tempDir = (dir++"temp/")
+                                     liftIOLater $ createDirectoryIfMissing False tempDir
+                                     forM [element elURLin, element elURL] (# set UI.value urlIn)
+                                     -- element elURLin # set UI.value urlIn
+                                     element elURLout # set UI.value (tempDir++"temp")
+                                     uri <- loadFile "image" urlIn -- "image" = MIME Type
                                      element elIimgOrig # set UI.src uri
                                      element elDimgs #+ [element elIimgOrig]
                                      readSize  
@@ -262,18 +286,30 @@ setup window = do
     on UI.valueChange elDW $ return reloadSize
     on UI.valueChange elDH $ return reloadSize
 
+    let updateRand = do [oldRand] <- getValuesList [elRand]
+                        let newRand = getRand oldRand
+                        element elRand # set UI.value newRand
 
-    on UI.click elBapplyResize $ return $ do urlIn <- currentValue bUrlIn
+    let refreshImage url (Just w) = do --element elDivHIDE #+ [element elIimgOrig]
+                                       --delete elIimgOrig
+                                       element elIimgOrig -- <- UI.image
+                                                  # set UI.height w
+                                                  # set UI.width  300
+                                                  # set style [("border", "solid black 1px")]
+                                                  # set UI.src url
+                                       --element elDimgs #+ [element elIimgOrig]
+
+    on UI.click elBapplyResize $ return $ do [urlIn,urlOut,rand,strcanW] <- getValuesList [elURLin,elURLout,elRand,elcanvWidth]
                                              [strdW,strdH,strWidth,strHeight] <- getValuesList [elDW,elDH,elIimgWidth,elIimgHeight]
                                              let size@(width,height) = safeTupel (strWidth,strHeight)
                                                  dwh@(draW,drawH)    = safeTupel (strdW,strdH)
                                                  rat@(h_rat,w_rat)   = funTupel (%) dwh size
-                                             liftIO $ goResize urlIn "./images/tempRes.png" height
-                                             element elIimgRes  # set UI.src "static/tempRes.png"
-                                                                # set UI.height height
-                                                                # set UI.width  width
-                                             element elDimgs #+ [element elIimgRes]
-                                             element elURL   # set UI.value "./images/tempRes.png"
+                                             liftIO $ preProcessImage (doResize height) [] urlIn (urlOut++rand)
+                                             let mcW = readMay strcanW 
+                                                 canW = if (mcW == Nothing) then (Just 300) else mcW  
+                                             refreshImage (statURLOut++rand++"_res.png") canW 
+                                             element elURL   # set UI.value (urlOut++rand++"_res.png")
+                                             updateRand
                                              liftIOLater $ do mapM_ print $ show rat:(map show [size,dwh])  
     -------GUI--------------- COLOR PICKER --------------------
     -- update Values in Color Picker
@@ -313,22 +349,21 @@ setup window = do
                                         --liftIOLater $ print $ val
     -------GUI--------------- DITHER --------------------------    
     -- apply Dither and change to new imgDith
-    on UI.click elBapplyDither $ return $ do [url] <- getValuesList [elURL]
-                                             liftIO $ print url
+    on UI.click elBapplyDither $ return $ do [urlIn,urlOut,rand,strcanW] <- getValuesList [elURLin,elURLout,elRand,elcanvWidth]
+                                             liftIO $ print $ "Dither URL IN: "++urlIn
                                              pal   <- getPallette
-                                             liftIO $ testDither (whitePix:pal) url "./images/temp"
-                                             delete elIimgOrig
-                                             elIimgOrig  <- UI.image
-                                                                # set UI.height 300
-                                                                # set UI.width  300
-                                                                # set style [("border", "solid black 1px")]
-                                                                # set UI.src "static/temp_dith.png"
-                                             element elDimgs #+ [element elIimgOrig]
+                                             liftIO $ preProcessImage doTestDither (whitePix:pal) urlIn (urlOut++rand)
+                                             let mcW = readMay strcanW 
+                                                 canW = if (mcW == Nothing) then (Just 300) else mcW  
+                                             --element elDivHIDE #+ [element elIimgOrig]
+                                             refreshImage (statURLOut++rand++"_dith.png") canW 
+                                             element elURL   # set UI.value (urlOut++rand++"_dith.png")
+                                             updateRand
 
     on UI.click elBsplice $ return $ do [url] <- getValuesList [elURL]
                                         liftIO $ print url
                                         pal   <- getPallette
-                                        liftIO $ processImage (whitePix:pal) url "./images/temp"
+                                        liftIO $ processImage (whitePix:pal) url "./images/temp/temp"
                                         element elIimgOrig # set UI.src "static/temp_dith.png"
 
 

@@ -4,12 +4,17 @@ import Core.Colorsplicer
 import Codec.Picture.Types
 import Core.ProcessImage
 import Data.List
+import System.Random
 
-main =  do 
-    processImage [redPix,yellowPix] "./images/canvas.png" "./images/test"
-    ls <- return $ (lsDistance starls)
-    print $ show ls	   
+
+-- main =  do 
+    -- processImage [redPix,yellowPix] "./images/canvas.png" "./images/test"
+    -- ls <- return $ (lsDistance starls)
+    -- print $ show ls	   
     -- print $ show (length starls)++"/"++show (length testList)
+
+
+main1 g = take 3 (randomRs ('0', '9') (mkStdGen g))
 
 
 {- 		
