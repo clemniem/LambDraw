@@ -48,7 +48,7 @@ colorMinDist p (x:xs) = colorMinDistAcc p xs ((colorDist8 p x),x)
         | dist' < dist = colorMinDistAcc p' xs' (dist',x')
         | otherwise    = colorMinDistAcc p' xs' (dist ,pixAcc)
         where
-        dist' = colorDist8 p' x 
+        dist' = colorDist8 p' x' 
 
 -- | Debugging function for grey->chess Problem, turns out:
 -- its more a Problem of the Error Calculation (rounding 7/16 etc...)

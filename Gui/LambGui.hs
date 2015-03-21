@@ -227,21 +227,57 @@ setup window = do
     -------GUI--------------- LOADIMG -------------------------
     bUrlIn <- stepper "" $ UI.valueChange elIpathIn
     
+    -- -- | reloads size inputs and calculates new ratio etc.
+    -- let reloadSize = do  
+    --         [strdW,strdH,
+    --          strWidth,strHeight,
+    --          strOutW,strOutH] <- getValuesList [elDW,elDH,elIimgWidth,elIimgHeight,elIoutWidth,elIoutHeight]
+    --         let dwh@(_draW ,_drawH) = safeTupel (strdW,strdH)
+    --             size@(width,height) = safeTupel (strWidth,strHeight)
+    --             out@(outW,outH)     = safeTupel (strOutW,strOutH) 
+    --             rat@(_h_rat,_w_rat) = funTupel (%) dwh (funTupel min size out)
+            
+    --         liftIOLater $ do putStrLn ("drawW: "++strdW++" drawH: "++strdH)
+    --                          putStrLn ("Ratio: "++show rat)
+    --         let ratio = min (1%1) $ uncurry min rat
+    --         element elIoutWidth  # set UI.value (show $ round (ratio* fromIntegral width))
+    --         element elIoutHeight # set UI.value (show $ round (ratio* fromIntegral height))
+    let updateRand = do [oldRand] <- getValuesList [elRand]
+                        let newRand = getRand oldRand
+                        element elRand # set UI.value newRand
+
+    let refreshImage url (Just w) = do element elIimgOrig # set UI.height w # set UI.src url
+
     -- | reloads size inputs and calculates new ratio etc.
-    let reloadSize = do  
+    let reloadSize nosave = do  
             [strdW,strdH,
              strWidth,strHeight,
              strOutW,strOutH] <- getValuesList [elDW,elDH,elIimgWidth,elIimgHeight,elIoutWidth,elIoutHeight]
             let dwh@(_draW ,_drawH) = safeTupel (strdW,strdH)
                 size@(width,height) = safeTupel (strWidth,strHeight)
                 out@(outW,outH)     = safeTupel (strOutW,strOutH) 
-                rat@(_h_rat,_w_rat) = funTupel (%) dwh (funTupel min size out)
-            
-            liftIOLater $ do putStrLn ("drawW: "++strdW++" drawH: "++strdH)
-                             putStrLn ("Ratio: "++show rat)
-            let ratio = min (1%1) $ uncurry min rat
-            element elIoutWidth  # set UI.value (show $ round (ratio* fromIntegral width))
-            element elIoutHeight # set UI.value (show $ round (ratio* fromIntegral height))
+                rat@(_h_rat,_w_rat) = funTupel (%) (funTupel min dwh out) size  
+                ratio = min (1%1) $ uncurry min rat
+            liftIOLater $ do putStrLn ("Machine : "++show dwh)
+                             putStrLn ("Size : " ++ show size)
+                             putStrLn ("OutSize: "++ show out)
+                             putStrLn ("Ratios: "++show rat)
+                             putStrLn ("Ratio: "++show ratio)
+            if nosave 
+              then liftIOLater $ putStrLn "No Saving.."
+              else do [urlIn,urlOut,rand,strcanW] <- getValuesList [elURLin,elURLout,elRand,elcanvWidth]
+                      let newSize@(newH,_newW) = funTupel (*) (ratio,ratio) (fromIntegral width,fromIntegral height)
+                          mcW = readMay strcanW 
+                          canW = if (mcW == Nothing) then (Just 300) else mcW  
+                      liftIO $ preProcessImage (doResize $ round newH) [] urlIn (urlOut++rand)
+
+                      refreshImage (statURLOut++rand++"_res.png") canW 
+                      element elURLres   # set UI.value (urlOut++rand++"_res.png")
+                      updateRand
+                      liftIOLater $ do 
+                            print $ "Resize URL IN : "++urlIn
+                            print $ "Resize URL OUT : "++(urlOut++rand++"_res.png")
+                            mapM_ print $ show rat:(map show [size,dwh])++[show newSize] 
 
     -- | reads Image size and applys to Canvas
     let readSize = do 
@@ -257,7 +293,7 @@ setup window = do
             forM [element elIimgHeight,element elIoutHeight] (# set UI.value strHeight)
             element elIimgWidth   # set UI.text  strWidth
             element elIimgHeight  # set UI.text  strHeight
-            reloadSize
+            reloadSize True
             liftIOLater $ print size
 
     -- | loads image and updates variables
@@ -284,31 +320,34 @@ setup window = do
 
     -------GUI--------------- RESIZE --------------------------
 
-    forM (map (on UI.valueChange) [elIoutWidth,elIoutHeight,elDW,elDH]) (return reloadSize)                                 
+    --forM (map 
+    on UI.valueChange elIoutWidth  $ return $ reloadSize True
+    on UI.valueChange elIoutHeight $ return $ reloadSize True                                 
+    on UI.valueChange elDW $ return $ reloadSize True                                 
+    on UI.valueChange elDH $ return $ reloadSize True                                 
+                                 
 
-    let updateRand = do [oldRand] <- getValuesList [elRand]
-                        let newRand = getRand oldRand
-                        element elRand # set UI.value newRand
 
-    let refreshImage url (Just w) = do element elIimgOrig # set UI.height w # set UI.src url
 
-    on UI.click elBapplyResize $ return $ do [urlIn,urlOut,rand,strcanW] <- getValuesList [elURLin,elURLout,elRand,elcanvWidth]
-                                             [strdW,strdH,strWidth,strHeight] <- getValuesList [elDW,elDH,elIimgWidth,elIimgHeight]
-                                             let size@(width,height)  = safeTupel (strWidth,strHeight)
-                                                 dwh@(_draW,_drawH)   = safeTupel (strdW,strdH)
-                                                 rat@(_h_rat,_w_rat)  = funTupel (%) (min dwh size) size
-                                                 newSize@(newH,_newW) = funTupel (*) (fac,fac) (fromIntegral width,fromIntegral height)
-                                                    where fac = (uncurry min rat)
-                                             liftIO $ preProcessImage (doResize $ round newH) [] urlIn (urlOut++rand)
-                                             let mcW = readMay strcanW 
-                                                 canW = if (mcW == Nothing) then (Just 300) else mcW  
-                                             refreshImage (statURLOut++rand++"_res.png") canW 
-                                             element elURLres   # set UI.value (urlOut++rand++"_res.png")
-                                             updateRand
-                                             liftIOLater $ do 
-                                                print $ "Resize URL IN : "++urlIn
-                                                print $ "Resize URL OUT : "++(urlOut++rand++"_res.png")
-                                                mapM_ print $ show rat:(map show [size,dwh])++[show newSize]  
+
+    on UI.click elBapplyResize $ return $ do reloadSize False
+                                             -- [urlIn,urlOut,rand,strcanW] <- getValuesList [elURLin,elURLout,elRand,elcanvWidth]
+                                             -- [strdW,strdH,strWidth,strHeight] <- getValuesList [elDW,elDH,elIimgWidth,elIimgHeight]
+                                             -- let size@(width,height)  = safeTupel (strWidth,strHeight)
+                                             --     dwh@(_draW,_drawH)   = safeTupel (strdW,strdH)
+                                             --     rat@(_h_rat,_w_rat)  = funTupel (%) (min dwh size) size
+                                             --     newSize@(newH,_newW) = funTupel (*) (fac,fac) (fromIntegral width,fromIntegral height)
+                                             --        where fac = (uncurry min rat)
+                                             -- liftIO $ preProcessImage (doResize $ round newH) [] urlIn (urlOut++rand)
+                                             -- let mcW = readMay strcanW 
+                                             --     canW = if (mcW == Nothing) then (Just 300) else mcW  
+                                             -- refreshImage (statURLOut++rand++"_res.png") canW 
+                                             -- element elURLres   # set UI.value (urlOut++rand++"_res.png")
+                                             -- updateRand
+                                             -- liftIOLater $ do 
+                                             --    print $ "Resize URL IN : "++urlIn
+                                             --    print $ "Resize URL OUT : "++(urlOut++rand++"_res.png")
+                                             --    mapM_ print $ show rat:(map show [size,dwh])++[show newSize]  
     -------GUI--------------- COLOR PICKER --------------------
     -- update Values in Color Picker
     [bRIn,bGIn,bBIn] <- mapM (stepper "0") $ map UI.valueChange [elrVal,elgVal,elbVal]
@@ -343,16 +382,18 @@ setup window = do
     on UI.click elBclearPal $ const $ do UI.clearCanvas palCanvas
 
     -------GUI--------------- DITHER --------------------------    
-    on UI.click elBapplyDither $ return $ do [urlIn,urlOut,rand,strcanW] <- getValuesList [elURLres,elURLout,elRand,elcanvWidth]
-                                             liftIO $ print $ "Dither URL IN: "++urlIn
+    on UI.click elBapplyDither $ return $ do [urlIn,urlOut,rand,strcanW] <- getValuesList [elURLres,elURLout,elRand,elcanvWidth]                                                         
                                              pal   <- getPallette
-                                             liftIO $ preProcessImage doTestDither (whitePix:pal) urlIn (urlOut++rand)
+                                             liftIO $ do 
+                                                print $ pal
+                                                print $ "Dither URL IN: "++urlIn
+                                                preProcessImage doTestDither (whitePix:pal) urlIn (urlOut++rand)
                                              let mcW = readMay strcanW 
                                                  canW = if (mcW == Nothing) then (Just 300) else mcW  
                                              refreshImage (statURLOut++rand++"_dith.png") canW 
                                              element elURLdith   # set UI.value (urlOut++rand++"_dith.png")
                                              updateRand
-                                             liftIO $ print $ "Dither URL IN: "++(urlOut++rand++"_dith.png")
+                                             liftIO $ print $ "Dither URL Out: "++(urlOut++rand++"_dith.png")
 
     -------GUI--------------- SPLICE --------------------------    
 

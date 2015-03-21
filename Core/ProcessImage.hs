@@ -36,7 +36,10 @@ preProcessImage fun pixls pathIn pathOut = do
 -- | Does the Resize
 doResize :: Int -> Image PixelRGB8 -> [PixelRGB8] -> FilePath -> IO ()
 doResize hnew img _ pathOut = do let fact = hnew % (imageHeight img)
-                                 saveImage "Resize done" (pathOut++"_res") $ ImageRGB8 $ resize fact img
+                                 putStrLn $ "Fact Resize: "++show fact
+                                 if (fact == 1%1) 
+                                  then saveImage "No Resize done ratio == 1%1" (pathOut++"_res") $ ImageRGB8 $ img
+                                  else saveImage "Resize done" (pathOut++"_res") $ ImageRGB8 $ resize fact img
 -- | Does the Test Dither 
 doTestDither :: Image PixelRGB8 -> [PixelRGB8] -> FilePath -> IO ()
 doTestDither img pixls pathOut = do _dithImg    <- doDither pixls img pathOut
