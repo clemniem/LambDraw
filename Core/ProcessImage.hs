@@ -7,25 +7,20 @@ import Core.MakeIMG
 import Core.Dither
 import Core.Resize
 import Core.Colorsplicer
-import Data.List.Utils as L
+
 import Codec.Picture
-import Codec.Picture.Types 
 import System.IO
-import System.Environment
-import Control.Monad
 import Control.Parallel.Strategies
-import Control.DeepSeq
-import Data.Word( Word8, Word16 )
 import Data.Ratio
 import System.Directory
 
 -------------------------------------------------------------------------------
 ----            Image Processing
 -------------------------------------------------------------------------------
+-- | Preprocessing is for intermediate steps (resize,testDither) 
 preProcessImage :: (Image PixelRGB8 -> [PixelRGB8] -> FilePath -> IO()) 
                 -> [PixelRGB8] -> FilePath -> FilePath -> IO()
 preProcessImage fun pixls pathIn pathOut = do
-    createDirectoryIfMissing False "./images/temp/"
     dynImg <- loadPng pathIn
     dyn2string dynImg -- Debugging Helper
     mayImg <- return $ dyn2rgb8 dynImg
@@ -38,19 +33,19 @@ preProcessImage fun pixls pathIn pathOut = do
      where isNothing Nothing = True
            isNothing _       = False
 
+-- | Does the Resize
 doResize :: Int -> Image PixelRGB8 -> [PixelRGB8] -> FilePath -> IO ()
 doResize hnew img _ pathOut = do let fact = hnew % (imageHeight img)
                                  saveImage "Resize done" (pathOut++"_res") $ ImageRGB8 $ resize fact img
-
+-- | Does the Test Dither 
 doTestDither :: Image PixelRGB8 -> [PixelRGB8] -> FilePath -> IO ()
-doTestDither img pixls pathOut = do dithImg    <- processDither pixls img pathOut
-                                    putStrLn "Test Done."
+doTestDither img pixls pathOut = do _dithImg    <- doDither pixls img pathOut
+                                    print "Test Done."
 
-
+-- | Processes the Image => Dither and Splice
 processImage :: [PixelRGB8] -> FilePath -> FilePath -> IO()
 processImage pixls pathIn pathOut = do
     createDirectoryIfMissing False "./images/temp/"
-    let checkFile = doesFileExist pathIn 
     dynImg <- loadPng pathIn
     dyn2string dynImg -- Debugging Helper
     mayImg <- return $ dyn2rgb8 dynImg
@@ -58,35 +53,39 @@ processImage pixls pathIn pathOut = do
       then do print "Error with loading PNG"
       else do
         (Just img) <- return mayImg
-        dithImg    <- processDither pixls img pathOut
-        splicelss  <- processSplice pixls dithImg pathOut
+        dithImg    <- doDither pixls img pathOut
+        splicelss  <- doSplice pixls dithImg pathOut
         processToolpath img splicelss pathOut
         putStrLn "Image Processed."
      where isNothing Nothing = True
            isNothing _       = False
 
-processDither :: [PixelRGB8] -> Image PixelRGB8 -> FilePath -> IO(Image PixelRGB8)
-processDither pal img pathOut = do
+-- | Does the Dither
+doDither :: [PixelRGB8] -> Image PixelRGB8 -> FilePath -> IO(Image PixelRGB8)
+doDither pal img pathOut = do
     dimg <- return $ ditherFloydRGB8 pal img
     saveImage "Dither processed" (pathOut++"_dith") $ ImageRGB8 dimg
     return dimg
 
-
-processSplice :: [PixelRGB8] -> Image PixelRGB8 -> FilePath -> IO([(Int,[Point])])
-processSplice pal img@(Image { imageWidth  = w, 
+-- | Does the Splice
+-- Takes a Pallette and an Image and creates a list of Tuples (Int,[Point])
+-- Int     ^= Number of the Color in Pallette 
+-- [Point] ^= List of Points for that Color
+doSplice :: [PixelRGB8] -> Image PixelRGB8 -> FilePath -> IO([(Int,[Point])])
+doSplice pal img@(Image { imageWidth  = w, 
                                  imageHeight = h}) pathOut = 
   do  splicelss  <- return $ runEval $ do parMap1 ((starSort w h) . (colorSplicer img)) pal
       let tupsplices = zip [0..(length splicelss)] splicelss
       mapM_ (spliceSave pathOut) tupsplices
-      --return $ runEval $ do parMap1 (spliceSave pathOut) tupsplices
       return tupsplices
         where
-        spliceSave pOut (nr,[])   = putStrLn $ "For white ("++show nr++") no splicing needed. No file created."
-        spliceSave pOut (nr,spls) = saveImage ("Splicing "++show nr++" done") (pOut++"_splice"++show nr) 
+        spliceSave _pOut (nr,[])   = putStrLn $ "For white ("++show nr++") no splicing needed. No file created."
+        spliceSave pOut (nr,spls)  = saveImage ("Splicing "++show nr++" done") (pOut++"_splice"++show nr) 
                                           $ ImageRGB8 $ pointlsToImg spls w h
 
+-- | generates the Toolpath from an Image (work in Progress...)
 processToolpath :: Image PixelRGB8 -> [(Int,[Point])] -> FilePath -> IO()
-processToolpath im [] _   = return () 
+processToolpath _im [] _   = return () 
 processToolpath (Image { imageWidth  = w, 
                          imageHeight = h}) pss pOut  = do 
           gcodes   <- return $ runEval $ do parMap1 toGcode pss
@@ -94,30 +93,22 @@ processToolpath (Image { imageWidth  = w,
 -------------------------------------------------------------------------------
 ----            Generate GCode
 -------------------------------------------------------------------------------
--- spliceToGCode :: FilePath -> [PixelRGB8] -> IO()
--- spliceToGCode pathIn pixls = 
---   runEval $ do let pathOut = L.replace ".png" "_gcode.txt" pathIn
 
---                lsToGcode pathOut $ []
-
+-- | Writes the File
 codeLstoFile :: FilePath -> [String] -> IO()
 codeLstoFile _   []  = print "Error with writing TextFile."
 codeLstoFile url ls  = do outh <- openFile url WriteMode
                           mapM_ (hPutStrLn outh) ls 
                           hClose outh
 
-
--- lsToGcode :: FilePath -> [Point] -> IO()
--- lsToGcode url ls = do outh <- openFile url WriteMode
---                       mapM_ (hPutStrLn outh) $ (toGcode ls) 
---                       hClose outh
-
+-- | Generates GCode
 toGcode :: (Int,[Point]) -> [String]
 toGcode (_,[]) = ["G00 X00 Y00"] -- Jog Home
 toGcode (nr,(p:ps)) = setPen : toGString p : "M08" : "G04 P800" : "M09" : "G04 P100" : toGcode' ps
-  where toGcode' []     = ["G00 X00 Y00"]
-        toGcode' (p:ps) = toGString p : "M08" : "G04 P800" : "M09" : "G04 P100" : toGcode' ps
-        toGString (px,py) = "G00 X" ++ show px ++ " Y" ++ show py
+  where toGcode'  []       = ["G00 X00 Y00"]
+        toGcode'  (p':ps') = toGString p' : "M08" : "G04 P800" : "M09" : "G04 P100" : toGcode' ps'
+        toGString (px,py)  = "G00 X" ++ show (px+fst offset) ++ " Y" ++ show (py +snd offset)
+        [offset] = take 1  $ drop (nr-1) [(0,0),(5,0),(0,5),(5,5)] 
         setPen  = "Placeholder for PenChoosing: "++show nr -- needs to be adressed in Hardware first
         --dropPen = "M08" : "G04 P800" : "M09" : "G04 P100"
 

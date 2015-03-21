@@ -2,14 +2,12 @@ module Core.Dither where
 
 import           Core.MakeIMG
 
-import           Data.Vector          (Vector, (!))
 import qualified Data.Vector.Storable as VS
 import           Codec.Picture.Types
-import           Control.Monad( foldM, liftM, ap )
+import           Control.Monad(liftM, ap )
 import           Control.Monad.ST as ST
 import           Control.Monad.Primitive ( PrimMonad, PrimState )
-import           Data.Bits( unsafeShiftL, unsafeShiftR, (.|.), (.&.),shiftR )
-import           Data.Word( Word8, Word16, Word32, Word64 )
+import           Data.Bits(shiftR )
 import qualified Data.Vector.Storable.Mutable as M
 import           Data.Maybe
 
@@ -21,7 +19,7 @@ PixelXDirection = number how many pixels i need to go in x direction to get to
 the Neighbour Pixel who should carry the Error from my current Pixel
 -}
 
--- operation to drop used colors to a list of colors
+-- | operation to drop used colors to a list of colors
 noDither :: [PixelRGB8] -> PixelRGB8 -> PixelRGB8
 noDither ls p = colorMinDist p ls
 
@@ -29,37 +27,37 @@ noDither ls p = colorMinDist p ls
 ----            Dithering
 -------------------------------------------------------------------------------
 
--- calculates the difference between two pixels
+-- | calculates the difference between two pixels
 -- saves values as Int so negative values can be saved 
 subtPixel :: PixelRGB8 -> PixelRGB8 -> PixError
 subtPixel (PixelRGB8 r1 g1 b1) (PixelRGB8 r2 g2 b2) = PixError r' g' b'
     where
-    r' = fromIntegral r1 - fromIntegral r2
-    g' = fromIntegral g1 - fromIntegral g2
-    b' = fromIntegral b1 - fromIntegral b2
+    [r',g',b'] = map sub [(r1,r2),(g1,g2),(b1,b2)]
+    sub (x,y)  = fromIntegral x - fromIntegral y
 
--- takes a pixel and a palette (= list of pixels)
+
+-- | takes a pixel and a palette (= list of pixels)
 -- returns the perceived closest pixel from the palette
 colorMinDist :: PixelRGB8 -> [PixelRGB8] -> PixelRGB8
-colorMinDist p []     = PixelRGB8 255 255 255
+colorMinDist _ []     = PixelRGB8 255 255 255
 colorMinDist p (x:xs) = colorMinDistAcc p xs ((colorDist8 p x),x) 
     where
     colorMinDistAcc :: PixelRGB8 -> [PixelRGB8] -> (Distance,PixelRGB8) -> PixelRGB8
-    colorMinDistAcc p []     (_   ,pixAcc)    = pixAcc
-    colorMinDistAcc p (x:xs) (dist,pixAcc)
-        | dist' < dist = colorMinDistAcc p xs (dist',x)
-        | otherwise    = colorMinDistAcc p xs (dist ,pixAcc)
+    colorMinDistAcc _ []     (_   ,pixAcc)    = pixAcc
+    colorMinDistAcc p' (x':xs') (dist,pixAcc)
+        | dist' < dist = colorMinDistAcc p' xs' (dist',x')
+        | otherwise    = colorMinDistAcc p' xs' (dist ,pixAcc)
         where
-        dist' = colorDist8 p x 
+        dist' = colorDist8 p' x 
 
--- Debugging function for grey->chess Problem, turns out:
+-- | Debugging function for grey->chess Problem, turns out:
 -- its more a Problem of the Error Calculation (rounding 7/16 etc...)
 colorDistGrey :: PixelRGB8 -> PixelRGB8
 colorDistGrey (PixelRGB8 g1 g2 g3)
                       | (and [g1==g2,g1==g3,g1>= 123]) = whitePix
                       | otherwise = blackPix
 
--- calculates perceived color-distance between two pixels
+-- | calculates perceived color-distance between two pixels
 -- Source for function: http://www.compuphase.com/cmetric.htm
 colorDist8 :: PixelRGB8 -> PixelRGB8 -> Distance
 colorDist8 (PixelRGB8 r1 g1 b1) (PixelRGB8 r2 g2 b2) = sqrt $ (2 + r'/256)   * dr^2 
@@ -71,38 +69,36 @@ colorDist8 (PixelRGB8 r1 g1 b1) (PixelRGB8 r2 g2 b2) = sqrt $ (2 + r'/256)   * d
     dg = fromIntegral g1 - fromIntegral g2
     db = fromIntegral b1 - fromIntegral b2
 
--- simple euclidian Distance between two pixels
+-- | simple euclidian Distance between two pixels
 colorDistEuclid ::  PixelRGB8 -> PixelRGB8 -> Distance
 colorDistEuclid (PixelRGB8 r1 g1 b1) (PixelRGB8 r2 g2 b2) = sqrt $ dr^2  + dg^2 + db^2
     where
-    r' = (fromIntegral r1)/2 + (fromIntegral r2)/2
     dr = fromIntegral r1 - fromIntegral r2
     dg = fromIntegral g1 - fromIntegral g2
     db = fromIntegral b1 - fromIntegral b2
 
--- used to calculate Neighbour-Points
+-- | used to calculate Neighbour-Points
 addTupel :: Num a => (a,a) -> (a,a) -> (a,a)
 addTupel (x1,x2) (y1,y2) = (x1 + y1, x2 + y2)
 
--- Floyd-Steinberg Algorithm for a Palette (= [PixelRGB8]) and an Image PixelRGB8
+-- | Floyd-Steinberg Algorithm for a Palette (= [PixelRGB8]) and an Image PixelRGB8
 -- ditherFloydRGB8 :: [PixelRGB8] -> Image PixelRGB8 -> Image PixelRGB8
 -- ditherFloydRGB8 = ditherRGB8 [(7,(1,0)),(3,((-1),1)),(5,(0,1)),(1,(1,1))]
 ditherFloydRGB8 :: [PixelRGB8] -> Image PixelRGB8 -> Image PixelRGB8
 ditherFloydRGB8 = ditherRGB8 [(1,(1,0)),(1,((-1),1)),(1,(0,1)),(1,(1,1))]
 
--- generic Dither Function
+-- | generic Dither Function
 ditherRGB8 :: [DithErr] -> [PixelRGB8] -> Image PixelRGB8 -> Image PixelRGB8
-ditherRGB8 errls []   img                               = img 
-ditherRGB8 errls pxls img@(Image { imageWidth  = w, 
-                           imageHeight = h, 
-                           imageData   = vec }) =
+ditherRGB8 _errls []   img                       = img 
+ditherRGB8 errls  pxls (Image {imageWidth = w, 
+                              imageHeight = h, 
+                              imageData = vec }) =
   Image w h pixels
     where sourceCompCount    = componentCount (undefined :: PixelRGB8)
           destComponentCount = componentCount (undefined :: PixelRGB8)
 
           pixels = runST $ do
             oldArr <- VS.thaw vec 
-            --newArr <- M.new (w * h * sourceCompCount)
             let lineMapper _ _ y | y >= h = return ()
                 lineMapper readIdxLine writeIdxLine y = colMapper readIdxLine writeIdxLine 0 
                   where colMapper readIdx writeIdx x
@@ -119,12 +115,12 @@ ditherRGB8 errls pxls img@(Image { imageWidth  = w,
                                     where
                                     -- Still needed as it only works with RGB8 Pixels uptil now
                                     unsafeReadPixel' :: PrimMonad m => M.STVector (PrimState m) (PixelBaseComponent PixelRGB8) -> Int -> m PixelRGB8
-                                    unsafeReadPixel' vec idx =
-                                            PixelRGB8 `liftM` M.unsafeRead vec idx
-                                                      `ap`    M.unsafeRead vec (idx + 1)
-                                                      `ap`    M.unsafeRead vec (idx + 2)
+                                    unsafeReadPixel' vector idx =
+                                            PixelRGB8 `liftM` M.unsafeRead vector idx
+                                                      `ap`    M.unsafeRead vector (idx + 1)
+                                                      `ap`    M.unsafeRead vector (idx + 2)
                                     -- Takes a List of Error Factors and Neighbours (Int,(Int,Int)) and shares the Error
-                                    unsafeWritePixel' v []       _  = return ()
+                                    unsafeWritePixel' _ []       _  = return ()
                                     unsafeWritePixel' v (eb:ebs) pe =  do if mbaseE == Nothing 
                                                                             then do unsafeWritePixel' v ebs pe
                                                                             else do oldPixE <- unsafeReadPixel' oldArr baseE 
@@ -154,7 +150,6 @@ ditherRGB8 errls pxls img@(Image { imageWidth  = w,
 
 
             lineMapper 0 0 0
-
             -- unsafeFreeze avoids making a second copy and it will be
             -- safe because newArray can't be referenced as a mutable array
             -- outside of this where block

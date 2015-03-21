@@ -1,45 +1,24 @@
 module Core.Resize where
 
-import Core.MakeIMG
-import Core.Dither
- 
-import qualified Data.Vector.Storable.Mutable as M
+
 import Codec.Picture
-import Data.Word
-import Control.Monad( forM_, foldM, liftM, ap )
-import Control.DeepSeq( NFData( .. ) )
-import Control.Monad.ST( runST )
-import Control.Monad.Primitive ( PrimMonad, PrimState )
-import Foreign.Storable ( Storable )
-import Data.Bits( unsafeShiftL, unsafeShiftR, shiftR )
-import Data.Word( Word8, Word16 )
-import Data.List( foldl' )
-import Data.Vector.Storable ( (!) )
-import qualified Data.Vector.Storable as V
+import Control.Monad(join)
+
 import Data.Ratio
 import Control.Arrow
-import Control.Monad
 import Control.Applicative
-import System.FilePath
-import System.Directory
+
 
 -- DIN A4 210 x 297 mm
 -- DIN A5 148 x 210 mm
 -- DIN A6 105 x 148 mm
 -- DIN A7 74 x 105 mm
 
-type DrawMax = (Int,Int)
-type ImgMax = (Int,Int)
+-------------------------------------------------------------------------------
+----            Resize Function
+-------------------------------------------------------------------------------
 
 
--- goResize inF outF h = either error f =<< readImage inF
---     where f (ImageRGB8 i) = if fact < 1 
---                                 then do putStrLn $ "making " ++ outF
---                                         savePngImage outF . ImageRGB8 $ resize fact i   
---                                 else error "only shrinks"
---                             where fact = h % (imageHeight i)
---           f _             = error "only does ImageRGB8"         
- 
 --i hate that this is png/PixelRGB8 specific, but see https://github.com/Twinside/Juicy.Pixels/issues/1
 --resize :: (RealFrac a, Pixel b) => a -> Image b -> Image b
 resize :: (RealFrac a) => a -> Image PixelRGB8 -> Image PixelRGB8
@@ -60,13 +39,6 @@ pixelAt' (dw,dh) s i (x,y) = avg pix
           pf a = (+ a) . fromIntegral
           pd (r, g, b) d = PixelRGB8 (pr r d) (pr g d) (pr b d)
           pr a b = round (a % b)
-
-
-getConF :: (Int,Int) -> DrawMax -> Int
-getConF (imgX,imgY) (drawX,drawY)
-    | imgX >= imgY   = truncate $ fromIntegral $ imgX `div` drawX
-    | otherwise      = truncate $ fromIntegral $ imgY `div` drawX
-
 
 
 
