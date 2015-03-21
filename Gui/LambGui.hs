@@ -118,7 +118,7 @@ setup window = do
     statURLOut <- return "static/temp/temp"
     ---------------------- SETUP --------------------------
     elDiv0 <- UI.div
-    -- | helper Divs needed for calculation 
+    -- helper Divs needed for calculation 
     elURLin <- UI.new 
     elURLout <- UI.new  
     elURLdith <- UI.new 
@@ -227,7 +227,7 @@ setup window = do
     -------GUI--------------- LOADIMG -------------------------
     bUrlIn <- stepper "" $ UI.valueChange elIpathIn
     
-    -- -- | reloads size inputs and calculates new ratio etc.
+    -- -- reloads size inputs and calculates new ratio etc.
     -- let reloadSize = do  
     --         [strdW,strdH,
     --          strWidth,strHeight,
@@ -248,7 +248,7 @@ setup window = do
 
     let refreshImage url (Just w) = do element elIimgOrig # set UI.height w # set UI.src url
 
-    -- | reloads size inputs and calculates new ratio etc.
+    -- reloads size inputs and calculates new ratio etc.
     let reloadSize nosave = do  
             [strdW,strdH,
              strWidth,strHeight,
@@ -279,7 +279,7 @@ setup window = do
                             print $ "Resize URL OUT : "++(urlOut++rand++"_res.png")
                             mapM_ print $ show rat:(map show [size,dwh])++[show newSize] 
 
-    -- | reads Image size and applys to Canvas
+    -- reads Image size and applys to Canvas
     let readSize = do 
             urlIn   <- currentValue bUrlIn
             ioMsize <- liftIO $ return $ getImgSize urlIn
@@ -296,7 +296,7 @@ setup window = do
             reloadSize True
             liftIOLater $ print size
 
-    -- | loads image and updates variables
+    -- loads image and updates variables
     on UI.click elBload $ const $ do urlIn <- currentValue bUrlIn
                                      ioexists <- liftIO $ return $ doesFileExist urlIn
                                      exists <- liftIO ioexists
