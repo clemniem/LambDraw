@@ -81,6 +81,15 @@ colorDistEuclid (PixelRGB8 r1 g1 b1) (PixelRGB8 r2 g2 b2) = sqrt $ dr^2  + dg^2 
 addTupel :: Num a => (a,a) -> (a,a) -> (a,a)
 addTupel (x1,x2) (y1,y2) = (x1 + y1, x2 + y2)
 
+ditherStrength :: [Char] -> [DithErr]
+ditherStrength "5" = [(7,(1,0)),(3,((-1),1)),(5,(0,1)),(1,(1,1))]
+ditherStrength "4" = [(5,(1,0)),(3,((-1),1)),(4,(0,1)),(1,(1,1))]
+ditherStrength "3" = [(4,(1,0)),(2,((-1),1)),(3,(0,1)),(1,(1,1))]
+ditherStrength "2" = [(3,(1,0)),(2,((-1),1)),(2,(0,1)),(1,(1,1))]
+ditherStrength "1" = [(2,(1,0)),(1,((-1),1)),(1,(0,1)),(1,(1,1))]
+ditherStrength _   = [(1,(1,0)),(1,((-1),1)),(1,(0,1)),(1,(1,1))]
+
+
 -- | Floyd-Steinberg Algorithm for a Palette (= [PixelRGB8]) and an Image PixelRGB8
 -- ditherFloydRGB8 :: [PixelRGB8] -> Image PixelRGB8 -> Image PixelRGB8
 -- ditherFloydRGB8 = ditherRGB8 [(7,(1,0)),(3,((-1),1)),(5,(0,1)),(1,(1,1))]

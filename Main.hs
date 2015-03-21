@@ -1,7 +1,7 @@
 import Gui.LambGui
 
-
-
+-- | Starts the Programm
+main :: IO ()
 main = do 
 	mapM putStrLn  ["Welcome to LambDraw! :)",
 					"Please open your Browser and enter the address specified in the next lines.",

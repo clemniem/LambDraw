@@ -41,13 +41,13 @@ doResize hnew img _ pathOut = do let fact = hnew % (imageHeight img)
                                   then saveImage "No Resize done ratio == 1%1" (pathOut++"_res") $ ImageRGB8 $ img
                                   else saveImage "Resize done" (pathOut++"_res") $ ImageRGB8 $ resize fact img
 -- | Does the Test Dither 
-doTestDither :: Image PixelRGB8 -> [PixelRGB8] -> FilePath -> IO ()
-doTestDither img pixls pathOut = do _dithImg    <- doDither pixls img pathOut
-                                    print "Test Done."
+doTestDither :: [Char] -> Image PixelRGB8 -> [PixelRGB8] -> FilePath -> IO ()
+doTestDither opt img pixls pathOut = do _dithImg <- doDither (ditherStrength opt) pixls img pathOut
+                                        print "Test Done."
 
 -- | Processes the Image => Dither and Splice
-processImage :: [PixelRGB8] -> FilePath -> FilePath -> IO()
-processImage pixls pathIn pathOut = do
+processImage :: [Char] -> [PixelRGB8] -> FilePath -> FilePath -> IO()
+processImage opt pixls pathIn pathOut = do
     createDirectoryIfMissing False "./images/temp/"
     dynImg <- loadPng pathIn
     dyn2string dynImg -- Debugging Helper
@@ -56,7 +56,7 @@ processImage pixls pathIn pathOut = do
       then do print "Error with loading PNG"
       else do
         (Just img) <- return mayImg
-        dithImg    <- doDither pixls img pathOut
+        dithImg    <- doDither (ditherStrength opt) pixls img pathOut
         splicelss  <- doSplice pixls dithImg pathOut
         processToolpath img splicelss pathOut
         putStrLn "Image Processed."
@@ -64,9 +64,9 @@ processImage pixls pathIn pathOut = do
            isNothing _       = False
 
 -- | Does the Dither
-doDither :: [PixelRGB8] -> Image PixelRGB8 -> FilePath -> IO(Image PixelRGB8)
-doDither pal img pathOut = do
-    dimg <- return $ ditherFloydRGB8 pal img
+doDither :: [DithErr] -> [PixelRGB8] -> Image PixelRGB8 -> FilePath -> IO(Image PixelRGB8)
+doDither derrls pal img pathOut = do
+    dimg <- return $ ditherRGB8 derrls pal img
     saveImage "Dither processed" (pathOut++"_dith") $ ImageRGB8 dimg
     return dimg
 

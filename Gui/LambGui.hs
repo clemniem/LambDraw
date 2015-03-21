@@ -11,7 +11,7 @@ import Safe
 import Data.Ratio
 import System.Directory
 import System.FilePath.Posix
-
+import Data.Maybe (fromJust)
 import qualified Graphics.UI.Threepenny as UI
 import Graphics.UI.Threepenny.Core
 import Codec.Picture.Types
@@ -24,7 +24,8 @@ drawMax :: Point
 drawMax = (210,297) -- (width,height)
 
 -- | helpers for setting CSS style
-stva,padding :: UI Element -> UI Element
+stfont,stva,padding :: UI Element -> UI Element
+stfont = set style [("font-size","12px")]
 stva = set style [("vertical-align","top")]
 padding = set style [("padding","10px 10px 10px 10px")]
 
@@ -69,6 +70,8 @@ safeColorUI mr mg mb = UI.RGB (tst mr) (tst mg) (tst mb)
             | i > 255   = 255
             | i < 0     = 0
             | otherwise = i
+
+
 
 -- | Safe Conversion to PixelRGB8
 safeColorRGB8 :: Maybe Int -> Maybe Int -> Maybe Int -> PixelRGB8 
@@ -117,13 +120,12 @@ setup window = do
     
     statURLOut <- return "static/temp/temp"
     ---------------------- SETUP --------------------------
-    elDiv0 <- UI.div
     -- helper Divs needed for calculation 
-    elURLin <- UI.new 
-    elURLout <- UI.new  
+    elURLin   <- UI.new 
+    elURLout  <- UI.new  
     elURLdith <- UI.new 
-    elURLres <- UI.new 
-    elRand <- UI.new # set UI.value "0"
+    elURLres  <- UI.new 
+    elRand    <- UI.new # set UI.value "0"
     elcanvWidth <- UI.new 
 
     ---------------------- LOADIMG -------------------------
@@ -182,10 +184,22 @@ setup window = do
         # set UI.fillStyle (UI.solidColor $ UI.RGB 255 255 255)
     UI.fillRect (0,0) (35*4) (35) palCanvas
 
+    elDithGen <- UI.input # set UI.value "0" 
+                          # set UI.text "0"
+                          # set UI.size "3"
+
     colPick <- UI.div #+ [row [column [grid [[string "R",element elrVal], [string "G", element elgVal],[string "B", element elbVal]]  # set style [("padding","0px 0px 5px")]
-                         ,row [element canvas # stva, column [row [element addCol1,element addCol2,element addCol3,element addCol4] # stva  
-                                                      ,element removeColor] # set style [("padding","0px 0px 0px 5px")]]] # stva # padding
-                         ,column [element palCanvas # stva , element elBclearPal]] 
+                                            ,row [element canvas # stva
+                                                 ,column [row [element addCol1
+                                                               ,element addCol2
+                                                               ,element addCol3
+                                                               ,element addCol4] # stva  
+                                                         ,element removeColor] # set style [("padding","0px 0px 0px 5px")]
+                                                 ]] # stva # padding
+                              ,column [element palCanvas # stva 
+                                      ,element elBclearPal
+                                      ,row [string "Dither Strength (0-5)" # stfont
+                                           ,element elDithGen]]] 
                          ]
         # set UI.height 300
         # set UI.width  300
@@ -193,6 +207,8 @@ setup window = do
         # set UI.align "top"
         # set UI.valign "left"
     ---------------------- DITHER --------------------------
+
+
     elBapplyDither <- UI.button #+ [string "Apply Dither."]
     elDdither      <- UI.div #+ [element elBapplyDither]    
 
@@ -350,7 +366,7 @@ setup window = do
                                              --    mapM_ print $ show rat:(map show [size,dwh])++[show newSize]  
     -------GUI--------------- COLOR PICKER --------------------
     -- update Values in Color Picker
-    [bRIn,bGIn,bBIn] <- mapM (stepper "0") $ map UI.valueChange [elrVal,elgVal,elbVal]
+    [bRIn,bGIn,bBIn,dithIn] <- mapM (stepper "0") $ map UI.valueChange [elrVal,elgVal,elbVal,elDithGen]
     
     -- function to update a canvas
     let updateCanv canv nr = const $ do
@@ -364,7 +380,18 @@ setup window = do
                                 element elbVal # set UI.value (show b)        
                                 UI.fillRect ((nr*35),0) 35 35 canv
 
+    let checkDithValue = const $ do val <- currentValue dithIn
+                                    let mval = readMay val
+                                    if mval == Nothing
+                                        then element elDithGen # set UI.value "0"
+                                        else do let newVal = show (max 0 (min 5 (fromJust mval)))
+                                                element elDithGen # set UI.value newVal # set UI.text newVal
+
     -- How can I make this smaller? forM doesnt work...
+    
+
+    on UI.valueChange elDithGen $ updateCanv canvas 0
+
     on UI.valueChange elrVal $ updateCanv canvas 0
     on UI.valueChange elgVal $ updateCanv canvas 0
     on UI.valueChange elbVal $ updateCanv canvas 0
@@ -382,12 +409,12 @@ setup window = do
     on UI.click elBclearPal $ const $ do UI.clearCanvas palCanvas
 
     -------GUI--------------- DITHER --------------------------    
-    on UI.click elBapplyDither $ return $ do [urlIn,urlOut,rand,strcanW] <- getValuesList [elURLres,elURLout,elRand,elcanvWidth]                                                         
+    on UI.click elBapplyDither $ return $ do [urlIn,urlOut,rand,strcanW,dstrength] <- getValuesList [elURLres,elURLout,elRand,elcanvWidth,elDithGen]                                                         
                                              pal   <- getPallette
                                              liftIO $ do 
                                                 print $ pal
                                                 print $ "Dither URL IN: "++urlIn
-                                                preProcessImage doTestDither (whitePix:pal) urlIn (urlOut++rand)
+                                                preProcessImage (doTestDither dstrength) (whitePix:pal) urlIn (urlOut++rand)
                                              let mcW = readMay strcanW 
                                                  canW = if (mcW == Nothing) then (Just 300) else mcW  
                                              refreshImage (statURLOut++rand++"_dith.png") canW 
@@ -397,10 +424,10 @@ setup window = do
 
     -------GUI--------------- SPLICE --------------------------    
 
-    on UI.click elBsplice $ return $ do [urlIn, urlOut] <- getValuesList [elURLdith,elURLout]
+    on UI.click elBsplice $ return $ do [urlIn, urlOut,dstrength] <- getValuesList [elURLdith,elURLout,elDithGen]
                                         liftIO $ print urlIn
                                         pal   <- getPallette
-                                        liftIO $ processImage (whitePix:pal) urlIn urlOut
+                                        liftIO $ processImage dstrength (whitePix:pal) urlIn urlOut
 
 
 
