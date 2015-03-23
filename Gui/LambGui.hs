@@ -185,7 +185,7 @@ setup window = do
                                                  ]] # stva # padding
                               ,column [element palCanvas # stva 
                                       ,element elBclearPal
-                                      ,row [string "Dither Strength (0-3)" # stfont
+                                      ,row [string "Dither Strength (0-6)" # stfont
                                            ,element elDithGen]]] 
                          ]
         # set UI.height 300

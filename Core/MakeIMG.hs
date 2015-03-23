@@ -8,6 +8,7 @@ import Control.Parallel.Strategies
 import Data.Bits( unsafeShiftR )
 import qualified Data.Vector.Storable as V
 import Data.Word( Word8, Word16 )
+import Control.Monad
 
 
 -- Type & Data declarations
@@ -132,7 +133,6 @@ dyn2string (ImageRGBA16 _)   = putStrLn "ImageRGBA16 loading..."
 dyn2string (ImageYCbCr8 _)   = putStrLn "ImageYCbCr8 loading..."
 dyn2string (ImageCMYK8  _)   = putStrLn "ImageCMYK8 loading..."
 dyn2string (ImageCMYK16 _)   = putStrLn "ImageCMYK16 loading..."
-dyn2string (_            )   = putStrLn "Unknown format."
 
 -- | getter for Image size
 getImgSize :: FilePath -> IO (Maybe (Int,Int))
@@ -197,6 +197,7 @@ parMap1 f (a:as) = do
    b <- rpar (f a)
    bs <- parMap1 f as
    return (b:bs)
+
 
 
 

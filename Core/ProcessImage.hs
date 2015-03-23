@@ -77,7 +77,8 @@ doDither derrls pal img pathOut = do
 doSplice :: [PixelRGB8] -> Image PixelRGB8 -> FilePath -> IO([(Int,[Point])])
 doSplice pal img@(Image { imageWidth  = w, 
                                  imageHeight = h}) pathOut = 
-  do  splicelss  <- return $ runEval $ do parMap1 ((starSort w h) . (colorSplicer img)) pal
+  do  --splicelss  <- return $ runEval $ do parMap1 ((starSort{-Par-} w h) . (colorSplicer img)) pal
+      splicelss  <- return $ map ((starSort w h) . (colorSplicer img)) pal
       let tupsplices = zip [0..(length splicelss)] splicelss
       mapM_ (spliceSave pathOut) tupsplices
       return tupsplices
@@ -92,10 +93,13 @@ processToolpath _im [] _   = return ()
 processToolpath (Image { imageWidth  = w, 
                          imageHeight = h}) pss pOut  = do 
           gcodes   <- return $ runEval $ do parMap1 toGcode pss
-          codeLstoFile (pOut++"_gcode.txt") $ concat gcodes
+          codeLstoFile (pOut++"_gcode.nc") $ concat $ startSequence:gcodes
 -------------------------------------------------------------------------------
 ----            Generate GCode
 -------------------------------------------------------------------------------
+startSequence :: [String]
+startSequence = ["$X","G21","G90","G92 X0 Y0 Z0"]
+
 
 -- | Writes the File
 codeLstoFile :: FilePath -> [String] -> IO()
@@ -106,13 +110,15 @@ codeLstoFile url ls  = do outh <- openFile url WriteMode
 
 -- | Generates GCode
 toGcode :: (Int,[Point]) -> [String]
-toGcode (_,[]) = ["G00 X00 Y00"] -- Jog Home
-toGcode (nr,(p:ps)) = setPen : toGString p : "M08" : "G04 P800" : "M09" : "G04 P100" : toGcode' ps
-  where toGcode'  []       = ["G00 X00 Y00"]
-        toGcode'  (p':ps') = toGString p' : "M08" : "G04 P800" : "M09" : "G04 P100" : toGcode' ps'
-        toGString (px,py)  = "G00 X" ++ show (px+fst offset) ++ " Y" ++ show (py +snd offset)
-        [offset] = take 1  $ drop (nr-1) [(0,0),(5,0),(0,5),(5,5)] 
-        setPen  = "Placeholder for PenChoosing: "++show nr -- needs to be adressed in Hardware first
+toGcode (_,[]) = ["G0 X0 Y0"] -- Jog Home
+toGcode (nr,(p:ps)) = {-setPen : -}toGString p : "M8" : "G4 P0.05" : "M9" : "G4 P0.1" : toGcode' ps
+  where toGcode'  []              = ["G0 X0 Y0"]
+        toGcode' (p':ps') = toGString p' : "M8" : "G4 P0.8" : "M9" : "G4 P0.1" : toGcode' ps'
+        toGString (px,py) = "G00 X" ++ show (xtoA+fst offset) ++ " Y" ++ show (ytoB +snd offset)
+          where xtoA = px+py
+                ytoB = px-py
+        offset = (0,0)
+        --setPen  = "Placeholder for PenChoosing: "++show nr -- needs to be adressed in Hardware first
         --dropPen = "M08" : "G04 P800" : "M09" : "G04 P100"
 
 
