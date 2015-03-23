@@ -9,4 +9,5 @@ LambDraw is a tool to provide G-Code for the LambDraw Plotter a selfbuild CoreXY
 1. Take an Image as Input
 2. Reduce the Image in Size and Colors to a 4-Color Palette. 
 3. Take each Color-Plane and produce G-Code
-4. Send G-Code via USB to Motorcontroller (Arduino)
+~~4. Send G-Code via USB to Motorcontroller (Arduino)~~
+4. Save Gcode to .gcode file and send via GcodeSender.
