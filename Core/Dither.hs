@@ -77,17 +77,15 @@ colorDistEuclid (PixelRGB8 r1 g1 b1) (PixelRGB8 r2 g2 b2) = sqrt $ dr^2  + dg^2 
     dg = fromIntegral g1 - fromIntegral g2
     db = fromIntegral b1 - fromIntegral b2
 
--- | used to calculate Neighbour-Points
-addTupel :: Num a => (a,a) -> (a,a) -> (a,a)
-addTupel (x1,x2) (y1,y2) = (x1 + y1, x2 + y2)
-
+-- | Helper Function to return different DitherErr Lists
 ditherStrength :: [Char] -> [DithErr]
-ditherStrength "5" = [(7,(1,0)),(3,((-1),1)),(5,(0,1)),(1,(1,1))]
-ditherStrength "4" = [(5,(1,0)),(3,((-1),1)),(4,(0,1)),(1,(1,1))]
-ditherStrength "3" = [(4,(1,0)),(2,((-1),1)),(3,(0,1)),(1,(1,1))]
-ditherStrength "2" = [(3,(1,0)),(2,((-1),1)),(2,(0,1)),(1,(1,1))]
-ditherStrength "1" = [(2,(1,0)),(1,((-1),1)),(1,(0,1)),(1,(1,1))]
-ditherStrength _   = [(1,(1,0)),(1,((-1),1)),(1,(0,1)),(1,(1,1))]
+ditherStrength "6" = [(7,(1,0)),(3,((-1),1)),(5,(0,1)),(1,(1,1))]
+ditherStrength "5" = [(5,(1,0)),(3,((-1),1)),(4,(0,1)),(1,(1,1))]
+ditherStrength "4" = [(4,(1,0)),(2,((-1),1)),(3,(0,1)),(1,(1,1))]
+ditherStrength "3" = [(3,(1,0)),(2,((-1),1)),(2,(0,1)),(1,(1,1))]
+ditherStrength "2" = [(2,(1,0)),(1,((-1),1)),(1,(0,1)),(1,(1,1))]
+ditherStrength "1" = [(1,(1,0)),(1,((-1),1)),(1,(0,1)),(1,(1,1))]
+ditherStrength _   = []
 
 
 -- | Floyd-Steinberg Algorithm for a Palette (= [PixelRGB8]) and an Image PixelRGB8
@@ -130,7 +128,7 @@ ditherRGB8 errls  pxls (Image {imageWidth = w,
                                                       `ap`    M.unsafeRead vector (idx + 2)
                                     -- Takes a List of Error Factors and Neighbours (Int,(Int,Int)) and shares the Error
                                     unsafeWritePixel' _ []       _  = return ()
-                                    unsafeWritePixel' v (eb:ebs) pe =  do if mbaseE == Nothing 
+                                    unsafeWritePixel' v (eb:ebs) pe =  do if mbaseE == Nothing -- bound checking for Error Base
                                                                             then do unsafeWritePixel' v ebs pe
                                                                             else do oldPixE <- unsafeReadPixel' oldArr baseE 
                                                                                     unsafeWritePixel v baseE $ newPixE (fst eb) oldPixE
@@ -138,7 +136,7 @@ ditherRGB8 errls  pxls (Image {imageWidth = w,
                                                                           where
                                                                           newPixE fac ol = compwiseErr fac pe ol
                                                                           baseE          = fromJust mbaseE
-                                                                          mbaseE         = baseId $ addTupel (x,y) $ snd eb 
+                                                                          mbaseE         = baseId $ funTupel (+) (x,y) $ snd eb 
                                     -- calculates the BaseId for any given Point in the Image (checks bounds)
                                     baseId :: Point -> Maybe Int
                                     baseId (a,b)
@@ -160,7 +158,7 @@ ditherRGB8 errls  pxls (Image {imageWidth = w,
 
             lineMapper 0 0 0
             -- unsafeFreeze avoids making a second copy and it will be
-            -- safe because newArray can't be referenced as a mutable array
+            -- safe because oldArray can't be referenced as a mutable array
             -- outside of this where block
             VS.unsafeFreeze oldArr
 

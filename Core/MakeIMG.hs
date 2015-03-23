@@ -20,14 +20,14 @@ type Accessor = PixelRGB8 -> Pixel8
 --type BasID      = Int
 --type ErrorFac   = Int
 
--- Getters for pixel components, as the constructor does not
+-- | Getters for pixel components, as the constructor does not
 -- provide any public ones.
 red, blue, green :: Accessor
 red   (PixelRGB8 r _ _) = r
 green (PixelRGB8 _ g _) = g
 blue  (PixelRGB8 _ _ b) = b
 
--- HelperVariables for Testing
+-- | HelperVariables for Testing
 redPix,greenPix,bluePix,blackPix,whitePix,yellowPix,magentaPix,cyanPix :: PixelRGB8
 redPix     = PixelRGB8 255 0   0
 greenPix   = PixelRGB8 0   255 0
@@ -38,11 +38,12 @@ yellowPix  = PixelRGB8 255 255 0
 magentaPix = PixelRGB8 255 0   255
 cyanPix    = PixelRGB8 0   255 255
 
--- PixelLists for rgb and cmyk
+-- | PixelLists for rgb and cmyk
 rgbPixls,cmykPixls :: [PixelRGB8]
 rgbPixls   = [redPix,greenPix,bluePix,blackPix,whitePix]
 cmykPixls  = [cyanPix,magentaPix,yellowPix,blackPix,whitePix]
 
+-- | Helper Set Size of TestImage
 picW :: Int
 picW = 100
 
@@ -85,8 +86,6 @@ pixelungls col ls x y
 -------------------------------------------------------------------------------
 ----            Image Loading
 -------------------------------------------------------------------------------
-
-
 -- | DynamicImage to Image PixelRGB8 converter
 dyn2rgb8 :: DynamicImage -> Maybe (Image PixelRGB8)
 dyn2rgb8 (ImageRGB8   img) = Just $ img
@@ -118,7 +117,6 @@ dyn2rgb8 (ImageRGBF   img) = Just $ pixelMap pFtoRGB8 img
 --dyn2rgb8 (ImageYF     img) = undefined
 dyn2rgb8 _                 = Nothing
 
-
 -- | Helper for Debugging
 dyn2string :: DynamicImage -> IO()
 dyn2string (ImageY8     _)   = putStrLn "ImageY8 loading..."
@@ -134,6 +132,7 @@ dyn2string (ImageRGBA16 _)   = putStrLn "ImageRGBA16 loading..."
 dyn2string (ImageYCbCr8 _)   = putStrLn "ImageYCbCr8 loading..."
 dyn2string (ImageCMYK8  _)   = putStrLn "ImageCMYK8 loading..."
 dyn2string (ImageCMYK16 _)   = putStrLn "ImageCMYK16 loading..."
+dyn2string (_            )   = putStrLn "Unknown format."
 
 -- | getter for Image size
 getImgSize :: FilePath -> IO (Maybe (Int,Int))
@@ -141,8 +140,6 @@ getImgSize pIn = do dyn <- readPng pIn >>= either error return
                     return $ getSize $ dyn2rgb8 dyn
     where getSize (Just img) = Just (imageWidth img, imageHeight img)
           getSize _          = Nothing
-
-
 
 -- | Helper Function to Load an Image and prompt report
 loadPng :: FilePath -> IO DynamicImage
@@ -156,12 +153,12 @@ saveImage str name img  = do
     savePngImage (name ++ ".png") img
     putStrLn $ str++" and Image saved." 
 
--- DEBUGGING
+-- | DEBUGGING Helper to save Test-Images
+saveImg::Image PixelRGB8 -> IO ()
 saveImg i = saveImage "Testing" "./images/test.png" $ ImageRGB8 i
 -------------------------------------------------------------------------------
 ----            Pixel Functions
 -------------------------------------------------------------------------------
-
 
 -- | Perform a componentwise pixel operation.
 compwise :: (Word8 -> Word8 -> Word8) -> PixelRGB8 -> PixelRGB8 -> PixelRGB8
@@ -171,7 +168,6 @@ compwise f (PixelRGB8 ra ga ba) (PixelRGB8 rb gb bb) =
 -- | Compute the absolute difference of two pixels.
 diffPixel :: PixelRGB8 -> PixelRGB8 -> PixelRGB8
 diffPixel = compwise (\x y -> max x y - min x y)
-
 
 -- | Compute the average value of a list of pixels.
 average :: [PixelRGB8] -> PixelRGB8
@@ -186,6 +182,15 @@ distPixel x y = fromIntegral $ foldl (flip (^)) 2 [r,g,b]
   where
     (PixelRGB8 r g b) = diffPixel x y
 
+-------------------------------------------------------------------------------
+----            Misc Util Functions
+-------------------------------------------------------------------------------
+
+-- | operate a Function on Tuples, elementwise
+funTupel :: (t -> t1 -> t2) -> (t, t) -> (t1, t1) -> (t2, t2)
+funTupel f (x1,x2) (y1,y2) = (f x1 y1,f x2 y2)
+
+-- | parMap implementation with rpar
 parMap1 :: (a -> b) -> [a] -> Eval [b]
 parMap1 _ [] = return []
 parMap1 f (a:as) = do

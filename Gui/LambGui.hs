@@ -1,9 +1,6 @@
 module Gui.LambGui where
 
-import Core.MakeIMG as I
--- import Core.Colorsplicer
--- import Core.Dither 
--- import Core.Resize
+import Core.MakeIMG
 import Core.ProcessImage
 
 import Control.Monad
@@ -25,18 +22,14 @@ drawMax = (210,297) -- (width,height)
 
 -- | helpers for setting CSS style
 stfont,stva,padding :: UI Element -> UI Element
-stfont = set style [("font-size","12px")]
-stva = set style [("vertical-align","top")]
+stfont  = set style [("font-size","12px")]
+stva    = set style [("vertical-align","top")]
 padding = set style [("padding","10px 10px 10px 10px")]
 
--- | ImgMax -> DrawMax -> Bool
-imgTooBig :: (Int,Int) -> (Int,Int) -> Bool
-imgTooBig (imW,imH) (dW,dH) = and [imW>dW,imH>dH]
-
 -- | Bound Checking Helper Function
-ifSize :: Maybe (Int,Int) -> (Int,Int)
-ifSize (Just msize) = msize
-ifSize _           = (0,0)
+fromMaybeSize :: Maybe (Int,Int) -> (Int,Int)
+fromMaybeSize (Just msize) = msize
+fromMaybeSize _           = (0,0)
 
 -- | getter for specific Color () of a Canvas at a specific Point
 -- to UI (PixelRGB8) is also possible just change from fst to snd after the return
@@ -71,8 +64,6 @@ safeColorUI mr mg mb = UI.RGB (tst mr) (tst mg) (tst mb)
             | i < 0     = 0
             | otherwise = i
 
-
-
 -- | Safe Conversion to PixelRGB8
 safeColorRGB8 :: Maybe Int -> Maybe Int -> Maybe Int -> PixelRGB8 
 safeColorRGB8 mr mg mb = PixelRGB8 (tst mr) (tst mg) (tst mb)
@@ -89,10 +80,6 @@ safeTupel (str1,str2) = (toInt (readMay str1),toInt (readMay str2))
     toInt :: Maybe Int -> Int
     toInt (Just nr) = nr
     toInt _         = 1  
-
--- | operate a Function on Tuples, elementwise
-funTupel :: (t -> t1 -> t2) -> (t, t) -> (t1, t1) -> (t2, t2)
-funTupel f (x1,x2) (y1,y2) = (f x1 y1,f x2 y2)
 
 -- | get a random three Digits Number String
 getRand :: [Char] -> [Char]
@@ -184,8 +171,8 @@ setup window = do
         # set UI.fillStyle (UI.solidColor $ UI.RGB 255 255 255)
     UI.fillRect (0,0) (35*4) (35) palCanvas
 
-    elDithGen <- UI.input # set UI.value "0" 
-                          # set UI.text "0"
+    elDithGen <- UI.input # set UI.value "3" 
+                          # set UI.text "3"
                           # set UI.size "3"
 
     colPick <- UI.div #+ [row [column [grid [[string "R",element elrVal], [string "G", element elgVal],[string "B", element elbVal]]  # set style [("padding","0px 0px 5px")]
@@ -198,7 +185,7 @@ setup window = do
                                                  ]] # stva # padding
                               ,column [element palCanvas # stva 
                                       ,element elBclearPal
-                                      ,row [string "Dither Strength (0-5)" # stfont
+                                      ,row [string "Dither Strength (0-3)" # stfont
                                            ,element elDithGen]]] 
                          ]
         # set UI.height 300
@@ -215,10 +202,8 @@ setup window = do
     ---------------------- COLORSPLICER --------------------
     elBsplice <- UI.button #+ [string "Apply Splice"]
     elDsplice <- UI.div #+ [element elBsplice]
-    ---------------------- GCODE ---------------------------
-    ---------------------- SAVEFILE ------------------------
-    -- ======
---------------------------- BODY ----------------------------
+ 
+    ---------------------- BODY ----------------------------
     getBody window #+ [ 
         string "Welcome to LambDraw 0.42" # set style [ ("font-family","Gill Sans, Verdana"),
                                                         ("font-size","11px"),
@@ -237,27 +222,9 @@ setup window = do
                         Start GUI
     ------------------------------------------------------------------------------}
 
-
-    -------GUI--------------- SETUP ---------------------------
-
     -------GUI--------------- LOADIMG -------------------------
     bUrlIn <- stepper "" $ UI.valueChange elIpathIn
     
-    -- -- reloads size inputs and calculates new ratio etc.
-    -- let reloadSize = do  
-    --         [strdW,strdH,
-    --          strWidth,strHeight,
-    --          strOutW,strOutH] <- getValuesList [elDW,elDH,elIimgWidth,elIimgHeight,elIoutWidth,elIoutHeight]
-    --         let dwh@(_draW ,_drawH) = safeTupel (strdW,strdH)
-    --             size@(width,height) = safeTupel (strWidth,strHeight)
-    --             out@(outW,outH)     = safeTupel (strOutW,strOutH) 
-    --             rat@(_h_rat,_w_rat) = funTupel (%) dwh (funTupel min size out)
-            
-    --         liftIOLater $ do putStrLn ("drawW: "++strdW++" drawH: "++strdH)
-    --                          putStrLn ("Ratio: "++show rat)
-    --         let ratio = min (1%1) $ uncurry min rat
-    --         element elIoutWidth  # set UI.value (show $ round (ratio* fromIntegral width))
-    --         element elIoutHeight # set UI.value (show $ round (ratio* fromIntegral height))
     let updateRand = do [oldRand] <- getValuesList [elRand]
                         let newRand = getRand oldRand
                         element elRand # set UI.value newRand
@@ -300,7 +267,7 @@ setup window = do
             urlIn   <- currentValue bUrlIn
             ioMsize <- liftIO $ return $ getImgSize urlIn
             mSize   <- liftIO ioMsize
-            let size@(width,height) = ifSize mSize
+            let size@(width,height) = fromMaybeSize mSize
                 (strWidth,strHeight) = (show width,show height)
                 res2canv = fromIntegral $ round $ (300%height) * (fromIntegral width)
             element elIimgOrig # set UI.height 300
@@ -341,29 +308,8 @@ setup window = do
     on UI.valueChange elIoutHeight $ return $ reloadSize True                                 
     on UI.valueChange elDW $ return $ reloadSize True                                 
     on UI.valueChange elDH $ return $ reloadSize True                                 
-                                 
-
-
-
-
     on UI.click elBapplyResize $ return $ do reloadSize False
-                                             -- [urlIn,urlOut,rand,strcanW] <- getValuesList [elURLin,elURLout,elRand,elcanvWidth]
-                                             -- [strdW,strdH,strWidth,strHeight] <- getValuesList [elDW,elDH,elIimgWidth,elIimgHeight]
-                                             -- let size@(width,height)  = safeTupel (strWidth,strHeight)
-                                             --     dwh@(_draW,_drawH)   = safeTupel (strdW,strdH)
-                                             --     rat@(_h_rat,_w_rat)  = funTupel (%) (min dwh size) size
-                                             --     newSize@(newH,_newW) = funTupel (*) (fac,fac) (fromIntegral width,fromIntegral height)
-                                             --        where fac = (uncurry min rat)
-                                             -- liftIO $ preProcessImage (doResize $ round newH) [] urlIn (urlOut++rand)
-                                             -- let mcW = readMay strcanW 
-                                             --     canW = if (mcW == Nothing) then (Just 300) else mcW  
-                                             -- refreshImage (statURLOut++rand++"_res.png") canW 
-                                             -- element elURLres   # set UI.value (urlOut++rand++"_res.png")
-                                             -- updateRand
-                                             -- liftIOLater $ do 
-                                             --    print $ "Resize URL IN : "++urlIn
-                                             --    print $ "Resize URL OUT : "++(urlOut++rand++"_res.png")
-                                             --    mapM_ print $ show rat:(map show [size,dwh])++[show newSize]  
+ 
     -------GUI--------------- COLOR PICKER --------------------
     -- update Values in Color Picker
     [bRIn,bGIn,bBIn,dithIn] <- mapM (stepper "0") $ map UI.valueChange [elrVal,elgVal,elbVal,elDithGen]
@@ -383,8 +329,8 @@ setup window = do
     let checkDithValue = const $ do val <- currentValue dithIn
                                     let mval = readMay val
                                     if mval == Nothing
-                                        then element elDithGen # set UI.value "0"
-                                        else do let newVal = show (max 0 (min 5 (fromJust mval)))
+                                        then element elDithGen # set UI.value "3"
+                                        else do let newVal = show (max 0 (min 6 (fromJust mval)))
                                                 element elDithGen # set UI.value newVal # set UI.text newVal
 
     -- How can I make this smaller? forM doesnt work...
