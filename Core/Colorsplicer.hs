@@ -40,19 +40,11 @@ import qualified Data.Vector.Storable.Mutable as M
 ----            Splicing
 -------------------------------------------------------------------------------
 
--- | checks for: Pixel == Pixel 
-checkColor :: PixelRGB8 -> PixelRGB8 -> Bool
-checkColor (PixelRGB8 a1 a2 a3) (PixelRGB8 b1 b2 b3)
-    | a1 /= b1  = False
-    | a2 /= b2  = False 
-    | a3 /= b3  = False
-    | otherwise = True
-
 -- | creates List of Points for one Color from Image PixelRGB8
 colorSplicer :: Image PixelRGB8 -> PixelRGB8 -> [Point] 
 colorSplicer _ (PixelRGB8 255 255 255) = []
 colorSplicer img@(Image { imageWidth  = w, imageHeight = h }) pix =
-    [(x,y)| x <- [0..w-1], y <-[0..h-1], checkColor (pixelAt img x y) pix]
+    [(x,y)| x <- [0..w-1], y <-[0..h-1], (==) (pixelAt img x y) pix]
 
 
 -------------------------------------------------------------------------------
@@ -154,12 +146,12 @@ distSort[1500] 103152.83   0.66s -}
 
 {- | STARSORT *
 -------------------------------------------------------------------------------
-\n
-.\.1|2./..\n
-.8\.|./3..\n
-----c-----\n
-..7/.|.\4.\n
-../6.|5.\.\n
+
+.\.1|2./..
+.8\.|./3..
+----c-----
+..7/.|.\4.
+../6.|5.\.
 
 -------------------------------------------------------------------------------
 -- Divide Image (Grid) into 8 Slices (with list comprehension) and Sort them (D&C) 
