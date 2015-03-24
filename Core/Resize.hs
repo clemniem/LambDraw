@@ -18,8 +18,7 @@ import Control.Applicative
 ----            Resize Function
 -------------------------------------------------------------------------------
 
-
---i hate that this is png/PixelRGB8 specific, but see https://github.com/Twinside/Juicy.Pixels/issues/1
+-- | source: https://gist.github.com/eflister/5456125
 --resize :: (RealFrac a, Pixel b) => a -> Image b -> Image b
 resize :: (RealFrac a) => a -> Image PixelRGB8 -> Image PixelRGB8
 resize fact i = uncurry (generateImage f) new
@@ -29,7 +28,7 @@ resize fact i = uncurry (generateImage f) new
           scale r = round . (* (toRational r)) . toRational
           tmp s = scale (s old) . (% (s new))
  
--- pretty slow, should use repa or something
+-- | eflister: "pretty slow, should use repa or something"
 pixelAt' :: (Int, Int) -> Int -> Image PixelRGB8 -> (Int, Int) -> PixelRGB8
 pixelAt' (dw,dh) s i (x,y) = avg pix
     where inds n d = [a | a <- (+ n) <$> [0..s], all id ([(>= 0), (< d)] <*> [a])]

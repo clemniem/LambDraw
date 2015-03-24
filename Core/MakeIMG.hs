@@ -8,7 +8,6 @@ import Control.Parallel.Strategies
 import Data.Bits( unsafeShiftR )
 import qualified Data.Vector.Storable as V
 import Data.Word( Word8, Word16 )
-import Control.Monad
 
 
 -- Type & Data declarations

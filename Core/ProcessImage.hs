@@ -111,9 +111,9 @@ codeLstoFile url ls  = do outh <- openFile url WriteMode
 -- | Generates GCode
 toGcode :: (Int,[Point]) -> [String]
 toGcode (_,[]) = ["G0 X0 Y0"] -- Jog Home
-toGcode (nr,(p:ps)) = {-setPen : -}toGString p : "M8" : "G4 P0.05" : "M9" : "G4 P0.1" : toGcode' ps
+toGcode (nr,(p:ps)) = {-setPen : -}toGString p : "M8" : "G4 P0.02" : "M9" : "G4 P0.01" : toGcode' ps
   where toGcode'  []              = ["G0 X0 Y0"]
-        toGcode' (p':ps') = toGString p' : "M8" : "G4 P0.8" : "M9" : "G4 P0.1" : toGcode' ps'
+        toGcode' (p':ps') = toGString p' : "M8" : "G4 P0.02" : "M9" : "G4 P0.01" : toGcode' ps'
         toGString (px,py) = "G00 X" ++ show (xtoA+fst offset) ++ " Y" ++ show (ytoB +snd offset)
           where xtoA = px+py
                 ytoB = px-py

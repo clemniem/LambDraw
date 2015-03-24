@@ -137,8 +137,8 @@ setup window = do
                               # padding
     elIimgHeight   <- UI.span # set UI.text "---"-- img h    
                               # padding
-    elIoutWidth   <- UI.input -- dw
-    elIoutHeight  <- UI.input -- dh    
+    elIoutWidth   <- UI.input # set UI.value (show $ fst drawMax)
+    elIoutHeight  <- UI.input # set UI.value (show $ snd drawMax)    
         
 
 
@@ -236,11 +236,13 @@ setup window = do
             [strdW,strdH,
              strWidth,strHeight,
              strOutW,strOutH] <- getValuesList [elDW,elDH,elIimgWidth,elIimgHeight,elIoutWidth,elIoutHeight]
-            let dwh@(_draW ,_drawH) = safeTupel (strdW,strdH)
+            let dwh@(drawW,drawH)   = safeTupel (strdW,strdH)
                 size@(width,height) = safeTupel (strWidth,strHeight)
                 out@(outW,outH)     = safeTupel (strOutW,strOutH) 
                 rat@(_h_rat,_w_rat) = funTupel (%) (funTupel min dwh out) size  
                 ratio = min (1%1) $ uncurry min rat
+            element elIoutWidth  # set UI.value (show $ minimum [drawW,width,outW])
+            element elIoutHeight # set UI.value (show $ minimum [drawH,height,outH])
             liftIOLater $ do putStrLn ("Machine : "++show dwh)
                              putStrLn ("Size : " ++ show size)
                              putStrLn ("OutSize: "++ show out)
@@ -272,10 +274,8 @@ setup window = do
                 res2canv = fromIntegral $ round $ (300%height) * (fromIntegral width)
             element elIimgOrig # set UI.height 300
             forM [element elIimgOrig,element elcanvWidth]    (# set UI.width res2canv )
-            forM [element elIimgWidth,element elIoutWidth]   (# set UI.value strWidth )
-            forM [element elIimgHeight,element elIoutHeight] (# set UI.value strHeight)
-            element elIimgWidth   # set UI.text  strWidth
-            element elIimgHeight  # set UI.text  strHeight
+            element elIimgWidth  # set UI.value strWidth  # set UI.text strWidth
+            element elIimgHeight # set UI.value strHeight # set UI.text strHeight
             reloadSize True
             liftIOLater $ print size
 
