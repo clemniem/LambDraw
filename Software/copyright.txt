@@ -1,0 +1,5 @@
+copyright.txt
+
+Hiermit erlaube ich die Veröffentlichung der von mir zur Verfügung gestellten Daten auf der Homepage der Veranstalung “Fortgeschrittene Funktionale Programmierung”.
+
+Die genauen Lizenzbestimmungen befinden sich in der Textdatei LICENCE.

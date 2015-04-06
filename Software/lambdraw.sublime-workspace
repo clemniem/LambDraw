@@ -1,0 +1,1047 @@
+{
+	"auto_complete":
+	{
+		"selected_items":
+		[
+			[
+				"elI",
+				"elIoutWidth"
+			],
+			[
+				"take",
+				"takeExtension"
+			],
+			[
+				"pal",
+				"palette"
+			],
+			[
+				"dither",
+				"ditherStrength"
+			],
+			[
+				"font",
+				"font-size"
+			],
+			[
+				"elD",
+				"elDithGen"
+			],
+			[
+				"val",
+				"value"
+			],
+			[
+				"elIimg",
+				"elIimgWidth"
+			],
+			[
+				"el",
+				"elIoutWidth"
+			],
+			[
+				"strO",
+				"strOutH"
+			],
+			[
+				"url",
+				"urlIn"
+			],
+			[
+				"elDI",
+				"elDivHide"
+			],
+			[
+				"sa",
+				"safeColorRGB8"
+			],
+			[
+				"dra",
+				"drawMax"
+			],
+			[
+				"pa",
+				"pa"
+			],
+			[
+				"from",
+				"fromIntegral"
+			],
+			[
+				"Pixel",
+				"PixelRGB8"
+			],
+			[
+				"gree",
+				"greenPix"
+			],
+			[
+				"lift",
+				"liftIO"
+			],
+			[
+				"relo",
+				"reloadSize"
+			],
+			[
+				"elURL",
+				"elURLres"
+			],
+			[
+				"new",
+				"newSize"
+			],
+			[
+				"elU",
+				"elURLout"
+			],
+			[
+				"elDi",
+				"elDivHIDE"
+			],
+			[
+				"elR",
+				"elRand"
+			],
+			[
+				"ma",
+				"main1"
+			],
+			[
+				"upda",
+				"updateRand"
+			],
+			[
+				"getr",
+				"getRandIO"
+			],
+			[
+				"lif",
+				"liftIO"
+			],
+			[
+				"can",
+				"canvWidth"
+			],
+			[
+				"w",
+				"w"
+			],
+			[
+				"stat",
+				"statURLOut"
+			],
+			[
+				"elURl",
+				"elURLin"
+			],
+			[
+				"elId",
+				"elIdrawWidth"
+			],
+			[
+				"value",
+				"valueChange"
+			],
+			[
+				"valu",
+				"valueChange"
+			],
+			[
+				"safe",
+				"safeTupel"
+			],
+			[
+				"strd",
+				"strdW"
+			],
+			[
+				"saf",
+				"safeTupel"
+			],
+			[
+				"li",
+				"liftIO"
+			],
+			[
+				"eld",
+				"elDW"
+			],
+			[
+				"col",
+				"column"
+			],
+			[
+				"count",
+				"count"
+			],
+			[
+				"foo",
+				"fooPar"
+			],
+			[
+				"nep",
+				"nepoPar"
+			],
+			[
+				"orig",
+				"origls"
+			],
+			[
+				"pc",
+				"pcur"
+			],
+			[
+				"dist",
+				"distSortPre"
+			],
+			[
+				"ps",
+				"ps"
+			],
+			[
+				"dis",
+				"distSortdyn"
+			],
+			[
+				"splice",
+				"spliceSave"
+			],
+			[
+				"splic",
+				"splicelss"
+			],
+			[
+				"spli",
+				"splicelss"
+			],
+			[
+				"toG",
+				"toGcode"
+			],
+			[
+				"c",
+				"c"
+			],
+			[
+				"b",
+				"b"
+			],
+			[
+				"to",
+				"toGcode"
+			],
+			[
+				"proce",
+				"processToolpath"
+			],
+			[
+				"Path",
+				"pathOut"
+			],
+			[
+				"spl",
+				"spls"
+			],
+			[
+				"path",
+				"pathOut"
+			],
+			[
+				"mai",
+				"mayImg"
+			],
+			[
+				"process",
+				"processSplice"
+			],
+			[
+				"DIthE",
+				"DithErr"
+			],
+			[
+				"elb",
+				"elbVal"
+			],
+			[
+				"sta",
+				"starSortPar"
+			],
+			[
+				"pix",
+				"PixelRGB8"
+			],
+			[
+				"pixB",
+				"pixB"
+			],
+			[
+				"get",
+				"getPallette"
+			],
+			[
+				"urL",
+				"urlIn"
+			],
+			[
+				"add",
+				"addCol1"
+			],
+			[
+				"ur",
+				"urlIn"
+			],
+			[
+				"che",
+				"checkSize"
+			],
+			[
+				"max",
+				"drawMax"
+			],
+			[
+				"elIim",
+				"elIimgWidth"
+			],
+			[
+				"im",
+				"imhStr"
+			],
+			[
+				"imw",
+				"imwStr"
+			],
+			[
+				"str",
+				"str2"
+			],
+			[
+				"read",
+				"readMay"
+			],
+			[
+				"dh",
+				"dhIn"
+			],
+			[
+				"elB",
+				"elBlsresize"
+			],
+			[
+				"st",
+				"style"
+			],
+			[
+				"elDr",
+				"elDresizeInv"
+			],
+			[
+				"draw",
+				"drawMax"
+			],
+			[
+				"m",
+				"mSize"
+			],
+			[
+				"is",
+				"ifSize"
+			],
+			[
+				"elIi",
+				"elIimgHeight"
+			],
+			[
+				"if",
+				"ifSize"
+			],
+			[
+				"ima",
+				"imageHeight"
+			],
+			[
+				"img",
+				"imgur2"
+			],
+			[
+				"dr",
+				"drawRect"
+			],
+			[
+				"up",
+				"updatePall"
+			],
+			[
+				"a",
+				"a"
+			],
+			[
+				"addC",
+				"addCol4"
+			],
+			[
+				"B",
+				"B"
+			],
+			[
+				"Li",
+				"liftIOLater"
+			],
+			[
+				"soli",
+				"solidColor"
+			],
+			[
+				"fill",
+				"fillStyle"
+			],
+			[
+				"pr",
+				"procImg"
+			],
+			[
+				"main",
+				"mainLoadImage"
+			],
+			[
+				"sortBy",
+				"sortByY"
+			],
+			[
+				"so",
+				"sortByNextAcc"
+			],
+			[
+				"star",
+				"starDistance"
+			],
+			[
+				"pic",
+				"picPath"
+			],
+			[
+				"Image",
+				"ImageRGB8"
+			],
+			[
+				"pi",
+				"pixelungFromList"
+			],
+			[
+				"P",
+				"PixelRGB8"
+			],
+			[
+				"Ima",
+				"ImageRGB8"
+			],
+			[
+				"mod",
+				"module"
+			],
+			[
+				"rgb",
+				"rgb"
+			],
+			[
+				"cmyk",
+				"cmykPixls"
+			],
+			[
+				"colo",
+				"colorDistGrey"
+			],
+			[
+				"old",
+				"oldPix"
+			],
+			[
+				"color",
+				"colorDistGrey"
+			],
+			[
+				"coloD",
+				"colorDistGrew"
+			],
+			[
+				"black",
+				"blackPix"
+			],
+			[
+				"wh",
+				"whitePix"
+			],
+			[
+				"unsa",
+				"unsafeWritePixel"
+			],
+			[
+				"Pi",
+				"PixelRGB8"
+			],
+			[
+				"olE",
+				"oldPixE"
+			],
+			[
+				"bas",
+				"baseId"
+			],
+			[
+				"pixe",
+				"pixelung"
+			],
+			[
+				"ne",
+				"newPix"
+			],
+			[
+				"n",
+				"newPix"
+			],
+			[
+				"uns",
+				"unsafeReadPixel"
+			],
+			[
+				"writ",
+				"writeIdx"
+			],
+			[
+				"Pix",
+				"pixErr"
+			],
+			[
+				"comp",
+				"compwiseErr"
+			]
+		]
+	},
+	"buffers":
+	[
+		{
+			"settings":
+			{
+				"buffer_size": 0,
+				"line_ending": "Unix"
+			}
+		}
+	],
+	"build_system": "",
+	"command_palette":
+	{
+		"height": 392.0,
+		"selected_items":
+		[
+			[
+				"hask",
+				"SublimeHaskell: Go to next error"
+			],
+			[
+				"sub",
+				"Preferences: SublimeHaskell Settings – User"
+			],
+			[
+				"brow",
+				"Preferences: Browse Packages"
+			],
+			[
+				"pro",
+				"Project: Add Folder"
+			],
+			[
+				"insta",
+				"Package Control: Install Package"
+			],
+			[
+				"instal",
+				"SublimeHaskell: Install"
+			],
+			[
+				"inst",
+				"Package Control: Install Package"
+			],
+			[
+				"pac",
+				"Package Control: Remove Package"
+			],
+			[
+				"git pus",
+				"Git (SideBarGit): Push"
+			],
+			[
+				"git",
+				"Git (SideBarGit): Commit…"
+			],
+			[
+				"packa",
+				"Package Control: Install Package"
+			],
+			[
+				"pack",
+				"Package Control: Install Package"
+			],
+			[
+				"Disc",
+				"Package Control: Discover Packages"
+			],
+			[
+				"List Packages",
+				"Package Control: List Packages"
+			],
+			[
+				"Pack",
+				"Package Control: Install Package"
+			],
+			[
+				"Packag",
+				"Preferences: Browse Packages"
+			],
+			[
+				"haskell",
+				"Set Syntax: Haskell"
+			]
+		],
+		"width": 746.0
+	},
+	"console":
+	{
+		"height": 153.0,
+		"history":
+		[
+			"import urllib.request,os,hashlib; h = '7183a2d3e96f11eeadd761d777e62404' + 'e330c659d4bb41d3bdf022e94cab3cd0'; pf = 'Package Control.sublime-package'; ipp = sublime.installed_packages_path(); urllib.request.install_opener( urllib.request.build_opener( urllib.request.ProxyHandler()) ); by = urllib.request.urlopen( 'http://sublime.wbond.net/' + pf.replace(' ', '%20')).read(); dh = hashlib.sha256(by).hexdigest(); print('Error validating download (got %s instead of %s), please try manual install' % (dh, h)) if dh != h else open(os.path.join( ipp, pf), 'wb' ).write(by)"
+		]
+	},
+	"distraction_free":
+	{
+		"menu_visible": true,
+		"show_minimap": false,
+		"show_open_files": false,
+		"show_tabs": false,
+		"side_bar_visible": false,
+		"status_bar_visible": false
+	},
+	"expanded_folders":
+	[
+		"/Users/clem/Dropbox/LMU/FUN/LambDraw",
+		"/Users/clem/Dropbox/LMU/FUN/LambDraw/Core",
+		"/Users/clem/Dropbox/LMU/FUN/LambDraw/Gui"
+	],
+	"file_history":
+	[
+		"/Users/clem/Dropbox/LMU/FUN/LambDraw/Main.hs",
+		"/Users/clem/Dropbox/LMU/FUN/LambDraw/Core/MakeIMG.hs",
+		"/Users/clem/Dropbox/LMU/FUN/LambDraw/Core/Dither.hs",
+		"/Users/clem/Dropbox/LMU/FUN/LambDraw/Core/Colorsplicer.hs",
+		"/Users/clem/Dropbox/LMU/FUN/LambDraw/Toolpath.hs",
+		"/Users/clem/Dropbox/LMU/FUN/LambDraw/Core/ProcessImage.hs",
+		"/Users/clem/Dropbox/LMU/FUN/LambDraw/Gui/LambGui.hs",
+		"/Users/clem/Dropbox/LMU/FUN/LambDraw/Core/Resize.hs",
+		"/Users/clem/Dropbox/LMU/FUN/LambDraw/LambDraw.prof",
+		"/Users/clem/Dropbox/LMU/FUN/LambDraw/LambDraw.cabal",
+		"/Users/clem/Dropbox/LMU/FUN/LambDraw/Gui/GuiHelper.hs",
+		"/Users/clem/Dropbox/LMU/FUN/LambDraw/images/LambGui.css",
+		"/Users/clem/Dropbox/LMU/FUN/LambDraw/Performance/partest.txt",
+		"/Users/clem/Dropbox/LMU/FUN/LambDraw/Canvas",
+		"/Users/clem/Dropbox/LMU/FUN/LambDraw/LambDraw.hs",
+		"/Users/clem/Dropbox/LMU/FUN/LambDraw/Setup.hs",
+		"/Users/clem/Dropbox/LMU/FUN/LambDraw/LambDraw.Core.MakeIMG.hs",
+		"/Users/clem/Dropbox/LMU/FUN/LambDraw/partest.txt",
+		"/Users/clem/Dropbox/LMU/FUN/LambDraw/LambDraw.Core.Dither.hs",
+		"/Users/clem/Dropbox/LMU/FUN/LambDraw/LambDraw.Core.Resize.hs",
+		"/Users/clem/Dropbox/LMU/FUN/LambDraw/LambDraw.Gui.LambGui.hs",
+		"/Users/clem/Dropbox/LMU/FUN/LambDraw/LambDraw.Core.ProcessImage.hs",
+		"/Users/clem/Dropbox/LMU/FUN/LambDraw/LambDraw.Core.Colorsplicer.hs",
+		"/Users/clem/Library/Application Support/Sublime Text 3/Packages/User/SublimeHaskell.sublime-settings",
+		"/Users/clem/Dropbox/LMU/FUN/LambDraw/Colorsplicer.hs",
+		"/Users/clem/Downloads/threepenny-gui-0.5.0.0/samples/CurrencyConverter.hs",
+		"/Users/clem/Dropbox/LMU/FUN/LambDraw/Toolpath",
+		"/Users/clem/Dropbox/LMU/FUN/LambDraw/parTest.hs",
+		"/Users/clem/Dropbox/LMU/FUN/LambDraw/statetest.hs",
+		"/Users/clem/Dropbox/LMU/FUN/LambDraw/ToolpathStar100.prof",
+		"/Users/clem/Desktop/gestalt_node_BOM.csv",
+		"/Users/clem/Dropbox/LMU/FUN/LambDraw/colorPick.hs",
+		"/Users/clem/Dropbox/LMU/FUN/LambDraw/archive.hs",
+		"/Users/clem/Downloads/threepenny-gui-0.5.0.0/samples/DrumMachine.hs",
+		"/Users/clem/Dropbox/LMU/FUN/LambDraw/ToolpathNext.prof",
+		"/Users/clem/Dropbox/LMU/FUN/LambDraw/Toolpath.prof",
+		"/Users/clem/Dropbox/LMU/FUN/LambDraw/ToolpathStar300.prof",
+		"/Users/clem/Dropbox/LMU/FUN/LambDraw/ToolpathMathmindist100.prof",
+		"/Users/clem/Dropbox/LMU/FUN/LambDraw/Dither.hs",
+		"/Users/clem/Dropbox/LMU/FUN/LambDraw/MakeIMG.hs",
+		"/Users/clem/Dropbox/LMU/FUN/LambDraw/makeimg.hs",
+		"/Users/clem/Dropbox/LMU/FUN/LambDraw/ditherRacePiem1.prof",
+		"/Users/clem/Dropbox/LMU/FUN/LambDraw/ditherRace1.prof",
+		"/Users/clem/Dropbox/LMU/FUN/LambDraw/pixeld.hs",
+		"/Users/clem/Dropbox/LMU/FUN/LambDraw/ditherRaceResults.prof",
+		"/Users/clem/Dropbox/LMU/FUN/LambDraw/ditherRace1ST.prof",
+		"/Users/clem/Dropbox/LMU/FUN/archiv/colorquant.hs",
+		"/Users/clem/Dropbox/LMU/FUN/LambDraw/Bither.hs",
+		"/Users/clem/Dropbox/LMU/FUN/LambDraw/stmonad.hs",
+		"/Users/clem/Dropbox/LMU/FUN/LambDraw/Resize.hs",
+		"/Users/clem/Dropbox/LMU/FUN/LambDraw/ErrDither.hs",
+		"/Users/clem/Dropbox/LMU/FUN/uebung/stmexample.hs",
+		"/Users/clem/Dropbox/LMU/FUN/LambDraw/images/dither1.png",
+		"/Users/clem/Dropbox/LMU/FUN/LambDraw/Dither.sublime-project",
+		"/Users/clem/Dropbox/LMU/FUN/ffp-project/.git/info/exclude",
+		"/Users/clem/Dropbox/LMU/FUN/archiv/shortestalgorithm.hs",
+		"/Users/clem/Dropbox/LMU/FUN/ffp-project/Graphicsimport.hs",
+		"/Users/clem/Dropbox/LMU/FUN/ffp-project/graphicsimport.hs",
+		"/Users/clem/Dropbox/LMU/FUN/ffp-project/makeimg.hs",
+		"/Users/clem/Library/Application Support/Sublime Text 3/Packages/SideBarEnhancements/Side Bar.sublime-settings",
+		"/Users/clem/Library/Application Support/Sublime Text 3/Packages/User/Side Bar.sublime-settings",
+		"/Users/clem/Library/Application Support/Sublime Text 3/Packages/User/Preferences.sublime-settings",
+		"/Users/clem/Library/Application Support/Sublime Text 3/Packages/User/Package Control.sublime-settings",
+		"/Users/clem/Dropbox/LMU/FUN/archiv/makeimg.hs",
+		"/Users/clem/Dropbox/LMU/FUN/project/dither.hs",
+		"/Users/clem/Dropbox/LMU/FUN/project/shortestalgorithm.hs",
+		"/Users/clem/Dropbox/LMU/FUN/project/colorquant.hs",
+		"/Users/clem/Downloads/leptonica-1.71/src/colorquant2.c",
+		"/Users/clem/Downloads/FFP_Code10/helloWorld3.hs",
+		"/Users/clem/Dropbox/LMU/FUN/project/b)",
+		"/Users/clem/Dropbox/LMU/FUN/uebung/ub10.hs",
+		"/Users/clem/Dropbox/LMU/FUN/project/trash.hs",
+		"/Users/clem/Dropbox/LMU/TutorJob BS/blatt12.java",
+		"/Users/clem/Dropbox/LMU/TutorJob BS/KorrekturschemaBlatt10.txt",
+		"/Users/clem/Dropbox/LMU/FUN/project/middle.hs",
+		"/Users/clem/Dropbox/LMU/FUN/project/makeimg.hs",
+		"/Users/clem/Dropbox/LMU/FUN/niemeyer_zeichenmaschine.txt",
+		"/Users/clem/Downloads/Red Alert 2.app/Contents/Resources/drive_c/Program Files/Alarmstufe rot2/RA2.INI",
+		"/Users/clem/Library/Application Support/Sublime Text 3/Packages/User/Default (OSX).sublime-keymap",
+		"/Users/clem/Dropbox/LMU/FUN/uebung/FFP_U09_STM.hs",
+		"/Users/clem/Dropbox/LMU/FUN/project/pngtest.hs",
+		"/Users/clem/Dropbox/LMU/FUN/project/pixelcompare.hs",
+		"/Users/clem/Dropbox/LMU/FUN/project/shortestpoint.hs",
+		"/Users/clem/Downloads/FFP_U09_STM.hs",
+		"/usr/local/share/cmake-3.0/Modules/FindDevIL.cmake",
+		"/Users/clem/Dropbox/LMU/FUN/images/canvas2.ppm",
+		"/Users/clem/Dropbox/LMU/FUN/canvas3.ppm",
+		"/Users/clem/Dropbox/LMU/FUN/canvas.ppm",
+		"/Users/clem/Documents/sysprak/Beispielimplementierung/checkprime.c",
+		"/Users/clem/Documents/sysprak/Beispielimplementierung/findMaxOfFloats.c",
+		"/Users/clem/Documents/sysprak/Own/zweipro.c",
+		"/Users/clem/Dropbox/LMU/FUN/canvas2.ppm",
+		"/Users/clem/Desktop/canvas.ppm",
+		"/Users/clem/Dropbox/LMU/FUN/imagetest.hs",
+		"/Users/clem/Library/Haskell/repo-cache/hackage.haskell.org/repa-examples/3.3.1.1/repa-examples-3.3.1.1/examples/Blur/src-repa/Main.hs",
+		"/Users/clem/Library/Haskell/repo-cache/hackage.haskell.org/repa-examples/3.3.1.1/repa-examples-3.3.1.1/examples/UnitTesting/UnitTesting.hs",
+		"/Users/clem/Dropbox/LMU/FUN/ub7.hs",
+		"/Users/clem/Documents/sysprak/supermuehle/build/client.conf",
+		"/Users/clem/Downloads/table.html",
+		"/Users/clem/Downloads/FFP_U07_Parallel.hs",
+		"/Users/clem/Dropbox/LMU/FUN/parsing.hs",
+		"/Users/clem/Dropbox/LMU/FUN/parser.h",
+		"/Users/clem/Documents/sysprak/Own/read.c",
+		"/Users/clem/Documents/sysprak/Own/buffer.txt",
+		"/Users/clem/Documents/sysprak/Own/namen.txt",
+		"/Users/clem/Documents/sysprak/Own/multiproc.c",
+		"/Users/clem/Dropbox/LMU/TutorJob BS/pipetest.c",
+		"/Users/clem/Downloads/wavedrom.svg",
+		"/Users/clem/Dropbox/LMU/Seminar TUM/wavedrom_pwm.txt",
+		"/Users/clem/Dropbox/LMU/TutorJob BS/korrekturschema6.txt",
+		"/Users/clem/Documents/sysprak/Beispielimplementierung/chat.c",
+		"/Users/clem/Documents/sysprak/Beispielimplementierung/checkPrimeMultiThreaded/checkPrimeMultiThreaded.c",
+		"/Users/clem/Dropbox/LMU/TutorJob BS/BS Uebung 11.11.",
+		"/Users/clem/Downloads/SoftwareServo/SoftwareServo.h",
+		"/Users/clem/Downloads/SoftwareServo/SoftwareServo.cpp",
+		"/Users/clem/Documents/sysprak/Beispielimplementierung/gameOfLife.c",
+		"/Users/clem/.ghc/ghci.conf",
+		"/Users/clem/.ghc/test.hs",
+		"/Users/clem/Downloads/FFP_U02_Typklassen.hs",
+		"/Users/clem/test.hs",
+		"/Users/clem/edx1.hs",
+		"/Users/clem/Downloads/FFP_U01wiederholung.hs",
+		"/Users/clem/Documents/sysprak/Own/rrr.txt",
+		"/Users/clem/Documents/sysprak/Own/readfile.c",
+		"/Users/clem/Documents/sysprak/Own/star.c",
+		"/Users/clem/Downloads/Beispielimplementierung/findMaxOfFloats.c",
+		"/Users/clem/Downloads/Beispielimplementierung/matrixMult.c",
+		"/Users/clem/Downloads/main.c"
+	],
+	"find":
+	{
+		"height": 35.0
+	},
+	"find_in_files":
+	{
+		"height": 93.0,
+		"where_history":
+		[
+			"/Users/clem/Dropbox/LMU/FUN/LambDraw/",
+			"/Users/clem/Dropbox/LMU/FUN/LambDraw/e",
+			"/Users/clem/Dropbox/LMU/FUN/LambDraw/",
+			"/Users/clem/Dropbox/LMU/FUN/LambDraw/Core"
+		]
+	},
+	"find_state":
+	{
+		"case_sensitive": false,
+		"find_history":
+		[
+			"readSize",
+			"addTup",
+			"ifSize",
+			"imgTooBig",
+			"let",
+			"distPixel",
+			"[elIoutWidth,elIoutHeight,",
+			"[elIoutWidth,",
+			"elIdrawHeight",
+			"elIdrawWidth",
+			"elIdrawW",
+			": ",
+			"parMap1",
+			"ds ",
+			" <- rpar $ ",
+			" acc ",
+			"Acc ",
+			"acc ",
+			"Acc",
+			"acc",
+			"distPixel",
+			"d",
+			"exist",
+			"dire",
+			"t2",
+			"readMay",
+			"read",
+			"loadFile",
+			"bUrl",
+			"bUrk",
+			"./images/",
+			"./images/p",
+			"./ima",
+			".image",
+			".images",
+			"resize",
+			"only",
+			"^.*\\S+.*$",
+			"elBgetPall",
+			"tupel",
+			"fooPar",
+			"foo",
+			"(2,1)",
+			"style",
+			"LambDraw.Core.",
+			"saveImage",
+			"process",
+			"ds",
+			"f",
+			"imgur",
+			"imgur2",
+			"applyDither",
+			"ddrawImage",
+			"applyResize",
+			"bVal",
+			"gVal",
+			"rVal",
+			"(0,0)",
+			"plusPair",
+			"show",
+			"imgConverter",
+			"from16to8",
+			"toRGB8",
+			"= ",
+			"imgyn2rgb8",
+			"d",
+			"dyn2string",
+			"\"\"",
+			"putStrLn",
+			"reprRgb8",
+			"diDimensions",
+			"imgDimensions d",
+			"imgDimensions",
+			"false",
+			"generat",
+			"L.",
+			"foral",
+			"mod y 10",
+			"y",
+			"pixelLines x",
+			"(x*51)",
+			"x*51",
+			"save",
+			"Int",
+			"trun",
+			"pixelung8rot",
+			"arrToPoints",
+			"arrRadLs",
+			"periphPix",
+			"image",
+			"imageWidt",
+			"imagWidt",
+			"pixelung8rot",
+			"fertig",
+			"21753",
+			"21744",
+			"21752",
+			"21751",
+			"21749",
+			"(A·B)"
+		],
+		"highlight": true,
+		"in_selection": false,
+		"preserve_case": false,
+		"regex": false,
+		"replace_history":
+		[
+			"",
+			"LambDraw.Core.",
+			"",
+			"P4",
+			"PP",
+			"P3",
+			"P2",
+			"P1",
+			"21753",
+			"((A NAND B) NAND (A NAND B))"
+		],
+		"reverse": false,
+		"show_context": true,
+		"use_buffer2": true,
+		"whole_word": false,
+		"wrap": false
+	},
+	"groups":
+	[
+		{
+			"selected": 0,
+			"sheets":
+			[
+				{
+					"buffer": 0,
+					"semi_transient": false,
+					"settings":
+					{
+						"buffer_size": 0,
+						"regions":
+						{
+						},
+						"selection":
+						[
+							[
+								0,
+								0
+							]
+						],
+						"settings":
+						{
+							"syntax": "Packages/Text/Plain text.tmLanguage"
+						},
+						"translation.x": 0.0,
+						"translation.y": 0.0,
+						"zoom_level": 1.0
+					},
+					"stack_index": 0,
+					"type": "text"
+				}
+			]
+		},
+		{
+			"sheets":
+			[
+			]
+		}
+	],
+	"incremental_find":
+	{
+		"height": 27.0
+	},
+	"input":
+	{
+		"height": 35.0
+	},
+	"layout":
+	{
+		"cells":
+		[
+			[
+				0,
+				0,
+				1,
+				1
+			],
+			[
+				1,
+				0,
+				2,
+				1
+			]
+		],
+		"cols":
+		[
+			0.0,
+			0.919093851133,
+			1.0
+		],
+		"rows":
+		[
+			0.0,
+			1.0
+		]
+	},
+	"menu_visible": true,
+	"output.exec":
+	{
+		"height": 29.0
+	},
+	"output.find_results":
+	{
+		"height": 0.0
+	},
+	"output.haskell_error_checker":
+	{
+		"height": 29.0
+	},
+	"output.haskell_sublime_load":
+	{
+		"height": 29.0
+	},
+	"project": "lambdraw.sublime-project",
+	"replace":
+	{
+		"height": 64.0
+	},
+	"save_all_on_build": true,
+	"select_file":
+	{
+		"height": 0.0,
+		"selected_items":
+		[
+		],
+		"width": 0.0
+	},
+	"select_project":
+	{
+		"height": 0.0,
+		"selected_items":
+		[
+		],
+		"width": 0.0
+	},
+	"select_symbol":
+	{
+		"height": 47.0,
+		"selected_items":
+		[
+			[
+				"parMap",
+				"parMap1"
+			]
+		],
+		"width": 392.0
+	},
+	"selected_group": 0,
+	"settings":
+	{
+	},
+	"show_minimap": true,
+	"show_open_files": true,
+	"show_tabs": true,
+	"side_bar_visible": true,
+	"side_bar_width": 267.0,
+	"status_bar_visible": true,
+	"template_settings":
+	{
+	}
+}
