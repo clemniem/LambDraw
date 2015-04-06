@@ -14,3 +14,4 @@ images/
 *.key
 *.stl
 *.gcode
+*.3dm
