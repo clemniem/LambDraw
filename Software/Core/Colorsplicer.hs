@@ -142,14 +142,24 @@ fooPar[500]    110460.79   2.88s
 fooPar[100]    163754.72   0.16s
 distSort[1500] 103152.83   0.66s -}
 
+-- | Calculates the sorted List of closest Points for every Point in the List 
+--   returns the one with minimal Distance
+-- distOptimizer :: [Point] -> (Maybe Float,[Point])
+-- distOptimizer [] = (Nothing, [])
+-- distOptimizer ls@(_:xs) = distOptimizerAcc xs $ distSort ls
+--     where
+--     distOptimizerAcc :: [Point] -> (Maybe Float,[Point]) -> (Maybe Float,[Point])
+--     distOptimizerAcc [] acc = acc
+--     distOptimizerAcc (x':xs') acc
+--         | fst (distSort (x':ls)) < fst acc = distOptimizerAcc xs' (distSort (x':ls))
+--         | otherwise = distOptimizerAcc xs' acc
 
-
-{- | STARSORT *
+{- | 
 -------------------------------------------------------------------------------
 
 .\.1|2./..
 .8\.|./3..
-----c-----
+----c-----            STARSORT *
 ..7/.|.\4.
 ../6.|5.\.
 
@@ -198,8 +208,8 @@ starSortPar  w  h pts = concat $ runEval $ do
                                   so = [(x,y) | (x,y) <- pts, x>w' , y>h']
                                   w' = truncate $ fromIntegral w/2
                                   h' = truncate $ fromIntegral h/2
-                                  ds ls = L.reverse $ snd $ distSort ls
-                                  pieces = [                     [(x,y) | (x,y) <- nw, x>y ],
+                                  ds ls  = L.reverse $ snd $ distSort ls
+                                  pieces =  [                    [(x,y) | (x,y) <- nw, x>y ],
                                             (L.reverse $ sortByY [(x,y) | (x,y) <- no, x<=h-y]),
                                             (L.reverse           [(x,y) | (x,y) <- no, x>h-y ]),
                                                                  [(x,y) | (x,y) <- so, x>y   ],
@@ -209,17 +219,6 @@ starSortPar  w  h pts = concat $ runEval $ do
                                             (L.reverse           [(x,y) | (x,y) <- nw, x<=y  ])]
                              parMap1 ds pieces
                              
--- | Calculates the sorted List of closest Points for every Point in the List 
---   returns the one with minimal Distance
-distOptimizer :: [Point] -> (Maybe Float,[Point])
-distOptimizer [] = (Nothing, [])
-distOptimizer ls@(_:xs) = distOptimizerAcc xs $ distSort ls
-    where
-    distOptimizerAcc :: [Point] -> (Maybe Float,[Point]) -> (Maybe Float,[Point])
-    distOptimizerAcc [] acc = acc
-    distOptimizerAcc (x':xs') acc
-        | fst (distSort (x':ls)) < fst acc = distOptimizerAcc xs' (distSort (x':ls))
-        | otherwise = distOptimizerAcc xs' acc
 
 -- | generates a Heatmap Image of a [Point]
 pointlsToImg :: [Point] -> Int -> Int -> Image PixelRGB8

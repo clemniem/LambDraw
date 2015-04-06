@@ -4,6 +4,10 @@
 		"selected_items":
 		[
 			[
+				"elI",
+				"elIoutWidth"
+			],
+			[
 				"take",
 				"takeExtension"
 			],
@@ -288,10 +292,6 @@
 				"urlIn"
 			],
 			[
-				"elI",
-				"elIimgRes"
-			],
-			[
 				"che",
 				"checkSize"
 			],
@@ -520,7 +520,6 @@
 	"buffers":
 	[
 		{
-			"contents": "",
 			"settings":
 			{
 				"buffer_size": 0,
@@ -626,23 +625,23 @@
 	[
 		"/Users/clem/Dropbox/LMU/FUN/LambDraw",
 		"/Users/clem/Dropbox/LMU/FUN/LambDraw/Core",
-		"/Users/clem/Dropbox/LMU/FUN/LambDraw/Gui",
-		"/Users/clem/Dropbox/LMU/FUN/LambDraw/Performance"
+		"/Users/clem/Dropbox/LMU/FUN/LambDraw/Gui"
 	],
 	"file_history":
 	[
-		"/Users/clem/Dropbox/LMU/FUN/LambDraw/Core/Colorsplicer.hs",
 		"/Users/clem/Dropbox/LMU/FUN/LambDraw/Main.hs",
-		"/Users/clem/Dropbox/LMU/FUN/LambDraw/Gui/LambGui.hs",
-		"/Users/clem/Dropbox/LMU/FUN/LambDraw/Core/ProcessImage.hs",
-		"/Users/clem/Dropbox/LMU/FUN/LambDraw/Core/Dither.hs",
 		"/Users/clem/Dropbox/LMU/FUN/LambDraw/Core/MakeIMG.hs",
+		"/Users/clem/Dropbox/LMU/FUN/LambDraw/Core/Dither.hs",
+		"/Users/clem/Dropbox/LMU/FUN/LambDraw/Core/Colorsplicer.hs",
+		"/Users/clem/Dropbox/LMU/FUN/LambDraw/Toolpath.hs",
+		"/Users/clem/Dropbox/LMU/FUN/LambDraw/Core/ProcessImage.hs",
+		"/Users/clem/Dropbox/LMU/FUN/LambDraw/Gui/LambGui.hs",
+		"/Users/clem/Dropbox/LMU/FUN/LambDraw/Core/Resize.hs",
+		"/Users/clem/Dropbox/LMU/FUN/LambDraw/LambDraw.prof",
 		"/Users/clem/Dropbox/LMU/FUN/LambDraw/LambDraw.cabal",
 		"/Users/clem/Dropbox/LMU/FUN/LambDraw/Gui/GuiHelper.hs",
-		"/Users/clem/Dropbox/LMU/FUN/LambDraw/Core/Resize.hs",
 		"/Users/clem/Dropbox/LMU/FUN/LambDraw/images/LambGui.css",
 		"/Users/clem/Dropbox/LMU/FUN/LambDraw/Performance/partest.txt",
-		"/Users/clem/Dropbox/LMU/FUN/LambDraw/Toolpath.hs",
 		"/Users/clem/Dropbox/LMU/FUN/LambDraw/Canvas",
 		"/Users/clem/Dropbox/LMU/FUN/LambDraw/LambDraw.hs",
 		"/Users/clem/Dropbox/LMU/FUN/LambDraw/Setup.hs",
@@ -757,8 +756,7 @@
 		"/Users/clem/Documents/sysprak/Own/star.c",
 		"/Users/clem/Downloads/Beispielimplementierung/findMaxOfFloats.c",
 		"/Users/clem/Downloads/Beispielimplementierung/matrixMult.c",
-		"/Users/clem/Downloads/main.c",
-		"/Users/clem/Downloads/solarus-alttp-pack-master/README.md"
+		"/Users/clem/Downloads/main.c"
 	],
 	"find":
 	{
@@ -907,11 +905,6 @@
 	"groups":
 	[
 		{
-			"sheets":
-			[
-			]
-		},
-		{
 			"selected": 0,
 			"sheets":
 			[
@@ -933,7 +926,6 @@
 						],
 						"settings":
 						{
-							"auto_name": "",
 							"syntax": "Packages/Text/Plain text.tmLanguage"
 						},
 						"translation.x": 0.0,
@@ -943,6 +935,11 @@
 					"stack_index": 0,
 					"type": "text"
 				}
+			]
+		},
+		{
+			"sheets":
+			[
 			]
 		}
 	],
@@ -974,7 +971,7 @@
 		"cols":
 		[
 			0.0,
-			0.740873641339,
+			0.919093851133,
 			1.0
 		],
 		"rows":
@@ -1042,7 +1039,7 @@
 	"show_open_files": true,
 	"show_tabs": true,
 	"side_bar_visible": true,
-	"side_bar_width": 180.0,
+	"side_bar_width": 267.0,
 	"status_bar_visible": true,
 	"template_settings":
 	{

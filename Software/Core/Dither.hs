@@ -103,7 +103,7 @@ ditherRGB8 errls  pxls (Image {imageWidth = w,
   Image w h pixels
     where sourceCompCount    = componentCount (undefined :: PixelRGB8)
           destComponentCount = componentCount (undefined :: PixelRGB8)
-
+          
           pixels = runST $ do
             oldArr <- VS.thaw vec 
             let lineMapper _ _ y | y >= h = return ()
@@ -128,15 +128,15 @@ ditherRGB8 errls  pxls (Image {imageWidth = w,
                                                       `ap`    M.unsafeRead vector (idx + 2)
                                     -- Takes a List of Error Factors and Neighbours (Int,(Int,Int)) and shares the Error
                                     unsafeWritePixel' _ []       _  = return ()
-                                    unsafeWritePixel' v (eb:ebs) pe =  do if mbaseE == Nothing -- bound checking for Error Base
-                                                                            then do unsafeWritePixel' v ebs pe
+                                    unsafeWritePixel' v (de:des) pe =  do if mbaseE == Nothing -- bound checking for Error Base
+                                                                            then do unsafeWritePixel' v des pe
                                                                             else do oldPixE <- unsafeReadPixel' oldArr baseE 
-                                                                                    unsafeWritePixel v baseE $ newPixE (fst eb) oldPixE
-                                                                                    unsafeWritePixel' v ebs pe
+                                                                                    unsafeWritePixel v baseE $ newPixE (fst de) oldPixE
+                                                                                    unsafeWritePixel' v des pe
                                                                           where
                                                                           newPixE fac ol = compwiseErr fac pe ol
                                                                           baseE          = fromJust mbaseE
-                                                                          mbaseE         = baseId $ funTupel (+) (x,y) $ snd eb 
+                                                                          mbaseE         = baseId $ funTupel (+) (x,y) $ snd de 
                                     -- calculates the BaseId for any given Point in the Image (checks bounds)
                                     baseId :: Point -> Maybe Int
                                     baseId (a,b)
