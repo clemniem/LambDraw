@@ -18,10 +18,10 @@ LambDraw is a tool to provide G-Code for the LambDraw Plotter a selfbuild CoreXY
 I am using LambDraw to produce Gcode for my 4-Color-Plotter.
 
 The Programm
-![LambDraw GUI]()
+![LambDraw GUI](https://raw.githubusercontent.com/clemniem/LambDraw/master/doc/screenshot_lambgui.png)
 
 The Machine
-![LambDraw Machine]()
+![LambDraw Machine](https://raw.githubusercontent.com/clemniem/LambDraw/master/doc/lambdraw_machine.jpg)
 
 The Drawing
-![LambDraw Output]()
+![LambDraw Output](https://raw.githubusercontent.com/clemniem/LambDraw/master/doc/lambdraw_output.jpg)
