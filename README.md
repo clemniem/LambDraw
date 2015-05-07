@@ -26,5 +26,5 @@ The Drawing
 ![LambDraw Output](https://raw.githubusercontent.com/clemniem/LambDraw/master/doc/lambdraw_output.jpg)
 
 The Hardware ver 0.2
-![LambDraw Output](https://raw.githubusercontent.com/clemniem/LambDraw/master/doc/hardware2.jpg)
+![LambDraw Hardware Wiring](https://raw.githubusercontent.com/clemniem/LambDraw/master/doc/hardware2.png)
 
