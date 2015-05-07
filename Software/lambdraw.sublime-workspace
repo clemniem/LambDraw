@@ -520,10 +520,51 @@
 	"buffers":
 	[
 		{
+			"file": "LICENSE",
 			"settings":
 			{
-				"buffer_size": 0,
+				"buffer_size": 1832,
+				"line_ending": "Unix",
+				"name": "The following license (\"BSD3\") applies to the sour"
+			}
+		},
+		{
+			"contents": "# ffp-project: LambDraw!\n\nWelcome to my final project in advanced functional programming of 2014/15.\n\nLambDraw is a tool to provide G-Code for the LambDraw Plotter a selfbuild CoreXY-Drawing Machine.\n\n# The steps:\n\n1. Take an Image as Input\n2. Reduce the Image in Size and Colors to a 4-Color Palette. \n3. Take each Color-Plane and produce G-Code\n4. Save GCode as .nc File on your Computer\n\n# Example:\n\nI am using LambDraw to produce Gcode for my 4-Color-Plotter.\n\nThe Machine\n\nThe Drawing\n",
+			"file": "README.md",
+			"file_size": -1,
+			"file_write_time": -1,
+			"settings":
+			{
+				"buffer_size": 490,
 				"line_ending": "Unix"
+			}
+		},
+		{
+			"file": "Perf",
+			"settings":
+			{
+				"buffer_size": 29844367,
+				"line_ending": "Unix"
+			}
+		},
+		{
+			"file": "LICENSE",
+			"settings":
+			{
+				"buffer_size": 1832,
+				"line_ending": "Unix"
+			}
+		},
+		{
+			"contents": "readme.txt\n\nIm Ordner Code, sind die aktuellen .hs Dateien und eine .cabal-Datei. In der .cabal-Datei ist angegeben wie die Main.hs compiliert wird.\n\nDa sich der Code noch oft aendern wird, ist es vielleicht ratsam sich die neuste Version zu holen:\nhttps://github.com/clemniem/LambDraw/\n\nDort werden auch in Zukunft die Hardware Komponenten fuer die Maschine veroeffentlicht.\n\nBei Fragen einfach eine E-Mail an: clemens.niemeyer@campus.lmu.de\n\nBeste Gruesse,\nClemens",
+			"file": "/Users/clem/Documents/LambDraw/readme.txt",
+			"file_size": -1,
+			"file_write_time": -1,
+			"settings":
+			{
+				"buffer_size": 466,
+				"line_ending": "Unix",
+				"name": "readme.txt"
 			}
 		}
 	],
@@ -623,12 +664,13 @@
 	},
 	"expanded_folders":
 	[
-		"/Users/clem/Dropbox/LMU/FUN/LambDraw",
-		"/Users/clem/Dropbox/LMU/FUN/LambDraw/Core",
-		"/Users/clem/Dropbox/LMU/FUN/LambDraw/Gui"
+		"/Users/clem/Documents/LambDraw/Software",
+		"/Users/clem/Documents/LambDraw/Software/images"
 	],
 	"file_history":
 	[
+		"/Users/clem/Documents/LambDraw/Software/copyright.txt",
+		"/Users/clem/Documents/LambDraw/Software/LambDraw.cabal",
 		"/Users/clem/Dropbox/LMU/FUN/LambDraw/Main.hs",
 		"/Users/clem/Dropbox/LMU/FUN/LambDraw/Core/MakeIMG.hs",
 		"/Users/clem/Dropbox/LMU/FUN/LambDraw/Core/Dither.hs",
@@ -754,9 +796,7 @@
 		"/Users/clem/Documents/sysprak/Own/rrr.txt",
 		"/Users/clem/Documents/sysprak/Own/readfile.c",
 		"/Users/clem/Documents/sysprak/Own/star.c",
-		"/Users/clem/Downloads/Beispielimplementierung/findMaxOfFloats.c",
-		"/Users/clem/Downloads/Beispielimplementierung/matrixMult.c",
-		"/Users/clem/Downloads/main.c"
+		"/Users/clem/Downloads/Beispielimplementierung/findMaxOfFloats.c"
 	],
 	"find":
 	{
@@ -905,15 +945,75 @@
 	"groups":
 	[
 		{
-			"selected": 0,
+			"selected": 4,
 			"sheets":
 			[
 				{
 					"buffer": 0,
+					"file": "LICENSE",
 					"semi_transient": false,
 					"settings":
 					{
-						"buffer_size": 0,
+						"buffer_size": 1832,
+						"regions":
+						{
+						},
+						"selection":
+						[
+							[
+								350,
+								350
+							]
+						],
+						"settings":
+						{
+							"auto_name": "The following license (\"BSD3\") applies to the sour",
+							"side_bar_folders_auto_load_folder": 1,
+							"syntax": "Packages/Text/Plain text.tmLanguage"
+						},
+						"translation.x": 0.0,
+						"translation.y": 0.0,
+						"zoom_level": 1.0
+					},
+					"stack_index": 2,
+					"type": "text"
+				},
+				{
+					"buffer": 1,
+					"file": "README.md",
+					"semi_transient": false,
+					"settings":
+					{
+						"buffer_size": 490,
+						"regions":
+						{
+						},
+						"selection":
+						[
+							[
+								490,
+								490
+							]
+						],
+						"settings":
+						{
+							"side_bar_folders_auto_load_folder": 1,
+							"syntax": "Packages/Markdown/Markdown.tmLanguage"
+						},
+						"translation.x": 0.0,
+						"translation.y": 0.0,
+						"zoom_level": 1.0
+					},
+					"stack_index": 4,
+					"type": "text"
+				},
+				{
+					"buffer": 2,
+					"file": "Perf",
+					"semi_transient": false,
+					"settings":
+					{
+						"buffer_size": 29844367,
 						"regions":
 						{
 						},
@@ -926,6 +1026,66 @@
 						],
 						"settings":
 						{
+							"side_bar_folders_auto_load_folder": 1,
+							"syntax": "Packages/Text/Plain text.tmLanguage"
+						},
+						"translation.x": 0.0,
+						"translation.y": 0.0,
+						"zoom_level": 1.0
+					},
+					"stack_index": 3,
+					"type": "text"
+				},
+				{
+					"buffer": 3,
+					"file": "LICENSE",
+					"semi_transient": false,
+					"settings":
+					{
+						"buffer_size": 1832,
+						"regions":
+						{
+						},
+						"selection":
+						[
+							[
+								0,
+								0
+							]
+						],
+						"settings":
+						{
+							"side_bar_folders_auto_load_folder": 1,
+							"syntax": "Packages/Text/Plain text.tmLanguage"
+						},
+						"translation.x": 0.0,
+						"translation.y": 0.0,
+						"zoom_level": 1.0
+					},
+					"stack_index": 1,
+					"type": "text"
+				},
+				{
+					"buffer": 4,
+					"file": "/Users/clem/Documents/LambDraw/readme.txt",
+					"semi_transient": false,
+					"settings":
+					{
+						"buffer_size": 466,
+						"regions":
+						{
+						},
+						"selection":
+						[
+							[
+								178,
+								178
+							]
+						],
+						"settings":
+						{
+							"auto_name": "readme.txt",
+							"side_bar_folders_auto_load_folder": 1,
 							"syntax": "Packages/Text/Plain text.tmLanguage"
 						},
 						"translation.x": 0.0,
